@@ -1,26 +1,25 @@
-import React from 'react';
-import logo from './logo.svg';
-import './App.css';
+import { useEffect } from 'react';
+import AppRoutes from './app.routes';
+import { defineValidatorErrorDictionary } from './config/validator/dictionary';
+import { AuthContextProvider } from './hooks/contexts/auth';
+import { ScenarioContextProvider } from './hooks/contexts/scenario';
+import GlobalStyles from './styles/global';
 
-function App() {
-  return (
-    <div className="App">
-      <header className="App-header">
-        <img src={logo} className="App-logo" alt="logo" />
-        <p>
-          Edit <code>src/App.tsx</code> and save to reload.
-        </p>
-        <a
-          className="App-link"
-          href="https://reactjs.org"
-          target="_blank"
-          rel="noopener noreferrer"
-        >
-          Learn React
-        </a>
-      </header>
-    </div>
-  );
+const App = () => {
+    useEffect(() => {
+        defineValidatorErrorDictionary()
+    }, [])
+
+    return (
+        <AuthContextProvider>
+            <ScenarioContextProvider>
+                <div className="App">
+                    <AppRoutes />
+                    <GlobalStyles />
+                </div>
+            </ScenarioContextProvider>
+        </AuthContextProvider>
+    );
 }
 
-export default App;
+export default App
