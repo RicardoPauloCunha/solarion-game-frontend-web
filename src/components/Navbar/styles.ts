@@ -40,7 +40,7 @@ export const Container = styled.nav<ContainerProps>`
             justify-content: space-around;
             transition-duration: 300ms;
 
-            ${({$menuIsOpen}) => $menuIsOpen && css`
+            ${({ $menuIsOpen }) => $menuIsOpen && css`
                 display: flex;
             `}
         }

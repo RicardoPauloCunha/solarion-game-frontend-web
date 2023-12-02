@@ -2,7 +2,7 @@ import { useField } from '@unform/core'
 import { InputHTMLAttributes, useCallback, useEffect, useRef, useState } from 'react'
 import { Container } from './styles'
 
-export interface InputBaseProps extends InputHTMLAttributes<HTMLInputElement> {
+interface InputBaseProps extends InputHTMLAttributes<HTMLInputElement> {
     name: string
     label: string
     placeholder: string

@@ -1,10 +1,30 @@
-import styled, { css } from "styled-components";
+import styled, { css, keyframes } from "styled-components";
 import { RatingTypeEnum } from "../../types/enums/ratingType";
 
-export interface ContainerProps {
+interface ContainerProps {
     size: 'small' | 'large'
     $ratingType: RatingTypeEnum
 }
+
+const RatingInAnimation = keyframes`
+    0%, 30% {
+        opacity: 0;
+    }
+
+    100% {
+        opacity: 1;
+    }
+`;
+
+const ImageInAnimation = keyframes`
+    0%, 49%, 50%, 65% {
+        opacity: 0;
+    }
+
+    100% {
+        opacity: 1;
+    }
+`
 
 export const Container = styled.div<ContainerProps>`
     display: flex;
@@ -12,7 +32,7 @@ export const Container = styled.div<ContainerProps>`
     justify-content: space-between;
     align-items: flex-start;
 
-    >img, >span {
+    >span, >img {
         border-radius: 0.5rem;
         border: solid 0.15rem var(--color-wine);
     }
@@ -44,7 +64,7 @@ export const Container = styled.div<ContainerProps>`
     ${({ size }) => size === 'small' ? css`
         gap: 1rem;
 
-        >img, >span {
+        >span, >img {
             width: 5rem;
             height: 5rem;
         }
@@ -55,7 +75,7 @@ export const Container = styled.div<ContainerProps>`
     ` : css`
         gap: 2rem;
 
-        >img, >span {
+        >span, >img {
             width: calc(100vw - 2rem);
             height: calc(100vw - 2rem);
             max-width: 16rem;
@@ -64,7 +84,12 @@ export const Container = styled.div<ContainerProps>`
         }
 
         >span {
+            animation: ${RatingInAnimation} 1000ms normal 1 ease-in;
             font-size: calc(16rem * 0.5);
+        }
+
+        >img {
+            animation: ${ImageInAnimation} 2000ms normal 1 ease-in;
         }
     `}
 
@@ -72,7 +97,7 @@ export const Container = styled.div<ContainerProps>`
         justify-content: space-around;
 
         ${({ size }) => size === 'small' ? css`
-            >img, >span {
+            >span, >img {
                 width: 7rem;
                 height: 7rem;
             }
@@ -83,12 +108,9 @@ export const Container = styled.div<ContainerProps>`
         ` : css`
             flex-wrap: wrap;
 
-            >img, >span {
+            >span, >img {
                 max-width: 12rem;
                 max-height: 12rem;
-            }
-
-            >img, >span {
                 border-width: 0.25rem;
             }
 
@@ -100,7 +122,7 @@ export const Container = styled.div<ContainerProps>`
 
     @media(max-width: 450px) {
         ${({ size }) => size === 'large' && css`
-            >img, >span {
+            >span, >img {
                 max-width: 8rem;
                 max-height: 8rem;
             }
@@ -113,7 +135,7 @@ export const Container = styled.div<ContainerProps>`
 
     @media(max-width: 320px) {
         ${({ size }) => size === 'large' && css`
-            >img, >span {
+            >span, >img {
                 max-width: calc(100vw - 2rem);
                 max-height: calc(100vw - 2rem);
             }

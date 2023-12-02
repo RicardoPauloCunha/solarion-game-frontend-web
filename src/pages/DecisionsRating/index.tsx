@@ -7,13 +7,14 @@ import PageContainer from "../../components/PageContainer"
 import RatingResult from "../../components/RatingResult"
 import { getAxiosError } from "../../config/axios/error"
 import { createScoreApi } from "../../hooks/api/score"
-import { ScenarioData, getScenarioStorage, removeScenarioStorage, setScenarioStorage } from "../../hooks/storage/scenario"
+import { useAuthContext } from "../../hooks/contexts/auth"
+import { ScenarioData, getScenarioStorage, removeScenarioStorage } from "../../hooks/storage/scenario"
 import { GroupInColumn } from "../../styles/components"
 import { getHeroTypeByDecision } from "../../types/enums/heroType"
 import { RatingTypeEnum, getRatingTypeByDecisions, getRatingTypeEnumValue } from "../../types/enums/ratingType"
 import { DefaultRoutePathEnum } from "../../types/enums/routePath"
-import { useAuthContext } from "../../hooks/contexts/auth"
 import { ScenarioTypeEnum } from "../../types/enums/scenarioType"
+import { Section } from "./styles"
 
 const DecisionsRating = () => {
     const navigate = useNavigate()
@@ -77,35 +78,32 @@ const DecisionsRating = () => {
 
     return (
         <PageContainer>
-            {ratingType !== RatingTypeEnum.None && <RatingResult
-                size="large"
-                ratingType={ratingType}
-            />}
+            {ratingType !== RatingTypeEnum.None && <>
+                <RatingResult
+                    size="large"
+                    ratingType={ratingType}
+                />
 
-            <section>
-                <p>Você terminou o Cenário com nota '{ratingTypeValue}'.</p>
+                <Section>
+                    <p>Você terminou o Cenário com nota '{ratingTypeValue}'.</p>
 
-                {ratingType === RatingTypeEnum.None && <GroupInColumn>
-                    <p>...</p>
-                    <p>Você ainda não terminou o cenário.</p>
-                </GroupInColumn>}
+                    {warning && <WarningCard {...warning} />}
 
-                {warning && <WarningCard {...warning} />}
+                    <GroupInColumn>
+                        <Button
+                            text="Salvar pontuação"
+                            onClick={saveScore}
+                            isLoading={isLoading}
+                        />
 
-                <GroupInColumn>
-                    {ratingType !== RatingTypeEnum.None && <Button
-                        text="Salvar pontuação"
-                        onClick={saveScore}
-                        isLoading={isLoading}
-                    />}
-
-                    <Button
-                        text="Voltar ao início"
-                        variant="outline"
-                        onClick={handleBackHome}
-                    />
-                </GroupInColumn>
-            </section>
+                        <Button
+                            text="Voltar ao início"
+                            variant="outline"
+                            onClick={handleBackHome}
+                        />
+                    </GroupInColumn>
+                </Section>
+            </>}
 
             <SuccessModal
                 isOpen={showModal}

@@ -1,4 +1,5 @@
 import { useState } from "react"
+import { FaBars, FaTimes } from "react-icons/fa"
 import { useAuthContext } from "../../hooks/contexts/auth"
 import { removeTokenStorage } from "../../hooks/storage/token"
 import { DefaultRoutePathEnum } from "../../types/enums/routePath"
@@ -6,7 +7,6 @@ import { UserTypeEnum } from "../../types/enums/userType"
 import NavLogo from "../Logos/NavLogo"
 import Link from "../Typographies/Link"
 import { Container } from "./styles"
-import { FaBars, FaTimes } from "react-icons/fa"
 
 export const Navbar = () => {
     const [menuIsOpen, setMenuIsOpen] = useState(false)

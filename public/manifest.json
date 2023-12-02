@@ -1,25 +1,39 @@
 {
-  "short_name": "React App",
-  "name": "Create React App Sample",
-  "icons": [
-    {
-      "src": "favicon.ico",
-      "sizes": "64x64 32x32 24x24 16x16",
-      "type": "image/x-icon"
+    "id": "/",
+    "dir": "ltr",
+    "lang": "pt-BR",
+    "name": "SolarionGame",
+    "short_name": "SolarionGame",
+    "description": "Solarion Chronicles: The Game, uma aventura estilo 'visual novel' baseado em um evento presente no jogo 'Stardew Valley'.",
+    "scope": "/",
+    "start_url": ".",
+    "icons": [
+        {
+            "src": "favicon.ico",
+            "sizes": "64x64 32x32 24x24 16x16",
+            "type": "image/x-icon"
+        },
+        {
+            "src": "logo192.png",
+            "type": "image/png",
+            "sizes": "192x192"
+        },
+        {
+            "src": "logo512.png",
+            "type": "image/png",
+            "sizes": "512x512"
+        }
+    ],
+    "display": "minimal-ui",
+    "display_override": [
+        "standalone"
+    ],
+    "orientation": "any",
+    "theme_color": "#5B191E",
+    "background_color": "#282828",
+    "launch_handler": {
+        "client_mode": "auto"
     },
-    {
-      "src": "logo192.png",
-      "type": "image/png",
-      "sizes": "192x192"
-    },
-    {
-      "src": "logo512.png",
-      "type": "image/png",
-      "sizes": "512x512"
-    }
-  ],
-  "start_url": ".",
-  "display": "standalone",
-  "theme_color": "#000000",
-  "background_color": "#ffffff"
+    "edge_side_panel": {},
+    "prefer_related_applications": false
 }

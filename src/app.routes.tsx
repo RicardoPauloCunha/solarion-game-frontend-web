@@ -1,19 +1,19 @@
 import { useEffect } from "react"
-import { Route, Routes, useLocation, useNavigate } from "react-router-dom"
+import { Route, Routes, useLocation } from "react-router-dom"
 import { useAuthContext } from "./hooks/contexts/auth"
 import { getTokenStorage } from "./hooks/storage/token"
+import DecisionsRating from "./pages/DecisionsRating"
 import Home from "./pages/Home"
 import Login from "./pages/Login"
 import MyScores from "./pages/MyScores"
+import NotFound from "./pages/NotFound"
 import Profile from "./pages/Profile"
 import RecoverPassword from "./pages/RecoverPassword"
 import RegisterAccount from "./pages/RegisterAccount"
+import Scenario from "./pages/Scenario"
 import Scores from "./pages/Scores"
 import { DefaultRoutePathEnum } from "./types/enums/routePath"
 import { UserTypeEnum } from "./types/enums/userType"
-import NotFound from "./pages/NotFound"
-import Scenario from "./pages/Scenario"
-import DecisionsRating from "./pages/DecisionsRating"
 
 const AppRoutes = () => {
 	const location = useLocation()

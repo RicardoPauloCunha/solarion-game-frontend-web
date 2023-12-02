@@ -34,11 +34,11 @@ export default createGlobalStyle`
         padding: 1rem;
 
         >div#root >div.App {
-            gap: 8rem;
+            gap: 4rem;
             display: flex;
             flex-direction: column;
             align-items: center;
-            margin-bottom: 8rem;
+            margin-bottom: 2rem;
 
             >img {
                 width: 100%;

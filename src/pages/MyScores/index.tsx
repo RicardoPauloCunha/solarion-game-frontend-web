@@ -12,8 +12,8 @@ import { getDecisionTypeEnumValue } from "../../types/enums/decisionType"
 import { getHeroTypeByDecision, getHeroTypeEnumValue } from "../../types/enums/heroType"
 import { getRatingTypeByDecisions, getRatingTypeEnumValue } from "../../types/enums/ratingType"
 import { DefaultRoutePathEnum } from "../../types/enums/routePath"
-import { formatDateToString } from "../../utils/dateFormat"
 import { ScenarioTypeEnum } from "../../types/enums/scenarioType"
+import { formatDateToString } from "../../utils/dateFormat"
 
 enum LoadingEnum {
     None = 0,

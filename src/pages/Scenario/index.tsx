@@ -1,5 +1,6 @@
 import { useEffect, useState } from "react"
 import { useNavigate } from "react-router-dom"
+import CH1TableImg from '../../assets/images/ch1-table.png'
 import DecisionButton from "../../components/Buttons/DecisionButton"
 import NextIcon from "../../components/Icons/NextIcon"
 import PageContainer from "../../components/PageContainer"
@@ -8,16 +9,20 @@ import { getScenarioStorage, setScenarioStorage } from "../../hooks/storage/scen
 import { DecisionTypeEnum, listDecisionByScenario } from "../../types/enums/decisionType"
 import { DefaultRoutePathEnum } from "../../types/enums/routePath"
 import { ScenarioTypeEnum, getNextScenarioType, getScenarioTypeEnumValue, getScenarioTypeImage } from "../../types/enums/scenarioType"
+import { delay } from "../../utils/timer"
+import { Image, ImageAnimationEnum, Section, TextAnimationEnum } from './styles'
 
 const Scenario = () => {
     const navigate = useNavigate()
 
     const [scenarioType, setScenarioType] = useState(ScenarioTypeEnum.None)
-    const [img, setImg] = useState('')
-    const [text, setText] = useState('...')
-    const [hasDecisions, setHasDecisions] = useState(true)
-    const [decisions, setDecisions] = useState<DecisionViewModel[]>([])
     const [selectedDecisionTypes, setSelectedDecisionTypes] = useState<DecisionTypeEnum[]>([])
+    const [img, setImg] = useState(CH1TableImg)
+    const [text, setText] = useState('')
+    const [decisions, setDecisions] = useState<DecisionViewModel[]>([])
+    const [hasDecisions, setHasDecisions] = useState(true)
+    const [imageAnimation, setImageAnimation] = useState(ImageAnimationEnum.None)
+    const [textAnimation, setTextAnimation] = useState(TextAnimationEnum.None)
 
     useEffect(() => {
         getLastScenario()
@@ -47,9 +52,26 @@ const Scenario = () => {
         }
     }
 
-    const defineScene = (scenarioType: ScenarioTypeEnum) => {
+    const defineScene = async (scenarioType: ScenarioTypeEnum) => {
+        setTextAnimation(TextAnimationEnum.Out)
+
         setScenarioType(scenarioType)
-        setImg(getScenarioTypeImage(scenarioType))
+
+        let nextImg = getScenarioTypeImage(scenarioType)
+
+        if (nextImg !== img) {
+            await delay(500)
+            setImageAnimation(ImageAnimationEnum.OutToIn)
+            await delay(1000)
+
+            setImg(nextImg)
+
+            await delay(500)
+        }
+
+        await delay(500)
+        setTextAnimation(TextAnimationEnum.In)
+
         setText(getScenarioTypeEnumValue(scenarioType))
         setDecisions(listDecisionByScenario(scenarioType))
     }
@@ -68,20 +90,26 @@ const Scenario = () => {
         defineScene(type)
     }
 
-    const handleNextScene = (decisionType?: DecisionTypeEnum) => {
+    const handleNextScene = async (decisionType?: DecisionTypeEnum) => {
         if (scenarioType === ScenarioTypeEnum.CH8_AC3)
             decisionType = selectedDecisionTypes[0]
 
         let nextType = getNextScenarioType(scenarioType, decisionType)
 
         if (nextType === ScenarioTypeEnum.Finished) {
+            setTextAnimation(TextAnimationEnum.Out)
+
+            await delay(500)
+            setImageAnimation(ImageAnimationEnum.Out)
+            await delay(1000)
+
             saveScenario(nextType)
 
             navigate(DefaultRoutePathEnum.DecisionsRating)
         }
         else {
+            window.scrollTo(0, 0)
             defineScene(nextType)
-    		window.scrollTo(0, 0)
         }
     }
 
@@ -91,17 +119,35 @@ const Scenario = () => {
         handleNextScene(decisionType)
     }
 
+    const handleImageAnimationEnd = () => {
+        if (imageAnimation === ImageAnimationEnum.Out)
+            return
+
+        setImageAnimation(ImageAnimationEnum.None)
+    }
+
+    const handleTextAnimationEnd = () => {
+        if (textAnimation === TextAnimationEnum.Out)
+            return
+
+        setTextAnimation(TextAnimationEnum.None)
+    }
+
     return (
         <PageContainer>
-            <img
-                className="stylized-margin"
+            <Image
                 src={img}
+                className="stylized-margin"
                 alt="Imagem do cenário do capítulo atual."
+                $imageAnimation={imageAnimation}
+                onAnimationEnd={handleImageAnimationEnd}
             />
 
-            <section
+            {text && <Section
                 onClick={hasDecisions ? undefined : () => handleNextScene()}
                 className={hasDecisions ? '' : 'select-cursor-pointer'}
+                $textAnimation={textAnimation}
+                onAnimationEnd={handleTextAnimationEnd}
             >
                 <p>{text}</p>
 
@@ -117,7 +163,7 @@ const Scenario = () => {
                     </div>
                     : <NextIcon />
                 }
-            </section>
+            </Section>}
         </PageContainer>
     )
 }

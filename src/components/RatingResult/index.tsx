@@ -5,7 +5,7 @@ import CatDImg from '../../assets/images/cat-d.png'
 import { RatingTypeEnum, getRatingTypeEnumValue } from "../../types/enums/ratingType"
 import { Container } from "./styles"
 
-export interface RatingResultProps {
+interface RatingResultProps {
     size: 'small' | 'large'
     ratingType: RatingTypeEnum
 }
