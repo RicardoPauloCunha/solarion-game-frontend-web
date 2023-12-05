@@ -3,82 +3,80 @@ import { Form } from "@unform/web"
 import { useEffect, useRef, useState } from "react"
 import * as Yup from 'yup'
 import Button from "../../components/Buttons/Button"
-import ScoreCard from "../../components/Cards/ScoreCard"
 import WarningCard, { WarningData } from "../../components/Cards/WarningCard"
-import Checkbox, { OptionData } from "../../components/Inputs/Checkbox"
+import BarChart from "../../components/Charts/BarChart"
+import LineChart from "../../components/Charts/LineChart"
+import PieChart from "../../components/Charts/PieChart"
 import Input from "../../components/Inputs/Input"
 import Select from "../../components/Inputs/Select"
 import LoadingText from "../../components/Loading/LoadingText"
 import PageContainer from "../../components/PageContainer"
 import Toggle from "../../components/Toggle"
-import Link from "../../components/Typographies/Link"
 import { getSchemaError } from "../../config/validator/methods"
 import { endDateSchema, startDateSchema } from "../../config/validator/schemas"
-import { ListAllScoresParams, ScoreViewModel, listAllScoresApi } from "../../hooks/api/score"
+import { GetScoreIndicatorsApi, GetScoreIndicatorsParams, ScoreIndicatorsViewModel } from "../../hooks/api/score"
 import { GroupInColumn } from "../../styles/components"
-import { listHeroTypeOptions } from "../../types/enums/heroType"
-import { listRatingTypeOptions } from "../../types/enums/ratingType"
-import { DefaultRoutePathEnum } from "../../types/enums/routePath"
 import { LastMonthsTypeEnum, listLastMonthsTypeOptions } from "../../types/enums/lastMonthsType"
 
-interface ScoreFilterFormData {
-    ratingTypes: number[]
-    heroTypes: number[]
+interface DashboardFilterFormData {
     lastMonths: number
     startDate: Date | null
     endDate: Date | null
 }
 
-const Scores = () => {
+const ADVENTURE_COLORS = [
+    'var(--color-wine)'
+]
+const HERO_COLORS = [
+    'var(--color-gray)',
+    'var(--color-light-wine)',
+    'var(--color-green)',
+]
+const RATING_COLORS = [
+    'var(--color-yellow)',
+    'var(--color-pink)',
+    'var(--color-blue)',
+    'var(--color-cyan)',
+]
+
+const Dashboard = () => {
     const formRef = useRef<FormHandles>(null)
 
     const [isLoading, setIsLoading] = useState(false)
     const [warning, setWarning] = useState<WarningData | undefined>(undefined)
-    const [hasMore, setHasMore] = useState(false)
     const [hasDateInput, setHasDateInput] = useState(false)
-    const [scores, setScores] = useState<ScoreViewModel[]>([])
-    const [scoreFilter, setScoreFilter] = useState<ListAllScoresParams>({})
+    const [indicatorsFilter, setIndicatorsFilter] = useState<GetScoreIndicatorsParams>({})
+    const [scoreIndicators, setScoreIndicators] = useState<ScoreIndicatorsViewModel | undefined>(undefined)
 
-    const ratingTypesOptions = listRatingTypeOptions()
-    const heroTypesOptions = listHeroTypeOptions()
     const lastMonthsOptions = listLastMonthsTypeOptions()
 
     useEffect(() => {
-        getScoresData()
+        getIndicatorsData()
     }, [])
 
-    const getScoresData = async (filter?: ListAllScoresParams, reset?: boolean) => {
+    const getIndicatorsData = async (filter?: GetScoreIndicatorsParams) => {
         setIsLoading(true)
 
         if (!filter)
-            filter = scoreFilter
+            filter = indicatorsFilter
 
         if (filter.lastMonths === LastMonthsTypeEnum.Custom && !hasDateInput)
             filter.lastMonths = undefined
 
-        filter.page = reset ? 0 : scores[scores.length - 1]?.scoreId
+        await GetScoreIndicatorsApi(filter).then(response => {
+            setScoreIndicators(response)
 
-        await listAllScoresApi(filter).then(response => {
-            setScores(reset ? [...response] : [...scores, ...response])
-
-            let more = response.length !== 0 && response.length % 10 === 0
-
-            setHasMore(more)
-            setScoreFilter(filter as ListAllScoresParams)
+            setIndicatorsFilter(filter as GetScoreIndicatorsParams)
             setIsLoading(false)
         }).catch(() => { })
     }
 
-    const submitFilterForm: SubmitHandler<ScoreFilterFormData> = async (data) => {
+    const submitFilterForm: SubmitHandler<DashboardFilterFormData> = async (data) => {
         try {
             setWarning(undefined)
             formRef.current?.setErrors({})
 
             const shema = Yup.object().shape({
-                ratingTypes: Yup.array()
-                    .of(Yup.string()),
-                heroTypes: Yup.array()
-                    .of(Yup.string()),
                 lastMonths: Yup.string()
             })
 
@@ -100,18 +98,14 @@ const Scores = () => {
 
                 await subShema.validate(data, { abortEarly: false })
             }
-            
-            data.ratingTypes = data.ratingTypes.map(x => Number(x))
-            data.heroTypes = data.heroTypes.map(x => Number(x))
+
             data.lastMonths = data.lastMonths ? Number(data.lastMonths) : 0
 
-            await getScoresData({
-                ratingTypes: data.ratingTypes,
-                heroTypes: data.heroTypes,
+            await getIndicatorsData({
                 lastMonths: data.lastMonths,
                 startDate: data.startDate,
                 endDate: data.endDate
-            }, true)
+            })
         } catch (error) {
             let schemaError = getSchemaError(error)
 
@@ -122,7 +116,7 @@ const Scores = () => {
     }
 
     const handleCleanFilter = () => {
-        setScoreFilter({})
+        setIndicatorsFilter({})
 
         formRef.current?.reset()
     }
@@ -136,7 +130,7 @@ const Scores = () => {
     return (
         <PageContainer>
             <section>
-                <h1>Todas as pontuações</h1>
+                <h1>Dashboard</h1>
 
                 <Toggle
                     text="Filtros"
@@ -146,25 +140,11 @@ const Scores = () => {
                         ref={formRef}
                         onSubmit={submitFilterForm}
                         initialData={{
-                            ratingTypes: scoreFilter.ratingTypes?.map(x => `${x}`),
-                            heroTypes: scoreFilter.heroTypes?.map(x => `${x}`),
-                            lastMonths: `${scoreFilter.lastMonths}`,
-                            startDate: scoreFilter.startDate,
-                            endDate: scoreFilter.endDate
+                            lastMonths: `${indicatorsFilter.lastMonths}`,
+                            startDate: indicatorsFilter.startDate,
+                            endDate: indicatorsFilter.endDate
                         }}
                     >
-                        <Checkbox
-                            name="ratingTypes"
-                            label="Escolha as notas"
-                            options={ratingTypesOptions}
-                        />
-
-                        <Checkbox
-                            name="heroTypes"
-                            label="Escolha as classes"
-                            options={heroTypesOptions}
-                        />
-
                         <Select
                             name="lastMonths"
                             label="Período"
@@ -209,41 +189,41 @@ const Scores = () => {
 
                 <LoadingText
                     defaultText=""
-                    loadingText="Carregando lista de pontuações..."
+                    loadingText="Carregando indicadores..."
                     isLoading={isLoading}
                 />
             </section>
 
-            <article className="list-cards">
-                {scores.map(x => (
-                    <ScoreCard
-                        key={x.scoreId}
-                        data={x}
+            {scoreIndicators && <>
+                {scoreIndicators.adventuresChart && <section>
+                    <h2>Quantidade de aventuras</h2>
+
+                    <LineChart
+                        colors={ADVENTURE_COLORS}
+                        chart={scoreIndicators.adventuresChart}
                     />
-                ))}
+                </section>}
 
-                {scores.length === 0 && !isLoading && <WarningCard
-                    title="Nenhuma pontuação encontrada"
-                    message="Nenhuma pontuação dos usuários foram encontradas."
-                    variant="info"
-                />}
-            </article>
+                {scoreIndicators.heroCharts.length !== 0 && <section>
+                    <h2>Seleção de classes</h2>
 
-            {hasMore && <section>
-                <LoadingText
-                    defaultText=""
-                    loadingText="Carregando mais pontuações..."
-                    isLoading={isLoading}
-                />
+                    <PieChart
+                        colors={HERO_COLORS}
+                        charts={scoreIndicators.heroCharts}
+                    />
+                </section>}
 
-                {!isLoading && <Link
-                    text="Exibir mais"
-                    to={DefaultRoutePathEnum.Scores}
-                    onClick={() => getScoresData()}
-                />}
-            </section>}
+                {scoreIndicators.ratingCharts.length !== 0 && <section>
+                    <h2>Pontuações obtidas</h2>
+
+                    <BarChart
+                        colors={RATING_COLORS}
+                        charts={scoreIndicators.ratingCharts}
+                    />
+                </section>}
+            </>}
         </PageContainer>
     )
 }
 
-export default Scores
+export default Dashboard

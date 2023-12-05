@@ -1,37 +1,28 @@
 import { useField } from '@unform/core'
-import { InputHTMLAttributes, useCallback, useEffect, useRef, useState } from 'react'
+import { useCallback, useEffect, useRef, useState } from 'react'
+import { CheckboxProps } from '../Checkbox'
 import { Container } from './styles'
 
-export interface OptionData {
-	label: string
-	value: string
-	disabled?: boolean
+interface RadioProps extends CheckboxProps {
+
 }
 
-export interface CheckboxProps extends InputHTMLAttributes<HTMLInputElement> {
-	name: string
-	label: string
-	disabled?: boolean
-	onChangeValue?: (value: string) => void
-	options: OptionData[]
-}
-
-const Checkbox = ({
+const Radio = ({
 	name,
 	label,
 	disabled,
 	onChangeValue,
 	options,
-}: CheckboxProps) => {
+}: RadioProps) => {
 	const inputsRef = useRef<HTMLInputElement[]>([])
-	const { fieldName, registerField, defaultValue = [], error, clearError } = useField(name)
+	const { fieldName, registerField, defaultValue = '', error, clearError } = useField(name)
 
 	const [hasError, setHasError] = useState(false)
 
 	useEffect(() => {
 		if (inputsRef.current && defaultValue) {
 			inputsRef.current.forEach(x => {
-				if (defaultValue.includes(x?.value))
+				if (x?.value === defaultValue)
 					x.checked = true
 			})
 		}
@@ -42,13 +33,16 @@ const Checkbox = ({
 			name: fieldName,
 			ref: inputsRef.current,
 			getValue: (refs: HTMLInputElement[]) => {
-				return refs
-					.filter(x => x.checked)
-					.map(x => `${x.value}`)
+				let option = refs.find(x => x?.checked)
+
+				if (!option)
+					return ''
+
+				return option.value
 			},
-			setValue: (refs: HTMLInputElement[], values: string[]) => {
+			setValue: (refs: HTMLInputElement[], value: string) => {
 				refs.forEach(x => {
-					if (values.includes(x.value))
+					if (x.value === value)
 						x.checked = true
 				})
 
@@ -92,7 +86,7 @@ const Checkbox = ({
 					{x.label}
 
 					<input
-						type="checkbox"
+						type="radio"
 						id={`${name}-${x.value}`}
 						ref={y => {
 							inputsRef.current[index] = y as HTMLInputElement
@@ -112,4 +106,4 @@ const Checkbox = ({
 	)
 }
 
-export default Checkbox
+export default Radio

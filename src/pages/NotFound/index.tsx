@@ -7,7 +7,7 @@ const NotFound = () => {
             <img
                 className="stylized-margin"
                 src={NotFoundImg}
-                alt="Usuário: '?', Servidor: '...', Imagem para amenizar a página não encontrada."
+                alt="Reação da Raeliana ao receber a informação (The Reason Why Raeliana Ended Up at the Duke's Mansion)."
             />
 
             <section>

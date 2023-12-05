@@ -138,7 +138,7 @@ const Scenario = () => {
             <Image
                 src={img}
                 className="stylized-margin"
-                alt="Imagem do cenário do capítulo atual."
+                alt="Cenários do jogo 'Solarion Chronicles: The Game' no evento do Sebastian (Stardew Valley)."
                 $imageAnimation={imageAnimation}
                 onAnimationEnd={handleImageAnimationEnd}
             />

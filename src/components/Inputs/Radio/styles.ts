@@ -17,6 +17,7 @@ export const Container = styled.fieldset<ContainerProps>`
         padding-left: 2rem;
         position: relative;
         cursor: pointer;
+        user-select: none;
 
         >input {
             cursor: pointer;
@@ -31,23 +32,22 @@ export const Container = styled.fieldset<ContainerProps>`
             width: 1.5rem;
             background-color: var(--color-white);
             border: solid 0.15rem var(--color-wine);
-            border-radius: 0.25rem;
+            border-radius: 50%;
             transition-duration: 300ms;
+            display: flex;
+            justify-content: center;
+            align-items: center;
             position: absolute;
             top: 0;
             left: 0;
 
             &:after {
                 content: "";
-                position: absolute;
                 display: none;
-                left: 0.45rem;
-                top: 0.15rem;
-                width: 0.45rem;
-                height: 0.75rem;
-                border: solid var(--color-white);
-                border-width: 0 3px 3px 0;
-                transform: rotate(45deg);
+                width: 0.5rem;
+                height: 0.5rem;
+                border-radius: 50%;
+                background-color: var(--color-white);
             }
         }
 

@@ -1,11 +1,11 @@
 import styled, { css } from "styled-components";
+import { InputContainerProps } from "../Input/styles";
 
-export interface InputContainerProps {
-    $hasError: boolean
-    $isDisabled?: boolean
+interface ContainerProps extends InputContainerProps {
+
 }
 
-export const Container = styled.fieldset<InputContainerProps>`
+export const Container = styled.fieldset<ContainerProps>`
     width: 100%;
     display: flex;
     flex-direction: column;
@@ -15,13 +15,15 @@ export const Container = styled.fieldset<InputContainerProps>`
         margin-bottom: 0;
     }
 
-    >input {
+    >textarea {
         background-color: var(--color-white);
         padding: 0.5rem 1rem;
         border-radius: 1rem;
         border: 0.15rem solid var(--color-wine);
         color: var(--color-dark-gray);
         font-size: 1rem;
+        resize: none;
+        overflow: hidden;
 
         &:focus {
             outline-style: solid;
@@ -46,7 +48,7 @@ export const Container = styled.fieldset<InputContainerProps>`
     `}
 
     ${({ $isDisabled }) => $isDisabled && css`
-        >input {
+        >textarea {
             background-color: var(--color-light-gray);
         }
     `}

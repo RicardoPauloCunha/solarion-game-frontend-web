@@ -14,6 +14,7 @@ import Scenario from "./pages/Scenario"
 import Scores from "./pages/Scores"
 import { DefaultRoutePathEnum } from "./types/enums/routePath"
 import { UserTypeEnum } from "./types/enums/userType"
+import Dashboard from "./pages/Dashboard"
 
 const AppRoutes = () => {
 	const location = useLocation()
@@ -56,6 +57,7 @@ const AppRoutes = () => {
 
 			{loggedUser?.userType === UserTypeEnum.Admin && <>
 				<Route path={DefaultRoutePathEnum.Scores} element={<Scores />} />
+				<Route path={DefaultRoutePathEnum.Dashboard} element={<Dashboard />} />
 			</>}
 		</Routes>
 	)

@@ -18,15 +18,12 @@ const Select = ({
 	...rest
 }: SelectProps) => {
 	const inputRef = useRef<any>(null)
-
 	const { fieldName, registerField, defaultValue = '', error, clearError } = useField(name)
 
 	const [hasError, setHasError] = useState(false)
-	const [isFilled, setIsFilled] = useState(false)
-	const [isFocused, setIsFocused] = useState(false)
 
 	useEffect(() => {
-		if (inputRef?.current) {
+		if (inputRef.current && defaultValue) {
 			const selected = inputRef.current.props?.options?.find((x: any) => x?.value === defaultValue)
 
 			if (selected)
@@ -45,21 +42,17 @@ const Select = ({
 				return ref.state.selectValue[0].value
 			},
 			setValue: (ref, value) => {
-				if (ref && value) {
-					const selected = ref.props?.options?.find((x: any) => x?.value === value)
+				const selected = ref.props?.options?.find((x: any) => x?.value === value)
 
-					if (selected)
-						ref.setValue(selected)
+				if (selected)
+					ref.setValue(selected)
 
-					clearError()
-				}
+				clearError()
 			},
 			clearValue(ref) {
-				if (ref) {
-					ref.setValue('')
+				ref.setValue('')
 
-					clearError()
-				}
+				clearError()
 			},
 		})
 	}, [fieldName, registerField])
@@ -67,16 +60,6 @@ const Select = ({
 	useEffect(() => {
 		setHasError(!!error)
 	}, [error])
-
-	const handleFocus = useCallback(() => {
-		setIsFocused(true)
-		setHasError(false)
-	}, [])
-
-	const handleBlur = useCallback(() => {
-		setIsFocused(false)
-		setIsFilled(!!inputRef?.current?.state?.selectValue[0]?.value)
-	}, [])
 
 	const handleChangeValue = useCallback((e: any) => {
 		let value = `${e?.value}`
@@ -90,8 +73,6 @@ const Select = ({
 	return (
 		<Container
 			$hasError={hasError}
-			$isFilled={isFilled}
-			$isFocused={isFocused}
 			$isDisabled={!!isDisabled}
 		>
 			<label htmlFor={name}>{label}</label>
@@ -101,8 +82,6 @@ const Select = ({
 				ref={inputRef}
 				name={name}
 				isDisabled={isDisabled}
-				onBlur={handleBlur}
-				onFocus={handleFocus}
 				onChange={handleChangeValue}
 				styles={selectStyles}
 				{...rest}

@@ -13,7 +13,7 @@ import { getDecisionTypeEnumValue } from "../../types/enums/decisionType"
 import { getHeroTypeByDecision, getHeroTypeEnumValue } from "../../types/enums/heroType"
 import { DefaultRoutePathEnum } from "../../types/enums/routePath"
 import { ScenarioTypeEnum } from "../../types/enums/scenarioType"
-import { formatDateToString } from "../../utils/dateFormat"
+import { formatDateToString } from "../../utils/date"
 
 const Home = () => {
     const navigate = useNavigate()
@@ -76,7 +76,7 @@ const Home = () => {
             <img
                 className="stylized-margin"
                 src={CH1TableImg}
-                alt="Mesa com RPG 'Solarion Chronicles: The Game' (Stardew Valley)."
+                alt="Mesa com jogo 'Solarion Chronicles: The Game' no quarto do Sebastian (Stardew Valley)."
             />
 
             <section>

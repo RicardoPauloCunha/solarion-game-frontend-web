@@ -57,3 +57,31 @@ export const listAllScoresApi = async (params: ListAllScoresParams): Promise<Sco
     let { data } = await getParams<ListAllScoresParams, ScoreViewModel[]>(root + 'all', params)
     return data
 }
+
+export interface ChartViewModel {
+    description: string
+    totalValue: number
+    values?: ChartValueViewModel[]
+}
+
+interface ChartValueViewModel {
+    column: string
+    value: number
+}
+
+export interface ScoreIndicatorsViewModel {
+    adventuresChart: ChartViewModel
+    heroCharts: ChartViewModel[]
+    ratingCharts: ChartViewModel[]
+}
+
+export interface GetScoreIndicatorsParams {
+    lastMonths?: number
+    startDate?: Date | null
+    endDate?: Date | null
+}
+
+export const GetScoreIndicatorsApi = async (params: GetScoreIndicatorsParams): Promise<ScoreIndicatorsViewModel> => {
+    let { data } = await getParams<GetScoreIndicatorsParams, ScoreIndicatorsViewModel>(root + 'all/indicators', params)
+    return data
+}

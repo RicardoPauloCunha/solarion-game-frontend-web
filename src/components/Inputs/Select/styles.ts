@@ -26,7 +26,7 @@ export const Container = styled.fieldset<ContainerProps>`
     `}
 
     ${({ $isDisabled }) => $isDisabled && css`
-        input {
+        >input {
             background-color: var(--color-light-gray);
         }
     `}
