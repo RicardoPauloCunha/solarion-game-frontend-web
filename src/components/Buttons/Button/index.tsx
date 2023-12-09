@@ -1,4 +1,4 @@
-import LoadingText from "../../Loading/LoadingText"
+import LoadingText from "../../Loadings/LoadingText"
 import { ButtonVariant, Container } from "./styles"
 
 interface ButtonProps {
@@ -6,6 +6,7 @@ interface ButtonProps {
     type?: 'button' | "submit"
     variant?: ButtonVariant
     isLoading?: boolean
+    disabled?: boolean
     onClick?: () => void
 }
 
@@ -14,20 +15,22 @@ const Button = ({
     type = 'button',
     variant = 'default',
     isLoading,
+    disabled,
     onClick
 }: ButtonProps) => {
     return (
         <Container
             type={type}
             onClick={onClick}
-            disabled={isLoading}
+            disabled={isLoading || disabled}
             $variant={variant}
             $isLoading={isLoading}
+            $isDisabled={disabled}
             className="click-animation"
         >
             <LoadingText
-                defaultText={text}
                 isLoading={!!isLoading}
+                defaultText={text}
             />
         </Container>
     )

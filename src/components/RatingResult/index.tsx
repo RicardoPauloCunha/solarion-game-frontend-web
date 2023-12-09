@@ -3,10 +3,10 @@ import CatBImg from '../../assets/images/cat-b.png'
 import CatCImg from '../../assets/images/cat-c.png'
 import CatDImg from '../../assets/images/cat-d.png'
 import { RatingTypeEnum, getRatingTypeEnumValue } from "../../types/enums/ratingType"
-import { Container } from "./styles"
+import { Container, RatingSize } from "./styles"
 
 interface RatingResultProps {
-    size: 'small' | 'large'
+    size: RatingSize
     ratingType: RatingTypeEnum
 }
 

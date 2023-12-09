@@ -6,9 +6,9 @@ import NextIcon from "../../components/Icons/NextIcon"
 import PageContainer from "../../components/PageContainer"
 import { DecisionViewModel } from "../../hooks/api/score"
 import { getScenarioStorage, setScenarioStorage } from "../../hooks/storage/scenario"
-import { DecisionTypeEnum, listDecisionByScenario } from "../../types/enums/decisionType"
+import { DecisionTypeEnum } from "../../types/enums/decisionType"
 import { DefaultRoutePathEnum } from "../../types/enums/routePath"
-import { ScenarioTypeEnum, getNextScenarioType, getScenarioTypeEnumValue, getScenarioTypeImage } from "../../types/enums/scenarioType"
+import { ScenarioTypeEnum, getNextScenarioType, getScenarioTypeEnumValue, getScenarioTypeImage, listDecisionByScenario } from "../../types/enums/scenarioType"
 import { delay } from "../../utils/timer"
 import { Image, ImageAnimationEnum, Section, TextAnimationEnum } from './styles'
 

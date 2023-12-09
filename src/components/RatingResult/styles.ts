@@ -1,8 +1,10 @@
-import styled, { css, keyframes } from "styled-components";
-import { RatingTypeEnum } from "../../types/enums/ratingType";
+import styled, { css, keyframes } from "styled-components"
+import { RatingTypeEnum } from "../../types/enums/ratingType"
+
+export type RatingSize = 'small' | 'large'
 
 interface ContainerProps {
-    size: 'small' | 'large'
+    size: RatingSize
     $ratingType: RatingTypeEnum
 }
 
@@ -14,7 +16,7 @@ const RatingInAnimation = keyframes`
     100% {
         opacity: 1;
     }
-`;
+`
 
 const ImageInAnimation = keyframes`
     0%, 49%, 50%, 65% {
@@ -34,7 +36,7 @@ export const Container = styled.div<ContainerProps>`
 
     >span, >img {
         border-radius: 0.5rem;
-        border: solid 0.15rem var(--color-wine);
+        border: 0.15rem solid var(--color-wine);
     }
 
     >span {
@@ -68,7 +70,7 @@ export const Container = styled.div<ContainerProps>`
             width: 5rem;
             height: 5rem;
         }
-        
+
         >span {
             font-size: calc(5rem * 0.5);
         }
@@ -101,7 +103,7 @@ export const Container = styled.div<ContainerProps>`
                 width: 7rem;
                 height: 7rem;
             }
-            
+
             >span {
                 font-size: calc(7rem * 0.5);
             }

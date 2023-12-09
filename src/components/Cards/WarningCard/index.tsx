@@ -1,6 +1,6 @@
-import { FaQuestionCircle, FaTimesCircle } from 'react-icons/fa'
+import { FaInfoCircle, FaTimesCircle } from 'react-icons/fa'
 import Toggle from "../../Toggle"
-import DotList from "../../Typographies/DotList"
+import BulletList from "../../Typographies/BulletList"
 import { Container, WarningVariant } from "./styles"
 
 export interface WarningData {
@@ -25,7 +25,7 @@ const WarningCard = ({
             $variant={variant}
         >
             <strong>
-                {variant === 'info' && <FaQuestionCircle />}
+                {variant === 'info' && <FaInfoCircle />}
                 {variant === 'error' && <FaTimesCircle />}
                 {title}
             </strong>
@@ -35,7 +35,7 @@ const WarningCard = ({
             {submessages && submessages.length !== 0 && <Toggle
                 text='Detalhes'
             >
-                <DotList
+                <BulletList
                     items={submessages}
                 />
             </Toggle>}

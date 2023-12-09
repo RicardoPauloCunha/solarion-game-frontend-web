@@ -1,5 +1,5 @@
-import { Link } from "react-router-dom";
-import styled from "styled-components";
+import { Link } from "react-router-dom"
+import styled from "styled-components"
 
 export const Container = styled(Link)`
     color: var(--color-wine);
@@ -11,4 +11,4 @@ export const Container = styled(Link)`
         text-decoration: none;
         color: var(--color-wine);
     }
-`;
+`

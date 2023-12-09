@@ -13,7 +13,7 @@ export const Container = styled.div<ContainerProps>`
     gap: 0.5rem;
     padding: 1rem;
     border-radius: 0.5rem;
-    border: solid 0.25rem var(--color-white);
+    border: 0.25rem solid var(--color-white);
     background-color: var(--color-white);
 
     >p {
@@ -29,16 +29,16 @@ export const Container = styled.div<ContainerProps>`
 
     ${({ $variant }) => $variant === 'info' && css`
         border-color: var(--color-gray);
-        
-        >strong:first-of-type, >svg {
+
+        >strong:first-of-type>svg {
             color: var(--color-gray);
         }
     `}
 
     ${({ $variant }) => $variant === 'error' && css`
         border-color: var(--color-red);
-        
-        >strong:first-of-type, >svg {
+
+        >strong:first-of-type>svg {
             color: var(--color-red);
         }
     `}

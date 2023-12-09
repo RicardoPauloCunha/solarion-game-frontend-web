@@ -1,7 +1,7 @@
-import { GroupInColumn } from "../../../styles/components"
 import Button from "../../Buttons/Button"
 import WarningCard, { WarningData } from "../../Cards/WarningCard"
-import DotList from "../../Typographies/DotList"
+import VerticalGroup from "../../Groups/VerticalGroup"
+import BulletList from "../../Typographies/BulletList"
 import Modal from "../Modal"
 import { SuccessModalProps } from "../SuccessModal"
 
@@ -28,13 +28,13 @@ const DeleteModal = ({
             onClose={onClose}
             title={title}
         >
-            <GroupInColumn>
+            <VerticalGroup>
                 {messages.map((x, index) => (
                     <p key={index}>{x}</p>
                 ))}
-            </GroupInColumn>
+            </VerticalGroup>
 
-            <DotList
+            <BulletList
                 items={values}
                 variant="bold"
             />

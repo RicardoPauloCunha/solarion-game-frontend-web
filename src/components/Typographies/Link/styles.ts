@@ -1,5 +1,5 @@
-import { Link } from "react-router-dom";
-import styled from "styled-components";
+import { Link } from "react-router-dom"
+import styled from "styled-components"
 
 export const Container = styled(Link)`
     padding-bottom: 0.1rem;
@@ -12,4 +12,4 @@ export const Container = styled(Link)`
     &:hover {
         color: var(--color-wine);
     }
-`;
+`

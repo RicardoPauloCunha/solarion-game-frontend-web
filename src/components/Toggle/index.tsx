@@ -1,11 +1,11 @@
-import React, { useEffect, useState } from 'react'
+import React, { useState } from 'react'
 import ToggleIcon from '../Icons/ToggleIcon'
 import { Container } from './styles'
 
 interface ToggleProps {
     text: string
     isOpenDefault?: boolean
-    closeOnChange?: boolean
+    onOpen?: () => void
     preview?: React.ReactNode
     children: React.ReactNode
 }
@@ -13,19 +13,19 @@ interface ToggleProps {
 const Toggle = ({
     text,
     isOpenDefault = false,
-    closeOnChange,
+    onOpen,
     preview,
     children,
 }: ToggleProps) => {
     const [isOpen, setIsOpen] = useState(isOpenDefault)
 
-    useEffect(() => {
-        if (closeOnChange)
-            setIsOpen(false)
-    }, [closeOnChange])
-
     const handleToggle = () => {
-        setIsOpen(!isOpen)
+        let open = !isOpen
+
+        setIsOpen(open)
+
+        if (open && onOpen)
+            onOpen()
     }
 
     return (

@@ -2,18 +2,18 @@ import { useEffect, useState } from "react"
 import { useNavigate } from "react-router-dom"
 import CH1TableImg from '../../assets/images/ch1-table.png'
 import Button from "../../components/Buttons/Button"
+import VerticalGroup from "../../components/Groups/VerticalGroup"
 import Modal from "../../components/Modals/Modal"
 import PageContainer from "../../components/PageContainer"
 import Toggle from "../../components/Toggle"
 import Attribute from "../../components/Typographies/Attribute"
-import DotList from "../../components/Typographies/DotList"
+import BulletList from "../../components/Typographies/BulletList"
 import { ScenarioData, getScenarioStorage, removeScenarioStorage } from "../../hooks/storage/scenario"
-import { GroupInColumn } from "../../styles/components"
 import { getDecisionTypeEnumValue } from "../../types/enums/decisionType"
 import { getHeroTypeByDecision, getHeroTypeEnumValue } from "../../types/enums/heroType"
 import { DefaultRoutePathEnum } from "../../types/enums/routePath"
 import { ScenarioTypeEnum } from "../../types/enums/scenarioType"
-import { formatDateToString } from "../../utils/date"
+import { formatDateToView } from "../../utils/date"
 
 const Home = () => {
     const navigate = useNavigate()
@@ -35,7 +35,7 @@ const Home = () => {
             return
 
         let hero = getHeroTypeEnumValue(getHeroTypeByDecision(last.decisions[0]))
-        let date = formatDateToString(last.creationDate)
+        let date = formatDateToView(last.creationDate)
         let values = last.decisions.map(x => getDecisionTypeEnumValue(x))
 
         setScenario(last)
@@ -84,7 +84,7 @@ const Home = () => {
 
                 <p>Huum... Parece que a missão de hoje nos levará à Torre do Necromante... para tentar recuperar o Cajado de Solarion das garras de Xarth, o Senhor do Terror.</p>
 
-                <GroupInColumn>
+                <VerticalGroup>
                     <Button
                         text='Novo jogo'
                         onClick={handlePlay}
@@ -95,7 +95,7 @@ const Home = () => {
                         variant='outline'
                         onClick={handleContinue}
                     />
-                </GroupInColumn>
+                </VerticalGroup>
             </section>
 
             <Modal
@@ -107,30 +107,30 @@ const Home = () => {
                     ? <>
                         <p>O progresso da sua última aventura foi salvo.</p>
 
-                        <GroupInColumn>
+                        <VerticalGroup>
                             <Attribute
-                                field="Classe: "
+                                field="Classe:"
                                 value={heroTypeValue}
                             />
 
                             <Attribute
-                                field="Data: "
+                                field="Data:"
                                 value={creationDate}
                             />
 
                             <Toggle
                                 text="Decisões:"
-                                preview={<DotList
+                                preview={<BulletList
                                     items={[decisionTypesValue[0] + '..']}
                                 />}
                             >
-                                <DotList
+                                <BulletList
                                     items={decisionTypesValue}
                                 />
                             </Toggle>
-                        </GroupInColumn>
+                        </VerticalGroup>
 
-                        <GroupInColumn>
+                        <VerticalGroup>
                             <Button
                                 text="Continuar"
                                 onClick={handleConfirmContinue}
@@ -141,7 +141,7 @@ const Home = () => {
                                 variant="outline"
                                 onClick={handleRemoveContinuation}
                             />
-                        </GroupInColumn>
+                        </VerticalGroup>
                     </>
                     : <>
                         <p>Nenhum registro da sua última aventura foi encontrado.</p>

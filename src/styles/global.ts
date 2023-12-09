@@ -3,7 +3,7 @@ import { createGlobalStyle } from 'styled-components'
 export default createGlobalStyle`
     * {
         margin: 0;
-        padding: 0;     
+        padding: 0;
         box-sizing: border-box;
     }
 
@@ -17,7 +17,6 @@ export default createGlobalStyle`
         --color-light-wine: #993D33;
         --color-wine: #5B191E;
         --color-red: #B22222;
-        --color-light-red: #FCDDDC;
         --color-green: #345B4D;
         --color-yellow: #F79824;
         --color-pink: #DC6BAD;
@@ -87,10 +86,10 @@ export default createGlobalStyle`
     }
 
     section {
-        border: 0.25rem solid #993D33;
+        border: 0.25rem solid var(--color-light-wine);
         box-shadow:
-            0px 0px 0px 0.25rem #5B191E,
-            0px 0px 0px 0.25rem #5B191E inset;
+            0px 0px 0px 0.25rem var(--color-wine),
+            0px 0px 0px 0.25rem var(--color-wine) inset;
         border-radius: 0.5rem;
         padding: 1.5rem;
         background-color: var(--color-light-orange);
@@ -123,10 +122,10 @@ export default createGlobalStyle`
     }
 
     .modal-content {
-        border: 0.25rem solid #993D33;
+        border: 0.25rem solid var(--color-light-wine);
         box-shadow:
-            0px 0px 0px 0.25rem #5B191E,
-            0px 0px 0px 0.25rem #5B191E inset;
+            0px 0px 0px 0.25rem var(--color-wine),
+            0px 0px 0px 0.25rem var(--color-wine) inset;
         border-radius: 0.5rem;
         padding: 1.5rem;
         background-color: var(--color-light-orange);
@@ -137,10 +136,10 @@ export default createGlobalStyle`
     }
 
     .stylized-margin {
-        border: 0.25rem solid #993D33;
+        border: 0.25rem solid var(--color-light-wine);
         box-shadow:
-            0px 0px 0px 0.25rem #5B191E,
-            0px 0px 0px 0.25rem #5B191E inset;
+            0px 0px 0px 0.25rem var(--color-wine),
+            0px 0px 0px 0.25rem var(--color-wine) inset;
         border-radius: 0.5rem;
     }
 

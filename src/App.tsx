@@ -1,8 +1,8 @@
-import { useEffect } from 'react';
-import AppRoutes from './app.routes';
-import { defineValidatorErrorDictionary } from './config/validator/dictionary';
-import { AuthContextProvider } from './hooks/contexts/auth';
-import GlobalStyles from './styles/global';
+import { useEffect } from 'react'
+import { defineValidatorErrorDictionary } from './config/validator/dictionary'
+import { AuthContextProvider } from './hooks/contexts/auth'
+import AppRoutes from './routes/app.routes'
+import GlobalStyles from './styles/global'
 
 const App = () => {
     useEffect(() => {
@@ -16,7 +16,7 @@ const App = () => {
                 <GlobalStyles />
             </div>
         </AuthContextProvider>
-    );
+    )
 }
 
 export default App

@@ -1,4 +1,4 @@
-import styled, { css, keyframes } from "styled-components";
+import styled, { css, keyframes } from "styled-components"
 
 export const enum ImageAnimationEnum {
     None = 0,
@@ -18,7 +18,7 @@ const imageOutAnimation = keyframes`
     70%, 100% {
         opacity: 0;
     }
-`;
+`
 
 export const Image = styled.img<ImageProps>`
     ${({ $imageAnimation }) => $imageAnimation === ImageAnimationEnum.Out && css`
@@ -48,7 +48,7 @@ const textOutAnimation = keyframes`
     100% {
         display: none;
     }
-`;
+`
 
 const TextInAnimation = keyframes`
     0% {
@@ -60,7 +60,7 @@ const TextInAnimation = keyframes`
         display: flex;
         transform: scale(1);
     }
-`;
+`
 
 export const Section = styled.section<SectionProps>`
     ${({ $textAnimation }) => $textAnimation === TextAnimationEnum.Out && css`

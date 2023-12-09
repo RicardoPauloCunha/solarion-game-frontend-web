@@ -1,7 +1,7 @@
-import { GroupInColumn } from "../../../styles/components"
 import Button from "../../Buttons/Button"
-import SuccessIcon from "../../Icons/SuccessIcon"
+import VerticalGroup from "../../Groups/VerticalGroup"
 import Modal from "../Modal"
+import { Icon } from "./styles"
 
 export interface SuccessModalProps {
     title: string
@@ -22,13 +22,13 @@ const SuccessModal = ({
             onClose={onClose}
             title={title}
         >
-            <SuccessIcon />
+            <Icon />
 
-            <GroupInColumn>
+            <VerticalGroup>
                 {messages.map((x, index) => (
                     <p key={index}>{x}</p>
                 ))}
-            </GroupInColumn>
+            </VerticalGroup>
 
             <Button
                 text="Entendi"

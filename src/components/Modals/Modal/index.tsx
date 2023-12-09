@@ -1,6 +1,6 @@
 import { Modal as BaseModal } from "react-bootstrap"
 import { FaTimes } from "react-icons/fa"
-import { ModalHeader } from "./styles"
+import { Header } from "./styles"
 
 interface DataProps {
     size?: "sm" | "lg" | "xl"
@@ -24,14 +24,14 @@ const Modal = ({
             size={size}
             onHide={() => onClose()}
         >
-            <ModalHeader>
+            <Header>
                 <h2>{title}</h2>
 
                 <FaTimes
                     onClick={() => onClose()}
                     className="click-animation"
                 />
-            </ModalHeader>
+            </Header>
 
             {children}
         </BaseModal>

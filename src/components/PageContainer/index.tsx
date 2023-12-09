@@ -1,4 +1,4 @@
-import Navbar from "../Navbar"
+import Navbar from "../Menu/Navbar"
 
 interface PageContainerProps {
     children: React.ReactNode

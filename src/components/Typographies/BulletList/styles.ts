@@ -1,9 +1,9 @@
-import styled, { css } from "styled-components";
+import styled, { css } from "styled-components"
 
-export type DotListVariant = 'default' | 'bold'
+export type BulletListVariant = 'default' | 'bold'
 
 interface ContainerProps {
-    $variant: DotListVariant
+    $variant: BulletListVariant
 }
 
 export const Container = styled.ul<ContainerProps>`
@@ -13,4 +13,4 @@ export const Container = styled.ul<ContainerProps>`
     ${({ $variant }) => $variant === 'bold' && css`
         font-weight: 600;
     `}
-` 
+`

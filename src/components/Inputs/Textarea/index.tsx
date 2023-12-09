@@ -54,7 +54,7 @@ const Textarea = ({
         let value = `${e?.target?.value}`
 
         if (inputRef.current)
-            inputRef.current.style.height = (inputRef.current.scrollHeight + 4) + "px";
+            inputRef.current.style.height = (inputRef.current.scrollHeight + 4) + "px"
 
         if (onChangeValue)
             onChangeValue(value)

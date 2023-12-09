@@ -1,5 +1,5 @@
-import styled, { css } from "styled-components";
-import { InputContainerProps } from "../Input/styles";
+import styled, { css } from "styled-components"
+import { InputContainerProps } from "../Input/styles"
 
 interface ContainerProps extends InputContainerProps {
     $hasValue: boolean
@@ -38,7 +38,7 @@ export const Container = styled.fieldset<ContainerProps>`
             outline-color: var(--color-wine);
         }
 
-        ${({$hasValue}) => $hasValue && css`
+        ${({ $hasValue }) => $hasValue && css`
             &, svg {
                 color: var(--color-dark-gray);
             }

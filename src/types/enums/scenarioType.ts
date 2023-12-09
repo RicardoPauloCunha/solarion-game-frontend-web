@@ -11,7 +11,8 @@ import CH7DoorImg from '../../assets/images/ch7-door.png'
 import CH8DustImg from '../../assets/images/ch8-dust.png'
 import CH8VillainImg from '../../assets/images/ch8-villain.png'
 import NotFoundImg from '../../assets/images/not-found.png'
-import { DecisionTypeEnum } from "./decisionType"
+import { DecisionViewModel } from '../../hooks/api/score'
+import { DecisionTypeEnum, getDecisionTypeEnumValue } from "./decisionType"
 
 export enum ScenarioTypeEnum {
     Finished = -1,
@@ -202,7 +203,6 @@ export const getNextScenarioType = (currentScenarioType: ScenarioTypeEnum, decis
                 default:
                     return ScenarioTypeEnum.CH3_ACT1_DEC
             }
-            break
         case ScenarioTypeEnum.CH3_ACT2:
             return ScenarioTypeEnum.CH5_ACT1
         case ScenarioTypeEnum.CH4_ACT1:
@@ -216,7 +216,6 @@ export const getNextScenarioType = (currentScenarioType: ScenarioTypeEnum, decis
                 default:
                     return ScenarioTypeEnum.CH4_ACT2_DEC
             }
-            break
         case ScenarioTypeEnum.CH4_ROT1_ACT1_DEC:
             switch (decisionType) {
                 case DecisionTypeEnum.CH4_ROT1_ACT1_DEC_Weapon:
@@ -226,7 +225,6 @@ export const getNextScenarioType = (currentScenarioType: ScenarioTypeEnum, decis
                 default:
                     return ScenarioTypeEnum.CH4_ROT1_ACT1_DEC
             }
-            break
         case ScenarioTypeEnum.CH4_ROT1_SUBROT1_ACT1:
             return ScenarioTypeEnum.CH4_ROT1_SUBROT1_ACT2
         case ScenarioTypeEnum.CH4_ROT1_SUBROT1_ACT2:
@@ -248,7 +246,6 @@ export const getNextScenarioType = (currentScenarioType: ScenarioTypeEnum, decis
                 default:
                     return ScenarioTypeEnum.CH5_ACT2_DEC
             }
-            break
         case ScenarioTypeEnum.CH6_ACT1:
             return ScenarioTypeEnum.CH6_ACT2
         case ScenarioTypeEnum.CH6_ACT2:
@@ -262,7 +259,6 @@ export const getNextScenarioType = (currentScenarioType: ScenarioTypeEnum, decis
                 default:
                     return ScenarioTypeEnum.CH6_ACT3_DEC
             }
-            break
         case ScenarioTypeEnum.CH6_ROT1_AC1:
             return ScenarioTypeEnum.CH7_AC1
         case ScenarioTypeEnum.CH6_ROT2_AC1:
@@ -286,7 +282,6 @@ export const getNextScenarioType = (currentScenarioType: ScenarioTypeEnum, decis
                 default:
                     return ScenarioTypeEnum.CH8_AC3
             }
-            break
         case ScenarioTypeEnum.CH8_ROT_WAR_AC1:
             return ScenarioTypeEnum.CH8_ROT_WAR_AC2_DEC
         case ScenarioTypeEnum.CH8_ROT_WAR_AC2_DEC:
@@ -298,7 +293,6 @@ export const getNextScenarioType = (currentScenarioType: ScenarioTypeEnum, decis
                 default:
                     return ScenarioTypeEnum.CH8_ROT_WAR_AC2_DEC
             }
-            break
         case ScenarioTypeEnum.CH8_ROT_WAR_SUBROT1_AC1:
             return ScenarioTypeEnum.CH8_ROT_WAR_SUBROT1_AC2
         case ScenarioTypeEnum.CH8_ROT_WAR_SUBROT1_AC2:
@@ -326,7 +320,6 @@ export const getNextScenarioType = (currentScenarioType: ScenarioTypeEnum, decis
                 default:
                     return ScenarioTypeEnum.CH8_ROT_HEA_AC3_DEC
             }
-            break
         case ScenarioTypeEnum.CH8_ROT_HEA_SUBROT1_AC1:
             return ScenarioTypeEnum.CH8_ROT_HEA_SUBROT1_AC2_END
         case ScenarioTypeEnum.CH8_ROT_HEA_SUBROT1_AC2_END:
@@ -346,7 +339,6 @@ export const getNextScenarioType = (currentScenarioType: ScenarioTypeEnum, decis
                 default:
                     return ScenarioTypeEnum.CH8_ROT_MAG_AC2_DEC
             }
-            break
         case ScenarioTypeEnum.CH8_ROT_MAG_SUBROT1_AC1:
             return ScenarioTypeEnum.CH8_ROT_MAG_SUBROT1_AC2
         case ScenarioTypeEnum.CH8_ROT_MAG_SUBROT1_AC2:
@@ -435,4 +427,71 @@ export const getScenarioTypeImage = (type: ScenarioTypeEnum) => {
         default:
             return NotFoundImg
     }
+}
+
+export const listDecisionByScenario = (scenarioType: ScenarioTypeEnum): DecisionViewModel[] => {
+    let list: DecisionTypeEnum[] = []
+
+    switch (scenarioType) {
+        case ScenarioTypeEnum.CH1_ACT2_DEC:
+            list = [
+                DecisionTypeEnum.CH1_ACT2_DEC_Warrior,
+                DecisionTypeEnum.CH1_ACT2_DEC_Healer,
+                DecisionTypeEnum.CH1_ACT2_DEC_Mage,
+            ]
+            break
+        case ScenarioTypeEnum.CH3_ACT1_DEC:
+            list = [
+                DecisionTypeEnum.CH3_ACT1_DEC_Front,
+                DecisionTypeEnum.CH3_ACT1_DEC_Back,
+            ]
+            break
+        case ScenarioTypeEnum.CH4_ACT2_DEC:
+            list = [
+                DecisionTypeEnum.CH4_ACT2_DEC_Fight,
+                DecisionTypeEnum.CH4_ACT2_DEC_Run,
+            ]
+            break
+        case ScenarioTypeEnum.CH4_ROT1_ACT1_DEC:
+            list = [
+                DecisionTypeEnum.CH4_ROT1_ACT1_DEC_Weapon,
+                DecisionTypeEnum.CH4_ROT1_ACT1_DEC_Shield,
+            ]
+            break
+        case ScenarioTypeEnum.CH5_ACT2_DEC:
+            list = [
+                DecisionTypeEnum.CH5_ACT2_DEC_Left,
+                DecisionTypeEnum.CH5_ACT2_DEC_Right,
+            ]
+            break
+        case ScenarioTypeEnum.CH6_ACT3_DEC:
+            list = [
+                DecisionTypeEnum.CH6_ACT3_DEC_Run,
+                DecisionTypeEnum.CH6_ACT3_DEC_Break,
+            ]
+            break
+        case ScenarioTypeEnum.CH8_ROT_WAR_AC2_DEC:
+            list = [
+                DecisionTypeEnum.CH8_ROT_WAR_AC2_DEC_Sword,
+                DecisionTypeEnum.CH8_ROT_WAR_AC2_DEC_Shield,
+            ]
+            break
+        case ScenarioTypeEnum.CH8_ROT_HEA_AC3_DEC:
+            list = [
+                DecisionTypeEnum.CH8_ROT_HEA_AC3_DEC_Warrior,
+                DecisionTypeEnum.CH8_ROT_HEA_AC3_DEC_Mage,
+            ]
+            break
+        case ScenarioTypeEnum.CH8_ROT_MAG_AC2_DEC:
+            list = [
+                DecisionTypeEnum.CH8_ROT_MAG_AC2_DEC_Lightning,
+                DecisionTypeEnum.CH8_ROT_MAG_AC2_DEC_Shield,
+            ]
+            break
+    }
+
+    return list.map(x => ({
+        decisionType: x,
+        decisionTypeValue: getDecisionTypeEnumValue(x)
+    }))
 }

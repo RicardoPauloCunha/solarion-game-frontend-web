@@ -1,6 +1,6 @@
-import styled from "styled-components";
+import styled from "styled-components"
 
-export const GroupInColumn = styled.div`
+export const Container = styled.div`
     width: 100%;
     display: flex;
     flex-direction: column;

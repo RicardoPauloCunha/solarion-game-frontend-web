@@ -1,5 +1,5 @@
-import { FaCheckCircle } from 'react-icons/fa';
-import styled from "styled-components";
+import { FaCheckCircle } from 'react-icons/fa'
+import styled from "styled-components"
 
 export const Icon = styled(FaCheckCircle)`
     background-color: white;

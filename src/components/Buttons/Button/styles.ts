@@ -1,10 +1,11 @@
-import styled, { css } from "styled-components";
+import styled, { css } from "styled-components"
 
 export type ButtonVariant = 'default' | 'outline'
 
 interface ContainerProps {
     $variant?: ButtonVariant
     $isLoading?: boolean
+    $isDisabled?: boolean
 }
 
 export const Container = styled.button<ContainerProps>`
@@ -31,6 +32,13 @@ export const Container = styled.button<ContainerProps>`
         background-color: transparent;
         border-color: var(--color-wine);
         color: var(--color-dark-gray);
+    `}
+
+    ${({ $isDisabled }) => $isDisabled && css`
+        background-color: var(--color-light-gray);
+        border-color: var(--color-wine);
+        color: var(--color-dark-gray);
+        cursor: default;
     `}
 
     ${({ $isLoading }) => $isLoading && css`

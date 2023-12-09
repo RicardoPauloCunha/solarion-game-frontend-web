@@ -25,7 +25,8 @@ export const getAxiosError = (baseError: any) => {
                     warning = {
                         title: 'Dados inválidos',
                         message: 'Os dados enviados para a operação são inválidos.',
-                        variant: 'error'
+                        variant: 'error',
+                        submessages: error.response?.data?.errors
                     }
                     break
                 case 401:

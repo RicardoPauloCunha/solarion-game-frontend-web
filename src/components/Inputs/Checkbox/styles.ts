@@ -30,7 +30,7 @@ export const Container = styled.fieldset<ContainerProps>`
             height: 1.5rem;
             width: 1.5rem;
             background-color: var(--color-white);
-            border: solid 0.15rem var(--color-wine);
+            border: 0.15rem solid var(--color-wine);
             border-radius: 0.25rem;
             transition-duration: 300ms;
             position: absolute;

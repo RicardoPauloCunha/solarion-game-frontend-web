@@ -1,22 +1,23 @@
 import { useField } from '@unform/core'
 import { InputHTMLAttributes, useCallback, useEffect, useRef, useState } from 'react'
+import { formatDateToString, formatStringToDate } from '../../../utils/date'
 import { cepMask, cnpjMask, cpfMask, dateMask, phoneMask } from '../../../utils/mask'
 import { Container } from './styles'
 
 interface InputProps extends InputHTMLAttributes<HTMLInputElement> {
     name: string
     label: string
-    mask?: 'cpf' | 'cnpj' | 'phone' | 'cep' | 'date'
     placeholder: string
     onChangeValue?: (value: string) => void
+    mask?: 'cpf' | 'cnpj' | 'phone' | 'cep' | 'date'
 }
 
 const Input = ({
     name,
     label,
-    mask,
     disabled,
     onChangeValue,
+    mask,
     ...rest
 }: InputProps) => {
     const inputRef = useRef<HTMLInputElement>(null)
@@ -26,7 +27,7 @@ const Input = ({
 
     useEffect(() => {
         if (defaultValue)
-            defineValue(defaultValue)
+            defineValue(formatValueToType(defaultValue, true))
     }, [defaultValue])
 
     useEffect(() => {
@@ -35,12 +36,12 @@ const Input = ({
             ref: inputRef.current,
             getValue(ref) {
                 if (mask)
-                    return removeMask(ref.value)
+                    return removeMask(ref.value, true)
                 else
                     return ref.value
             },
             setValue(_, value) {
-                defineValue(value)
+                defineValue(formatValueToType(value, true))
                 clearError()
             },
             clearValue(_) {
@@ -101,8 +102,27 @@ const Input = ({
         return value
     }
 
-    const removeMask = (value: string) => {
+    const removeMask = (value: string, format?: boolean) => {
+        if (format) {
+            let formattedValue = formatValueToType(value)
+
+            if (formattedValue !== value)
+                return formattedValue
+        }
+
         return value.replace(/(\D)/g, '')
+    }
+
+    const formatValueToType = (value: string, reverse?: boolean) => {
+        switch (mask) {
+            case 'date':
+                if (reverse)
+                    return formatDateToString(value)
+                else
+                    return formatStringToDate(value)
+            default:
+                return value
+        }
     }
 
     return (

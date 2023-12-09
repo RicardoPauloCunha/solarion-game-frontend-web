@@ -157,7 +157,7 @@ const Profile = () => {
                 >
                     <Input
                         name="name"
-                        label="Name"
+                        label="Nome"
                         type="text"
                         placeholder="Coloque seu nome"
                         disabled={isLoading === LoadingEnum.Get}
@@ -176,7 +176,8 @@ const Profile = () => {
                     <Button
                         text="Alterar informações"
                         type="submit"
-                        isLoading={isLoading === LoadingEnum.Get || (isLoading === LoadingEnum.Save && currentSection === SectionEnum.Data)}
+                        isLoading={isLoading === LoadingEnum.Get
+                            || (isLoading === LoadingEnum.Save && currentSection === SectionEnum.Data)}
                     />
                 </Form>
             </section>

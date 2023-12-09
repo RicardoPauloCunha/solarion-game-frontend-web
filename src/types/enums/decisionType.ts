@@ -1,6 +1,3 @@
-import { DecisionViewModel } from "../../hooks/api/score"
-import { ScenarioTypeEnum } from "./scenarioType"
-
 export enum DecisionTypeEnum {
     None = 0,
     CH1_ACT2_DEC_Warrior = 1,
@@ -67,71 +64,4 @@ export const getDecisionTypeEnumValue = (type: DecisionTypeEnum | number) => {
         default:
             return ""
     }
-}
-
-export const listDecisionByScenario = (scenarioType: ScenarioTypeEnum): DecisionViewModel[] => {
-    let list: DecisionTypeEnum[] = []
-
-    switch (scenarioType) {
-        case ScenarioTypeEnum.CH1_ACT2_DEC:
-            list = [
-                DecisionTypeEnum.CH1_ACT2_DEC_Warrior,
-                DecisionTypeEnum.CH1_ACT2_DEC_Healer,
-                DecisionTypeEnum.CH1_ACT2_DEC_Mage,
-            ]
-            break
-        case ScenarioTypeEnum.CH3_ACT1_DEC:
-            list = [
-                DecisionTypeEnum.CH3_ACT1_DEC_Front,
-                DecisionTypeEnum.CH3_ACT1_DEC_Back,
-            ]
-            break
-        case ScenarioTypeEnum.CH4_ACT2_DEC:
-            list = [
-                DecisionTypeEnum.CH4_ACT2_DEC_Fight,
-                DecisionTypeEnum.CH4_ACT2_DEC_Run,
-            ]
-            break
-        case ScenarioTypeEnum.CH4_ROT1_ACT1_DEC:
-            list = [
-                DecisionTypeEnum.CH4_ROT1_ACT1_DEC_Weapon,
-                DecisionTypeEnum.CH4_ROT1_ACT1_DEC_Shield,
-            ]
-            break
-        case ScenarioTypeEnum.CH5_ACT2_DEC:
-            list = [
-                DecisionTypeEnum.CH5_ACT2_DEC_Left,
-                DecisionTypeEnum.CH5_ACT2_DEC_Right,
-            ]
-            break
-        case ScenarioTypeEnum.CH6_ACT3_DEC:
-            list = [
-                DecisionTypeEnum.CH6_ACT3_DEC_Run,
-                DecisionTypeEnum.CH6_ACT3_DEC_Break,
-            ]
-            break
-        case ScenarioTypeEnum.CH8_ROT_WAR_AC2_DEC:
-            list = [
-                DecisionTypeEnum.CH8_ROT_WAR_AC2_DEC_Sword,
-                DecisionTypeEnum.CH8_ROT_WAR_AC2_DEC_Shield,
-            ]
-            break
-        case ScenarioTypeEnum.CH8_ROT_HEA_AC3_DEC:
-            list = [
-                DecisionTypeEnum.CH8_ROT_HEA_AC3_DEC_Warrior,
-                DecisionTypeEnum.CH8_ROT_HEA_AC3_DEC_Mage,
-            ]
-            break
-        case ScenarioTypeEnum.CH8_ROT_MAG_AC2_DEC:
-            list = [
-                DecisionTypeEnum.CH8_ROT_MAG_AC2_DEC_Lightning,
-                DecisionTypeEnum.CH8_ROT_MAG_AC2_DEC_Shield,
-            ]
-            break
-    }
-
-    return list.map(x => ({
-        decisionType: x,
-        decisionTypeValue: getDecisionTypeEnumValue(x)
-    }))
 }

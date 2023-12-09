@@ -1,10 +1,11 @@
 import { FormHandles, SubmitHandler } from "@unform/core"
 import { Form } from "@unform/web"
-import { useEffect, useRef, useState } from "react"
+import { useRef, useState } from "react"
 import { useNavigate } from "react-router-dom"
 import * as Yup from 'yup'
 import Button from "../../components/Buttons/Button"
 import WarningCard, { WarningData } from "../../components/Cards/WarningCard"
+import VerticalGroup from "../../components/Groups/VerticalGroup"
 import Input from "../../components/Inputs/Input"
 import PageContainer from "../../components/PageContainer"
 import Link from "../../components/Typographies/Link"
@@ -13,8 +14,7 @@ import { getSchemaError } from "../../config/validator/methods"
 import { emailSchema, passwordSchema } from "../../config/validator/schemas"
 import { loginApi } from "../../hooks/api/user"
 import { useAuthContext } from "../../hooks/contexts/auth"
-import { getTokenStorage, setTokenStorage } from "../../hooks/storage/token"
-import { GroupInColumn } from "../../styles/components"
+import { setTokenStorage } from "../../hooks/storage/token"
 import { DefaultRoutePathEnum } from "../../types/enums/routePath"
 import { UserTypeEnum } from "../../types/enums/userType"
 
@@ -28,19 +28,11 @@ const Login = () => {
     const formRef = useRef<FormHandles>(null)
 
     const {
-        loggedUser,
         defineLoggedUserByToken
     } = useAuthContext()
 
     const [isLoading, setIsLoading] = useState(false)
     const [warning, setWarning] = useState<WarningData | undefined>(undefined)
-
-    useEffect(() => {
-        let token = getTokenStorage()
-
-        if (loggedUser || token)
-            navigate(DefaultRoutePathEnum.Home)
-    }, [])
 
     const submitLoginForm: SubmitHandler<LoginFormData> = async (data) => {
         try {
@@ -114,7 +106,7 @@ const Login = () => {
                     />
                 </Form>
 
-                <GroupInColumn>
+                <VerticalGroup>
                     <Link
                         text="Esqueci minha senha"
                         to={DefaultRoutePathEnum.RecoverPassword}
@@ -124,7 +116,7 @@ const Login = () => {
                         text="Registrar-se"
                         to={DefaultRoutePathEnum.RegisterAccount}
                     />
-                </GroupInColumn>
+                </VerticalGroup>
             </section>
         </PageContainer>
     )

@@ -1,4 +1,4 @@
-export const formatDateToString = (value: Date) => {
+export const formatDateToView = (value: Date) => {
     if (!(value instanceof Date)) {
         try {
             value = new Date(value)
@@ -14,4 +14,24 @@ export const formatDateToString = (value: Date) => {
     })
 
     return `${time} - ${date}`
+}
+
+export const formatStringToDate = (value: string) => {
+    if (!value)
+        return ''
+
+    return value
+        .split('/')
+        .reverse()
+        .join('-')
+}
+
+export const formatDateToString = (value: string) => {
+    if (!value)
+        return ''
+
+    return value
+        .split('-')
+        .reverse()
+        .join('/')
 }

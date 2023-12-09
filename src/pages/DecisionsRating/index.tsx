@@ -2,6 +2,7 @@ import { useEffect, useState } from "react"
 import { useNavigate } from "react-router-dom"
 import Button from "../../components/Buttons/Button"
 import WarningCard, { WarningData } from "../../components/Cards/WarningCard"
+import VerticalGroup from "../../components/Groups/VerticalGroup"
 import SuccessModal from "../../components/Modals/SuccessModal"
 import PageContainer from "../../components/PageContainer"
 import RatingResult from "../../components/RatingResult"
@@ -9,7 +10,6 @@ import { getAxiosError } from "../../config/axios/error"
 import { createScoreApi } from "../../hooks/api/score"
 import { useAuthContext } from "../../hooks/contexts/auth"
 import { ScenarioData, getScenarioStorage, removeScenarioStorage } from "../../hooks/storage/scenario"
-import { GroupInColumn } from "../../styles/components"
 import { getHeroTypeByDecision } from "../../types/enums/heroType"
 import { RatingTypeEnum, getRatingTypeByDecisions, getRatingTypeEnumValue } from "../../types/enums/ratingType"
 import { DefaultRoutePathEnum } from "../../types/enums/routePath"
@@ -39,7 +39,6 @@ const DecisionsRating = () => {
 
         if (!last || last.scenarioType !== ScenarioTypeEnum.Finished)
             return
-
 
         let rate = getRatingTypeByDecisions(last.decisions)
 
@@ -89,7 +88,7 @@ const DecisionsRating = () => {
 
                     {warning && <WarningCard {...warning} />}
 
-                    <GroupInColumn>
+                    <VerticalGroup>
                         <Button
                             text="Salvar pontuação"
                             onClick={saveScore}
@@ -101,7 +100,7 @@ const DecisionsRating = () => {
                             variant="outline"
                             onClick={handleBackHome}
                         />
-                    </GroupInColumn>
+                    </VerticalGroup>
                 </Section>
             </>}
 

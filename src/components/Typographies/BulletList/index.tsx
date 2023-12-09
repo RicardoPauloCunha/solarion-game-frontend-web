@@ -1,14 +1,14 @@
-import { Container, DotListVariant } from './styles'
+import { BulletListVariant, Container } from './styles'
 
-interface DotListProps {
+interface BulletListProps {
     items: string[]
-    variant?: DotListVariant
+    variant?: BulletListVariant
 }
 
-const DotList = ({
+const BulletList = ({
     items,
     variant = 'default'
-}: DotListProps) => {
+}: BulletListProps) => {
     return (
         <Container
             $variant={variant}
@@ -20,4 +20,4 @@ const DotList = ({
     )
 }
 
-export default DotList
+export default BulletList

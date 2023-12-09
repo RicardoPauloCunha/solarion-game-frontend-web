@@ -1,7 +1,7 @@
 import { useEffect, useState } from "react"
 import ScoreCard from "../../components/Cards/ScoreCard"
 import WarningCard, { WarningData } from "../../components/Cards/WarningCard"
-import LoadingText from "../../components/Loading/LoadingText"
+import LoadingText from "../../components/Loadings/LoadingText"
 import DeleteModal from "../../components/Modals/DeleteModal"
 import PageContainer from "../../components/PageContainer"
 import Link from "../../components/Typographies/Link"
@@ -13,7 +13,7 @@ import { getHeroTypeByDecision, getHeroTypeEnumValue } from "../../types/enums/h
 import { getRatingTypeByDecisions, getRatingTypeEnumValue } from "../../types/enums/ratingType"
 import { DefaultRoutePathEnum } from "../../types/enums/routePath"
 import { ScenarioTypeEnum } from "../../types/enums/scenarioType"
-import { formatDateToString } from "../../utils/date"
+import { formatDateToView } from "../../utils/date"
 
 enum LoadingEnum {
     None = 0,
@@ -51,7 +51,7 @@ const MyScores = () => {
 
         let score: ScoreViewModel = {
             scoreId: 0,
-            creationDate: formatDateToString(last.creationDate),
+            creationDate: formatDateToView(last.creationDate),
             heroType: hero,
             heroTypeValue: getHeroTypeEnumValue(hero),
             ratingType: rating,
@@ -160,9 +160,8 @@ const MyScores = () => {
                 <h1>Minhas pontuações</h1>
 
                 <LoadingText
-                    defaultText=""
-                    loadingText="Carregando lista de pontuações..."
                     isLoading={isLoading === LoadingEnum.Get}
+                    loadingText="Carregando lista de pontuações..."
                 />
             </section>
 
@@ -184,15 +183,14 @@ const MyScores = () => {
 
             {hasMore && <section>
                 <LoadingText
-                    defaultText=""
-                    loadingText="Carregando mais pontuações..."
                     isLoading={isLoading === LoadingEnum.Get}
+                    loadingText="Carregando mais pontuações..."
                 />
 
                 {isLoading !== LoadingEnum.Get && <Link
                     text="Exibir mais"
                     to={DefaultRoutePathEnum.MyScores}
-                    onClick={() => getScoresData()}
+                    onClick={getScoresData}
                 />}
             </section>}
 

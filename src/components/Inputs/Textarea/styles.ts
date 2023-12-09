@@ -1,5 +1,5 @@
-import styled, { css } from "styled-components";
-import { InputContainerProps } from "../Input/styles";
+import styled, { css } from "styled-components"
+import { InputContainerProps } from "../Input/styles"
 
 interface ContainerProps extends InputContainerProps {
 

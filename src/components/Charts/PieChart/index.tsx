@@ -13,7 +13,7 @@ const PieChart = ({
     charts
 }: PieChartProps) => {
     const total = charts.reduce((a, b) => a + b.totalValue, 0)
-    
+
     const legends = charts.map(x => ({
         description: x.description,
         value: formatNumberToPercentage((x.totalValue / total) * 100)

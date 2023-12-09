@@ -7,15 +7,15 @@ import WarningCard, { WarningData } from "../../components/Cards/WarningCard"
 import BarChart from "../../components/Charts/BarChart"
 import LineChart from "../../components/Charts/LineChart"
 import PieChart from "../../components/Charts/PieChart"
+import VerticalGroup from "../../components/Groups/VerticalGroup"
 import Input from "../../components/Inputs/Input"
 import Select from "../../components/Inputs/Select"
-import LoadingText from "../../components/Loading/LoadingText"
+import LoadingText from "../../components/Loadings/LoadingText"
 import PageContainer from "../../components/PageContainer"
 import Toggle from "../../components/Toggle"
 import { getSchemaError } from "../../config/validator/methods"
 import { endDateSchema, startDateSchema } from "../../config/validator/schemas"
 import { GetScoreIndicatorsApi, GetScoreIndicatorsParams, ScoreIndicatorsViewModel } from "../../hooks/api/score"
-import { GroupInColumn } from "../../styles/components"
 import { LastMonthsTypeEnum, listLastMonthsTypeOptions } from "../../types/enums/lastMonthsType"
 
 interface DashboardFilterFormData {
@@ -45,6 +45,7 @@ const Dashboard = () => {
     const [isLoading, setIsLoading] = useState(false)
     const [warning, setWarning] = useState<WarningData | undefined>(undefined)
     const [hasDateInput, setHasDateInput] = useState(false)
+    const [hasData, setHasData] = useState(true)
     const [indicatorsFilter, setIndicatorsFilter] = useState<GetScoreIndicatorsParams>({})
     const [scoreIndicators, setScoreIndicators] = useState<ScoreIndicatorsViewModel | undefined>(undefined)
 
@@ -64,8 +65,11 @@ const Dashboard = () => {
             filter.lastMonths = undefined
 
         await GetScoreIndicatorsApi(filter).then(response => {
+            let hasValue = response.adventuresChart?.totalValue !== 0
+
             setScoreIndicators(response)
 
+            setHasData(hasValue)
             setIndicatorsFilter(filter as GetScoreIndicatorsParams)
             setIsLoading(false)
         }).catch(() => { })
@@ -127,6 +131,16 @@ const Dashboard = () => {
         setHasDateInput(hasDate)
     }
 
+    const handleOpenFilter = () => {
+        setTimeout(() => {
+            formRef.current?.setData({
+                lastMonths: `${indicatorsFilter.lastMonths}`,
+                startDate: indicatorsFilter.startDate,
+                endDate: indicatorsFilter.endDate
+            })
+        }, 300)
+    }
+
     return (
         <PageContainer>
             <section>
@@ -134,16 +148,11 @@ const Dashboard = () => {
 
                 <Toggle
                     text="Filtros"
-                    closeOnChange={isLoading === true}
+                    onOpen={handleOpenFilter}
                 >
                     <Form
                         ref={formRef}
                         onSubmit={submitFilterForm}
-                        initialData={{
-                            lastMonths: `${indicatorsFilter.lastMonths}`,
-                            startDate: indicatorsFilter.startDate,
-                            endDate: indicatorsFilter.endDate
-                        }}
                     >
                         <Select
                             name="lastMonths"
@@ -171,57 +180,67 @@ const Dashboard = () => {
 
                         {warning && <WarningCard {...warning} />}
 
-                        <GroupInColumn>
+                        {!isLoading && <VerticalGroup>
                             <Button
                                 text="Filtrar"
                                 type="submit"
                                 isLoading={isLoading}
                             />
 
-                            {!isLoading && <Button
+                            <Button
                                 text="Limpar filtro"
                                 variant="outline"
                                 onClick={handleCleanFilter}
-                            />}
-                        </GroupInColumn>
+                            />
+                        </VerticalGroup>}
                     </Form>
                 </Toggle>
 
                 <LoadingText
-                    defaultText=""
-                    loadingText="Carregando indicadores..."
                     isLoading={isLoading}
+                    loadingText="Carregando indicadores..."
                 />
             </section>
 
-            {scoreIndicators && <>
-                {scoreIndicators.adventuresChart && <section>
-                    <h2>Quantidade de aventuras</h2>
+            {scoreIndicators && hasData
+                ? <>
+                    {scoreIndicators.adventuresChart && <section>
+                        <h2>Quantidade de aventuras</h2>
 
-                    <LineChart
-                        colors={ADVENTURE_COLORS}
-                        chart={scoreIndicators.adventuresChart}
-                    />
-                </section>}
+                        <LineChart
+                            colors={ADVENTURE_COLORS}
+                            chart={scoreIndicators.adventuresChart}
+                        />
+                    </section>}
 
-                {scoreIndicators.heroCharts.length !== 0 && <section>
-                    <h2>Seleção de classes</h2>
+                    {scoreIndicators.heroCharts.length !== 0 && <section>
+                        <h2>Seleção de classes</h2>
 
-                    <PieChart
-                        colors={HERO_COLORS}
-                        charts={scoreIndicators.heroCharts}
-                    />
-                </section>}
+                        <PieChart
+                            colors={HERO_COLORS}
+                            charts={scoreIndicators.heroCharts}
+                        />
+                    </section>}
 
-                {scoreIndicators.ratingCharts.length !== 0 && <section>
-                    <h2>Pontuações obtidas</h2>
+                    {scoreIndicators.ratingCharts.length !== 0 && <section>
+                        <h2>Pontuações obtidas</h2>
 
-                    <BarChart
-                        colors={RATING_COLORS}
-                        charts={scoreIndicators.ratingCharts}
-                    />
-                </section>}
-            </>}
+                        <BarChart
+                            colors={RATING_COLORS}
+                            charts={scoreIndicators.ratingCharts}
+                        />
+                    </section>}
+                </>
+                : <>
+                    {!isLoading && <article className="list-cards">
+                        <WarningCard
+                            title="Nenhum dado encontrado"
+                            message="Nenhum dado sobre as pontuações dos usuários foi encontrado."
+                            variant="info"
+                        />
+                    </article>}
+                </>
+            }
         </PageContainer>
     )
 }

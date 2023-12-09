@@ -4,7 +4,7 @@ import Button from "../../Buttons/Button"
 import RatingResult from "../../RatingResult"
 import Toggle from "../../Toggle"
 import Attribute from "../../Typographies/Attribute"
-import DotList from "../../Typographies/DotList"
+import BulletList from "../../Typographies/BulletList"
 import { Container } from "./styles"
 
 interface ScoreCardProps {
@@ -34,12 +34,12 @@ const ScoreCard = ({
                 />
 
                 <Attribute
-                    field="Classe: "
+                    field="Classe:"
                     value={data.heroTypeValue}
                 />
 
                 <Attribute
-                    field="Data: "
+                    field="Data:"
                     value={data.creationDate}
                 />
 
@@ -51,13 +51,13 @@ const ScoreCard = ({
                 <Toggle
                     text="Decisões:"
                     preview={data.decisions[0]
-                        ? (<DotList
+                        ? (<BulletList
                             items={[data.decisions[0].decisionTypeValue + '..']}
                         />)
                         : undefined
                     }
                 >
-                    <DotList
+                    <BulletList
                         items={data.decisions.map(x => x.decisionTypeValue)}
                     />
                 </Toggle>

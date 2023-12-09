@@ -1,6 +1,6 @@
 import { FormHandles, SubmitHandler } from "@unform/core"
 import { Form } from "@unform/web"
-import { useEffect, useRef, useState } from "react"
+import { useRef, useState } from "react"
 import { useNavigate } from "react-router-dom"
 import * as Yup from 'yup'
 import Button from "../../components/Buttons/Button"
@@ -13,8 +13,6 @@ import { getAxiosError } from "../../config/axios/error"
 import { getSchemaError } from "../../config/validator/methods"
 import { confirmPasswordSchema, emailSchema, passwordSchema } from "../../config/validator/schemas"
 import { replyPasswordRecoveryApi, solicitPasswordRecoveryApi } from "../../hooks/api/passwordRecovery"
-import { useAuthContext } from "../../hooks/contexts/auth"
-import { getTokenStorage } from "../../hooks/storage/token"
 import { DefaultRoutePathEnum } from "../../types/enums/routePath"
 
 interface SolicitRecoverFormData {
@@ -31,21 +29,10 @@ const RecoverPassword = () => {
     const navigate = useNavigate()
     const formRef = useRef<FormHandles>(null)
 
-    const {
-        loggedUser
-    } = useAuthContext()
-
     const [isLoading, setIsLoading] = useState(false)
     const [showModal, setShowModal] = useState(false)
     const [warning, setWarning] = useState<WarningData | undefined>(undefined)
     const [email, setEmail] = useState('')
-
-    useEffect(() => {
-        let token = getTokenStorage()
-
-        if (loggedUser || token)
-            navigate(DefaultRoutePathEnum.Home)
-    }, [])
 
     const submitSolicitRecoverForm: SubmitHandler<SolicitRecoverFormData> = async (data) => {
         try {
@@ -117,14 +104,14 @@ const RecoverPassword = () => {
         setShowModal(false)
     }
 
-    const handleNavBackPage = () => {
+    const handleBack = () => {
         let mail = email
 
         setEmail('')
 
         setTimeout(() => {
             formRef.current?.setFieldValue('email', mail)
-        }, 300);
+        }, 300)
     }
 
     return (
@@ -152,11 +139,16 @@ const RecoverPassword = () => {
                             isLoading={isLoading}
                         />
                     </Form>
+
+                    <Link
+                        to={DefaultRoutePathEnum.Login}
+                        text="Entrar"
+                    />
                 </section>
                 : <section>
                     <h1>Recuperar senha</h1>
 
-                    <p>Foi enviado para o email <strong>{email}</strong> o código de verificação para a recuperação de senha. Caso não encontre, procure na lixeira, caixa de spam ou aguarde alguns minutos para continuar.</p>
+                    <p>Foi enviado para o email ({email}) o código de verificação para a recuperação de senha.</p>
 
                     <Form
                         ref={formRef}
@@ -195,7 +187,7 @@ const RecoverPassword = () => {
                     <Link
                         to={DefaultRoutePathEnum.RecoverPassword}
                         text="Voltar"
-                        onClick={handleNavBackPage}
+                        onClick={handleBack}
                     />
                 </section>
             }

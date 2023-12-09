@@ -5,21 +5,21 @@ import * as Yup from 'yup'
 import Button from "../../components/Buttons/Button"
 import ScoreCard from "../../components/Cards/ScoreCard"
 import WarningCard, { WarningData } from "../../components/Cards/WarningCard"
-import Checkbox, { OptionData } from "../../components/Inputs/Checkbox"
+import VerticalGroup from "../../components/Groups/VerticalGroup"
+import Checkbox from "../../components/Inputs/Checkbox"
 import Input from "../../components/Inputs/Input"
 import Select from "../../components/Inputs/Select"
-import LoadingText from "../../components/Loading/LoadingText"
+import LoadingText from "../../components/Loadings/LoadingText"
 import PageContainer from "../../components/PageContainer"
 import Toggle from "../../components/Toggle"
 import Link from "../../components/Typographies/Link"
 import { getSchemaError } from "../../config/validator/methods"
 import { endDateSchema, startDateSchema } from "../../config/validator/schemas"
 import { ListAllScoresParams, ScoreViewModel, listAllScoresApi } from "../../hooks/api/score"
-import { GroupInColumn } from "../../styles/components"
 import { listHeroTypeOptions } from "../../types/enums/heroType"
+import { LastMonthsTypeEnum, listLastMonthsTypeOptions } from "../../types/enums/lastMonthsType"
 import { listRatingTypeOptions } from "../../types/enums/ratingType"
 import { DefaultRoutePathEnum } from "../../types/enums/routePath"
-import { LastMonthsTypeEnum, listLastMonthsTypeOptions } from "../../types/enums/lastMonthsType"
 
 interface ScoreFilterFormData {
     ratingTypes: number[]
@@ -100,7 +100,7 @@ const Scores = () => {
 
                 await subShema.validate(data, { abortEarly: false })
             }
-            
+
             data.ratingTypes = data.ratingTypes.map(x => Number(x))
             data.heroTypes = data.heroTypes.map(x => Number(x))
             data.lastMonths = data.lastMonths ? Number(data.lastMonths) : 0
@@ -133,6 +133,18 @@ const Scores = () => {
         setHasDateInput(hasDate)
     }
 
+    const handleOpenFilter = () => {
+        setTimeout(() => {
+            formRef.current?.setData({
+                ratingTypes: scoreFilter.ratingTypes ? scoreFilter.ratingTypes.map(x => `${x}`) : [],
+                heroTypes: scoreFilter.heroTypes ? scoreFilter.heroTypes.map(x => `${x}`) : [],
+                lastMonths: `${scoreFilter.lastMonths}`,
+                startDate: scoreFilter.startDate,
+                endDate: scoreFilter.endDate
+            })
+        }, 300)
+    }
+
     return (
         <PageContainer>
             <section>
@@ -140,18 +152,11 @@ const Scores = () => {
 
                 <Toggle
                     text="Filtros"
-                    closeOnChange={isLoading === true}
+                    onOpen={handleOpenFilter}
                 >
                     <Form
                         ref={formRef}
                         onSubmit={submitFilterForm}
-                        initialData={{
-                            ratingTypes: scoreFilter.ratingTypes?.map(x => `${x}`),
-                            heroTypes: scoreFilter.heroTypes?.map(x => `${x}`),
-                            lastMonths: `${scoreFilter.lastMonths}`,
-                            startDate: scoreFilter.startDate,
-                            endDate: scoreFilter.endDate
-                        }}
                     >
                         <Checkbox
                             name="ratingTypes"
@@ -191,26 +196,25 @@ const Scores = () => {
 
                         {warning && <WarningCard {...warning} />}
 
-                        <GroupInColumn>
+                        {!isLoading && <VerticalGroup>
                             <Button
                                 text="Filtrar"
                                 type="submit"
                                 isLoading={isLoading}
                             />
 
-                            {!isLoading && <Button
+                            <Button
                                 text="Limpar filtro"
                                 variant="outline"
                                 onClick={handleCleanFilter}
-                            />}
-                        </GroupInColumn>
+                            />
+                        </VerticalGroup>}
                     </Form>
                 </Toggle>
 
                 <LoadingText
-                    defaultText=""
-                    loadingText="Carregando lista de pontuações..."
                     isLoading={isLoading}
+                    loadingText="Carregando lista de pontuações..."
                 />
             </section>
 
@@ -231,9 +235,8 @@ const Scores = () => {
 
             {hasMore && <section>
                 <LoadingText
-                    defaultText=""
-                    loadingText="Carregando mais pontuações..."
                     isLoading={isLoading}
+                    loadingText="Carregando mais pontuações..."
                 />
 
                 {!isLoading && <Link

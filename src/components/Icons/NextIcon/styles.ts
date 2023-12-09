@@ -1,5 +1,5 @@
-import { FaForward } from 'react-icons/fa';
-import styled, { keyframes } from "styled-components";
+import { FaForward } from 'react-icons/fa'
+import styled, { keyframes } from "styled-components"
 
 const movementAnimation = keyframes`
     from {
@@ -9,14 +9,14 @@ const movementAnimation = keyframes`
     to {
         transform: translateX(1rem);
     }
-`;
+`
 
 export const Icon = styled(FaForward)`
     font-size: 2rem;
     color: var(--color-wine);
     position: relative;
     left: calc(95% - 1.5rem);
-    top: -1rem; 
+    top: -1rem;
     margin-bottom: -1rem;
     animation: ${movementAnimation} 1s alternate-reverse infinite;
 `
