@@ -122,9 +122,10 @@ const Scores = () => {
     }
 
     const handleCleanFilter = () => {
-        setScoreFilter({})
-
+        setHasDateInput(false)
         formRef.current?.reset()
+
+        getScoresData({}, true)
     }
 
     const handleSelectLastMonths = (value: string) => {

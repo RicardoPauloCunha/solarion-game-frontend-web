@@ -108,6 +108,7 @@ const RecoverPassword = () => {
         let mail = email
 
         setEmail('')
+        setWarning(undefined)
 
         setTimeout(() => {
             formRef.current?.setFieldValue('email', mail)

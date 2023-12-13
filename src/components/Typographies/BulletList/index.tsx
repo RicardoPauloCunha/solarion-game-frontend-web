@@ -14,7 +14,7 @@ const BulletList = ({
             $variant={variant}
         >
             {items.map((x, index) => (
-                <li key={index}>{x}</li>
+                <li key={index}>{`\u2022 ${x}`}</li>
             ))}
         </Container>
     )

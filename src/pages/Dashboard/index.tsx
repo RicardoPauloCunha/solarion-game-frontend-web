@@ -120,9 +120,10 @@ const Dashboard = () => {
     }
 
     const handleCleanFilter = () => {
-        setIndicatorsFilter({})
-
+        setHasDateInput(false)
         formRef.current?.reset()
+
+        getIndicatorsData({})
     }
 
     const handleSelectLastMonths = (value: string) => {

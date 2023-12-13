@@ -118,7 +118,7 @@ const Home = () => {
                                 value={creationDate}
                             />
 
-                            <Toggle
+                            {decisionTypesValue.length !== 0 && <Toggle
                                 text="Decisões:"
                                 preview={<BulletList
                                     items={[decisionTypesValue[0] + '..']}
@@ -127,7 +127,7 @@ const Home = () => {
                                 <BulletList
                                     items={decisionTypesValue}
                                 />
-                            </Toggle>
+                            </Toggle>}
                         </VerticalGroup>
 
                         <VerticalGroup>

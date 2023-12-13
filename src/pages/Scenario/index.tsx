@@ -44,8 +44,8 @@ const Scenario = () => {
             navigate(DefaultRoutePathEnum.DecisionsRating)
         }
         if (last) {
-            defineScene(last.scenarioType)
             setSelectedDecisionTypes(last.decisions)
+            defineScene(last.scenarioType)
         }
         else {
             handleInitScene()

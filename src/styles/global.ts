@@ -168,8 +168,8 @@ export default createGlobalStyle`
 
     @media(max-width: 768px) {
         body >div#root >div.App {
-            gap: 4rem;
-            margin-bottom: 4rem;
+            gap: 2rem;
+            margin-bottom: 2rem;
         }
 
         h1 {

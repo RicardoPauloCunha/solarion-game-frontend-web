@@ -17,7 +17,7 @@ export const getHeroTypeEnumValue = (type: HeroTypeEnum | number) => {
         case HeroTypeEnum.Mage:
             return "Mago"
         default:
-            return ""
+            return "-"
     }
 }
 
