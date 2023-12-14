@@ -11,7 +11,7 @@ O intuito dessa série de repositórios é possuir um projeto atual com bibliote
 * Realizar login;
 * Recuperar senha;
 * Salvar pontuação obtida;
-* Listar pontuações
+* Listar pontuações;
 * Visualizar dashboard das pontuações (admin);
 
 ## Repositórios relacionados
