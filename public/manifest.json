@@ -4,7 +4,7 @@
     "lang": "pt-BR",
     "name": "SolarionGame",
     "short_name": "SolarionGame",
-    "description": "Solarion Chronicles: The Game, uma aventura estilo 'visual novel' baseado em um evento presente no jogo 'Stardew Valley'.",
+    "description": "Solarion Chronicles: The Game, uma aventura de narrativa interativa (jogo de escolhas) baseado em um evento presente no jogo 'Stardew Valley'.",
     "scope": "/",
     "start_url": ".",
     "icons": [
