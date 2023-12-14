@@ -35,7 +35,7 @@ git clone https://github.com/RicardoPauloCunha/solarion-game-frontend-web
 
 2. Abra o arquivo ```.env.development``` para adicionar as configurações do ambiente de desenvolvimento (```.env.production``` para produção):
 
-3. Em ```REACT_APP_API_URL```, altere o valor de **API_URL_HERE** para a URL do backend que será utilizado e coloque uma **/** no final (exemplo: http://localhost:5000/) ([solarion-game-backend](https://github.com/RicardoPauloCunha/solarion-game-backend));
+3. Em ```REACT_APP_API_URL```, altere o texto **API_URL_HERE** para a URL do backend que será utilizado e coloque uma **/** no final (exemplo: http://localhost:5000/) ([solarion-game-backend](https://github.com/RicardoPauloCunha/solarion-game-backend));
 
 4. Execute o comando no terminal para instalar os pacotes:
 
@@ -59,5 +59,4 @@ yarn start
 
 7. Por fim, inicie um 'Novo jogo' e finalize o cenário para obter uma pontuação e ???.
 
-> **Note**
 > As imagens e a história presente no cenário de 'Solarion Chronicles: The Game' foram retiradas de um evento no jogo 'Stardew Valley', não sendo de minha autoria, apesar que algumas partes foram editadas para melhorar o contexto fora do jogo mencionado.
