@@ -51,11 +51,7 @@ yarn start
 
 6. Abra [http://localhost:3000](http://localhost:3000) para acessar o site.
 
-<div align="center">
-
-![main page files](src/assets/prints/main-page.png)
-
-</div>
+<img src="src/assets/prints/main-page.png">
 
 7. Por fim, inicie um 'Novo jogo' e finalize o cenário para obter uma pontuação e ???.
 
