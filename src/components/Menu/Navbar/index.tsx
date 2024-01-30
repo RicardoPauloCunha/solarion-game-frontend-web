@@ -46,11 +46,6 @@ export const Navbar = () => {
             <div>
                 {loggedUser
                     ? <>
-                        {loggedUser.userType === UserTypeEnum.Common && <Link
-                            to={DefaultRoutePathEnum.MyScores}
-                            text="Minhas pontuações"
-                        />}
-
                         {loggedUser.userType === UserTypeEnum.Admin && <>
                             <Link
                                 to={DefaultRoutePathEnum.Dashboard}
@@ -62,6 +57,11 @@ export const Navbar = () => {
                                 text="Pontuações"
                             />
                         </>}
+
+                        {loggedUser.userType === UserTypeEnum.Common && <Link
+                            to={DefaultRoutePathEnum.MyScores}
+                            text="Minhas pontuações"
+                        />}
 
                         <Link
                             to={DefaultRoutePathEnum.Profile}

@@ -20,11 +20,13 @@ const ScoreCard = ({
     onDelete,
     onSave
 }: ScoreCardProps) => {
+    let hasUserName = !!data.userName
+
     return (
         <Container
             className="stylized-margin"
         >
-            {onSave && <h2>Pontuação da última aventura</h2>}
+            {!hasUserName && onSave && <h2>Pontuação da última aventura</h2>}
             {data.userName && <h3>{data.userName}</h3>}
 
             <div>
@@ -43,7 +45,8 @@ const ScoreCard = ({
                     value={data.creationDate}
                 />
 
-                {onDelete && <FaRegTimesCircle
+                {!hasUserName && onDelete && <FaRegTimesCircle
+                    role="deletion"
                     onClick={onDelete}
                     className="click-animation"
                 />}
@@ -63,7 +66,7 @@ const ScoreCard = ({
                 </Toggle>
             </div>
 
-            {onSave && <Button
+            {!hasUserName && onSave && <Button
                 text="Salvar"
                 onClick={onSave}
                 isLoading={isLoading}

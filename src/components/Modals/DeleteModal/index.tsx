@@ -30,7 +30,10 @@ const DeleteModal = ({
         >
             <VerticalGroup>
                 {messages.map((x, index) => (
-                    <p key={index}>{x}</p>
+                    <p
+                        key={index}
+                        role="alertdialog"
+                    >{x}</p>
                 ))}
             </VerticalGroup>
 

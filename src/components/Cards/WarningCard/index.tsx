@@ -23,6 +23,7 @@ const WarningCard = ({
     return (
         <Container
             $variant={variant}
+            role='alert'
         >
             <strong>
                 {variant === 'info' && <FaInfoCircle />}

@@ -9,7 +9,9 @@ const VerticalGroup = ({
     children
 }: VerticalGroupProps) => {
     return (
-        <Container>
+        <Container
+            role="group"
+        >
             {children}
         </Container>
     )

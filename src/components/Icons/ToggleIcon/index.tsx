@@ -14,6 +14,7 @@ const ToggleIcon = ({
         <Container
             onClick={onToggle}
             className="click-animation"
+            role="switch"
         >
             {isOpen
                 ? <>

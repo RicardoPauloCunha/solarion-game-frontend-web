@@ -30,6 +30,8 @@ const Modal = ({
                 <FaTimes
                     onClick={() => onClose()}
                     className="click-animation"
+                    role="switch"
+                    title="Fechar modal"
                 />
             </Header>
 

@@ -7,7 +7,7 @@ export interface LoggedUserData {
     userType: number
 }
 
-interface AuthContextData {
+export interface AuthContextData {
     loggedUser: LoggedUserData | undefined
     setLoggedUser: (value: LoggedUserData | undefined) => void
     defineLoggedUserByToken: (token: string) => LoggedUserData
