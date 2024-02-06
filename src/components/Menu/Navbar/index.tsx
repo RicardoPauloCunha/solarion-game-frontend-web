@@ -29,6 +29,7 @@ export const Navbar = () => {
         <Container
             className="stylized-margin"
             $menuIsOpen={menuIsOpen}
+            role='menubar'
         >
             <NavLogo />
 

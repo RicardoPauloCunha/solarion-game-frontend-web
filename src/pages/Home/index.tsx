@@ -147,7 +147,7 @@ const Home = () => {
                         <p>Nenhum registro da sua última aventura foi encontrado.</p>
 
                         <Button
-                            text='Novo jogo'
+                            text='Nova aventura'
                             onClick={handlePlay}
                         />
                     </>}

@@ -6,7 +6,7 @@ import { AuthContext, AuthContextData, LoggedUserData } from "../../../hooks/con
 import { DefaultRoutePathEnum } from "../../../types/enums/routePath"
 import { UserTypeEnum } from "../../../types/enums/userType"
 
-const setLoggedUser = jest.fn()
+const mockSetLoggedUser = jest.fn()
 const mockNavigate = jest.fn()
 
 jest.mock('react-router', () => ({
@@ -30,7 +30,7 @@ const renderComponent = (userType: UserTypeEnum, options?: {
     render(<AuthContext.Provider
         value={{
             loggedUser: options?.hasNoLoggedUser ? undefined : loggedUser,
-            setLoggedUser
+            setLoggedUser: mockSetLoggedUser
         } as unknown as AuthContextData}
     >
         <Navbar />
@@ -41,19 +41,20 @@ const renderComponent = (userType: UserTypeEnum, options?: {
     }
 }
 
+// TODO: Test open/close menu in mobile
+
 describe('Navbar Comp', () => {
     it('should render a navbar', () => {
         renderComponent(UserTypeEnum.None, { hasNoLoggedUser: true })
 
-        const homeLink = screen.getByText('SolarionGame')
+        const navbar = screen.getByRole('menubar')
 
-        expect(homeLink).toBeInTheDocument()
+        expect(navbar).toBeInTheDocument()
     })
-
-    // TODO: Test open/close menu in mobile
 
     describe('when not logged', () => {
         it.each([
+            ['SolarionGame', DefaultRoutePathEnum.Home],
             ['Entrar', DefaultRoutePathEnum.Login],
         ])('should render default links', async (linkName, linkPath) => {
             renderComponent(UserTypeEnum.None, { hasNoLoggedUser: true })

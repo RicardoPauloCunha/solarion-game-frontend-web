@@ -18,10 +18,10 @@ describe('PageContainer Comp', () => {
     it('should render a page container', () => {
         const props = renderComponent()
 
-        const homeLink = screen.getByRole('link', { name: 'SolarionGame' })
+        const navbar = screen.getByRole('menubar')
         const content = screen.getByText(props.textContext)
 
-        expect(homeLink).toBeInTheDocument()
+        expect(navbar).toBeInTheDocument()
         expect(content).toBeInTheDocument()
     })
 })

@@ -79,7 +79,7 @@ const FileUpload = ({
                 onChange={handleChangeValue}
             />
 
-            {error && <strong>{error}</strong>}
+            {error && <strong role='alertdialog'>{error}</strong>}
         </Container>
     )
 }

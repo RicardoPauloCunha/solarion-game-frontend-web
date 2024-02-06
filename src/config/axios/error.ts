@@ -1,4 +1,4 @@
-import { AxiosError } from "axios"
+import { AxiosError, AxiosHeaders, AxiosResponse } from "axios"
 import { WarningData } from "../../components/Cards/WarningCard"
 
 export interface ResultWrapperData<T = null> {
@@ -45,12 +45,38 @@ export const getAxiosError = (baseError: any) => {
                     }
                     break
             }
-
-            console.log(error?.response?.status, error?.response?.data, error?.response?.data?.message)
         }
 
         return warning
     } catch (error) {
         return warning
     }
+}
+
+export const createAxiosError = (responseStatus: 400 | 401 | 403 | 422 | 500, message: string, errors?: string[]) => {
+    const error: ResultWrapperData = {
+        message,
+        responseStatus,
+        result: null,
+        errors
+    }
+
+    let headers = new AxiosHeaders();
+    let response: AxiosResponse = {
+        data: error,
+        status: responseStatus,
+        statusText: '',
+        headers,
+        config: {
+            headers
+        },
+    }
+
+    return new AxiosError(
+        undefined,
+        undefined,
+        undefined,
+        undefined,
+        response
+    )
 }

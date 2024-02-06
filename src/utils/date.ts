@@ -8,7 +8,7 @@ export const formatDateToView = (value: Date) => {
     }
 
     let date = new Date(value).toLocaleDateString()
-    let time = new Date(value).toLocaleTimeString(navigator.language, {
+    let time = new Date(value).toLocaleTimeString('pt-BR', {
         hour: '2-digit',
         minute: '2-digit'
     })

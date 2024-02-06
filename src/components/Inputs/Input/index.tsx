@@ -141,7 +141,7 @@ const Input = ({
                 {...rest}
             />
 
-            {error && <strong>{error}</strong>}
+            {error && <strong role='alertdialog'>{error}</strong>}
         </Container>
     )
 }

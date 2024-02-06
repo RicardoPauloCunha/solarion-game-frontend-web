@@ -143,7 +143,7 @@ const RecoverPassword = () => {
 
                     <Link
                         to={DefaultRoutePathEnum.Login}
-                        text="Entrar"
+                        text="Tentar entrar novamente"
                     />
                 </section>
                 : <section>

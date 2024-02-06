@@ -1,6 +1,6 @@
 import { setLocale } from 'yup'
 
-const ErrorDictionary = {
+export const ErrorDictionary = {
     mixed: {
         default: "O valor é inválido.",
         required: "Preencha o campo com o valor solicitado.",
@@ -26,6 +26,15 @@ const ErrorDictionary = {
         min: "Escolha no mínimo ${min} item.",
         max: "Escolha no mínimo ${max} item."
     }
+}
+
+export const replaceVariableInErrorDictionaryMessage = (message: string, replacementValue: string) => {
+    return message
+        .replace('${length}', replacementValue)
+        .replace('${min}', replacementValue)
+        .replace('${max}', replacementValue)
+        .replace('${less}', replacementValue)
+        .replace('${more}', replacementValue)
 }
 
 export const defineValidatorErrorDictionary = () => {

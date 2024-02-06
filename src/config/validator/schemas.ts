@@ -9,9 +9,9 @@ export const nameSchema = () => {
 
 export const emailSchema = () => {
     return Yup.string().trim()
+        .email()
         .min(3)
         .max(80)
-        .email()
         .required()
 }
 
@@ -30,14 +30,14 @@ export const confirmPasswordSchema = (fieldName: string) => {
 
 export const startDateSchema = () => {
     return Yup.date()
-        .max(new Date(), 'Coloque uma data menor ou igual a data de hoje.')
         .min('1900-01-01', 'Coloque uma data válida maior ou igual a 01/01/1900.')
+        .max(new Date(), 'Coloque uma data menor ou igual a data de hoje.')
         .typeError('Coloque uma data válida.')
 }
 
 export const endDateSchema = (startDate: Date | null) => {
     return Yup.date()
-        .max(new Date(), 'Coloque uma data menor ou igual a data de hoje.')
         .min(startDate ? startDate : new Date(), 'Coloque uma data maior ou igual a data inicial.')
+        .max(new Date(), 'Coloque uma data menor ou igual a data de hoje.')
         .typeError('Coloque uma data válida.')
 }
