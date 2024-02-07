@@ -10,3 +10,12 @@ export const testTypeInInput = async (inputLabel: string, value: string) => {
     const input = screen.getByLabelText(inputLabel)
     await userEvent.type(input, value)
 }
+
+export const testClearInputs = async (inputsName: string[]) => {
+    inputsName.forEach(async x => {
+        const input = screen.getByLabelText(x)
+        await userEvent.clear(input)
+    })
+}
+
+export const textAwait = (ms: number) => new Promise((r) => setTimeout(r, ms))

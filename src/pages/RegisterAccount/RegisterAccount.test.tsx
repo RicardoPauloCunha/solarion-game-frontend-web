@@ -8,10 +8,11 @@ import * as userApiFile from "../../hooks/api/user"
 import { AuthContext, AuthContextData } from "../../hooks/contexts/auth"
 import * as tokenStorageFile from "../../hooks/storage/token"
 import { DefaultRoutePathEnum } from "../../types/enums/routePath"
+import { UserTypeEnum } from "../../types/enums/userType"
 import { testSubmitForm, testTypeInInput } from "../../utils/test"
 
 const mockCreateCommonUserApi = jest.spyOn(userApiFile, 'createCommonUserApi')
-const mockSetTokenStorage = jest.spyOn(tokenStorageFile, "setTokenStorage");
+const mockSetTokenStorage = jest.spyOn(tokenStorageFile, "setTokenStorage")
 const mockDefineLoggedUserByToken = jest.fn()
 const mockNavigate = jest.fn()
 
@@ -43,6 +44,12 @@ const renderPage = async (options?: {
     else if (options?.mockFailCreateCommonUserRequest) {
         mockCreateCommonUserApi.mockRejectedValue(createAxiosError(400, errorMessage))
     }
+
+    mockDefineLoggedUserByToken.mockReturnValue({
+        userId: 1,
+        name,
+        userType: UserTypeEnum.Common
+    })
 
     render(<AuthContext.Provider
         value={{
@@ -311,7 +318,7 @@ describe('RegisterAccount Page', () => {
             })
         })
 
-        describe('and when close the modal', () => {
+        describe('and when click to close the modal', () => {
             it('should call the navigation function to my scores page', async () => {
                 await renderPage({
                     submitValidAccountForm: true,

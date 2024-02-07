@@ -3,7 +3,7 @@ import { get, post, put } from "../../config/axios/methods"
 
 const root = "users/"
 
-interface UserSimpleViewModel {
+export interface UserSimpleViewModel {
     userId: number
     name: string
     email: string

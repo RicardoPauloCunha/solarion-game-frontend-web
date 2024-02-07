@@ -215,7 +215,7 @@ const Profile = () => {
                     <Button
                         text="Alterar senha"
                         type="submit"
-                        isLoading={currentSection === SectionEnum.Password && isLoading === LoadingEnum.Get}
+                        isLoading={currentSection === SectionEnum.Password && isLoading === LoadingEnum.Save}
                     />
                 </Form>
             </section>

@@ -12,7 +12,7 @@ import { UserTypeEnum } from "../../types/enums/userType"
 import { testSubmitForm, testTypeInInput } from "../../utils/test"
 
 const mockLoginApi = jest.spyOn(userApiFile, 'loginApi')
-const mockSetTokenStorage = jest.spyOn(tokenStorageFile, "setTokenStorage");
+const mockSetTokenStorage = jest.spyOn(tokenStorageFile, "setTokenStorage")
 const mockDefineLoggedUserByToken = jest.fn()
 const mockNavigate = jest.fn()
 

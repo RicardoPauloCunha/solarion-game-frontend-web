@@ -79,7 +79,6 @@ const renderPage = async (options?: {
     }
 }
 
-
 describe('RecoverPassword Page', () => {
     it('should render the recover password page', async () => {
         await renderPage()
@@ -497,7 +496,7 @@ describe('RecoverPassword Page', () => {
             })
         })
 
-        describe('and when close the modal', () => {
+        describe('and when click to close the modal', () => {
             it('should call the navigation function to login page', async () => {
                 await renderPage({
                     submitValidSolicitForm: true,
