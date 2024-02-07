@@ -36,12 +36,12 @@ describe('SuccessModal Comp', () => {
         expect(confirmButton).toBeInTheDocument()
     })
 
-    describe('when click in button', () => {
-        it('should call the onClose function', async () => {
+    describe('when click in modal button', () => {
+        it('should call onClose function', async () => {
             const props = renderComponent()
 
-            const button = screen.getByRole('button', { name: 'Entendi' })
-            await userEvent.click(button)
+            const modalButton = screen.getByRole('button', { name: 'Entendi' })
+            await userEvent.click(modalButton)
 
             expect(props.onClose).toHaveBeenCalledTimes(1)
         })

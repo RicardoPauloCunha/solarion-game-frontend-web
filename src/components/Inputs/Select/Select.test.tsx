@@ -123,8 +123,10 @@ describe('Select Comp', () => {
             expect(optionsText).toEqual(optionsTextData)
         })
 
-        it('should not call the onChange function', async () => {
-            const props = renderComponent({ hasOnChangeValue: true })
+        it('should not call onChangeValue function', async () => {
+            const props = renderComponent({
+                hasOnChangeValue: true
+            })
 
             const input = screen.getByRole('combobox')
             await userEvent.type(input, props.options[0].label)
@@ -133,7 +135,7 @@ describe('Select Comp', () => {
         })
     })
 
-    describe('when an option is selected', () => {
+    describe('when select an option', () => {
         it('should change the value of the fake input', async () => {
             const props = renderComponent()
             const option = props.options[0]
@@ -151,8 +153,10 @@ describe('Select Comp', () => {
             expect(options).toHaveLength(0)
         })
 
-        it('should call the onChange function with the option value', async () => {
-            const props = renderComponent({ hasOnChangeValue: true })
+        it('should call onChangeValue function with the option value', async () => {
+            const props = renderComponent({
+                hasOnChangeValue: true
+            })
             const option = props.options[0]
 
             const input = screen.getByRole('combobox')
@@ -169,7 +173,9 @@ describe('Select Comp', () => {
     describe('when disabled', () => {
         describe('and when type a text', () => {
             it('should not change the value of the fake input', async () => {
-                const props = renderComponent({ isDisabled: true })
+                const props = renderComponent({
+                    isDisabled: true
+                })
                 const option = props.options[0]
 
                 const input = screen.getByLabelText(props.label)
@@ -183,7 +189,9 @@ describe('Select Comp', () => {
 
         describe('and when clicked', () => {
             it('should not show the options', async () => {
-                const props = renderComponent({ isDisabled: true })
+                const props = renderComponent({
+                    isDisabled: true
+                })
 
                 const input = screen.getByLabelText(props.label)
                 await userEvent.click(input, { pointerEventsCheck: PointerEventsCheckLevel.Never })

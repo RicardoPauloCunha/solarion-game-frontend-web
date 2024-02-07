@@ -42,8 +42,10 @@ describe('Toggle', () => {
         expect(content).toBeNull()
     })
 
-    it('should render a opened toggle', () => {
-        const props = renderComponent({ isOpenDefault: true })
+    it('should render an open toggle', () => {
+        const props = renderComponent({
+            isOpenDefault: true
+        })
 
         const fieldName = screen.getByText(props.text)
         const toggle = screen.getByRole('switch')
@@ -57,7 +59,9 @@ describe('Toggle', () => {
     describe('when have a preview', () => {
         describe('and when is closed', () => {
             it('should show the preview', () => {
-                const props = renderComponent({ hasPreview: true })
+                const props = renderComponent({
+                    hasPreview: true
+                })
 
                 const preview = screen.getByText(props.previewTextContent)
 
@@ -66,7 +70,9 @@ describe('Toggle', () => {
 
             describe('and when clicked', () => {
                 it('should hide the preview', async () => {
-                    const props = renderComponent({ hasPreview: true })
+                    const props = renderComponent({
+                        hasPreview: true
+                    })
 
                     const previewOn = screen.getByText(props.previewTextContent)
 
@@ -82,9 +88,12 @@ describe('Toggle', () => {
             })
         })
 
-        describe('and when is opened', () => {
+        describe('and when is open', () => {
             it('should not render the preview', () => {
-                const props = renderComponent({ isOpenDefault: true, hasPreview: true })
+                const props = renderComponent({
+                    isOpenDefault: true,
+                    hasPreview: true
+                })
 
                 const preview = screen.queryByText(props.previewTextContent)
 
@@ -93,7 +102,10 @@ describe('Toggle', () => {
 
             describe('and when clicked', () => {
                 it('should show the preview', async () => {
-                    const props = renderComponent({ isOpenDefault: true, hasPreview: true })
+                    const props = renderComponent({
+                        isOpenDefault: true,
+                        hasPreview: true
+                    })
 
                     const previewOff = screen.queryByText(props.previewTextContent)
 
@@ -127,7 +139,9 @@ describe('Toggle', () => {
         })
 
         it('should call onOpen function', async () => {
-            const props = renderComponent({ hasOnOpen: true })
+            const props = renderComponent({
+                hasOnOpen: true
+            })
 
             const button = screen.getByRole('switch')
             await userEvent.click(button)
@@ -154,7 +168,9 @@ describe('Toggle', () => {
             })
 
             it('should call onOpen function only when opening', async () => {
-                const toggleProps = renderComponent({ hasOnOpen: true })
+                const toggleProps = renderComponent({
+                    hasOnOpen: true
+                })
 
                 const button = screen.getByRole('switch')
                 await userEvent.click(button)

@@ -43,7 +43,9 @@ describe('WarningCard Comp', () => {
 
     describe('when have submessages', () => {
         it('should render a card with details', async () => {
-            const props = renderComponent({ hasSubmessages: true })
+            const props = renderComponent({
+                hasSubmessages: true
+            })
 
             const detailsTitle = screen.getByText('Detalhes')
             const submessagesList = screen.queryByRole('list')

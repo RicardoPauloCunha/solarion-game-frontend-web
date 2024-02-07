@@ -20,17 +20,20 @@ const renderComponent = (options?: {
 }
 
 describe('DecisionButton Comp', () => {
-    it('should render a clickable button', () => {
+    it('should render an enabled button', () => {
         const props = renderComponent()
 
         const button = screen.getByRole('button', { name: props.text })
 
+        expect(button).toBeInTheDocument()
         expect(button).toBeEnabled()
     })
 
     describe('when clicked', () => {
         it('should call onClick function', async () => {
-            const props = renderComponent({ hasOnClick: true })
+            const props = renderComponent({
+                hasOnClick: true
+            })
 
             const button = screen.getByRole('button', { name: props.text })
             await userEvent.click(button)

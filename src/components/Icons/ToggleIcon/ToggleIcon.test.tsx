@@ -25,7 +25,7 @@ describe('ToggleIcon Comp', () => {
         expect(toggle).toBeInTheDocument()
     })
 
-    it('should render a opened toggle', () => {
+    it('should render an open toggle', () => {
         renderComponent(true)
 
         const toggle = screen.getByText('Esconder')

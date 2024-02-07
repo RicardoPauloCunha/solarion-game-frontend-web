@@ -45,7 +45,7 @@ const renderComponent = (options?: {
 }
 
 describe('Radio Comp', () => {
-    it('should render a radio list unchecked', () => {
+    it('should render a list of unchecked radios', () => {
         const props = renderComponent()
 
         const label = screen.getByText(props.label)
@@ -62,7 +62,9 @@ describe('Radio Comp', () => {
     })
 
     it('should render with one option checked', () => {
-        const props = renderComponent({ hasFirstOptionChecked: true })
+        const props = renderComponent({
+            hasFirstOptionChecked: true
+        })
 
         const input = screen.getByLabelText(props.options[0].label)
         const radios = screen.getAllByRole('radio').filter(x => x.id !== input.id)
@@ -84,8 +86,10 @@ describe('Radio Comp', () => {
             expect(input).toBeChecked()
         })
 
-        it('should call the onChange function with the option value', async () => {
-            const props = renderComponent({ hasOnChangeValue: true })
+        it('should call onChangeValue function with the option value', async () => {
+            const props = renderComponent({
+                hasOnChangeValue: true
+            })
             const option = props.options[0]
 
             const input = screen.getByLabelText(option.label)
@@ -128,7 +132,9 @@ describe('Radio Comp', () => {
 
     describe('when disabled', () => {
         it('should disable all options', () => {
-            renderComponent({ isDisabled: true })
+            renderComponent({
+                isDisabled: true
+            })
 
             const radios = screen.getAllByRole('radio')
 
@@ -137,8 +143,11 @@ describe('Radio Comp', () => {
             })
         })
 
-        it('should not call the onChange function', async () => {
-            const props = renderComponent({ hasOnChangeValue: true, isDisabled: true })
+        it('should not call onChangeValue function', async () => {
+            const props = renderComponent({
+                hasOnChangeValue: true,
+                isDisabled: true
+            })
 
             const input = screen.getByLabelText(props.options[0].label)
             await userEvent.click(input)
@@ -148,7 +157,9 @@ describe('Radio Comp', () => {
 
         describe('and when clicked', () => {
             it('should not check the option', async () => {
-                const props = renderComponent({ isDisabled: true })
+                const props = renderComponent({
+                    isDisabled: true
+                })
 
                 const input = screen.getByLabelText(props.options[0].label)
                 await userEvent.click(input)
@@ -160,7 +171,9 @@ describe('Radio Comp', () => {
 
     describe('when one option is disabled', () => {
         it('should only disable that option', () => {
-            const props = renderComponent({ hasFirstOptionDisabled: true })
+            const props = renderComponent({
+                hasFirstOptionDisabled: true
+            })
 
             const input = screen.getByLabelText(props.options[0].label)
             const radios = screen.getAllByRole('radio').filter(x => x.id !== input.id)
@@ -168,13 +181,15 @@ describe('Radio Comp', () => {
             expect(input).toBeDisabled()
 
             radios.forEach(x => {
-                expect(x).not.toBeDisabled()
+                expect(x).toBeEnabled()
             })
         })
 
         describe('and when clicked', () => {
             it('should not check that option', async () => {
-                const props = renderComponent({ hasFirstOptionDisabled: true })
+                const props = renderComponent({
+                    hasFirstOptionDisabled: true
+                })
 
                 const input = screen.getByLabelText(props.options[0].label)
                 await userEvent.click(input)
@@ -183,7 +198,9 @@ describe('Radio Comp', () => {
             })
 
             it('should be able to check another option', async () => {
-                const props = renderComponent({ hasFirstOptionDisabled: true })
+                const props = renderComponent({
+                    hasFirstOptionDisabled: true
+                })
 
                 const input = screen.getByLabelText(props.options[1].label)
                 await userEvent.click(input)

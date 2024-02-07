@@ -24,17 +24,20 @@ const renderComponent = (options?: {
 }
 
 describe('Button Comp', () => {
-    it('should render a clickable button', () => {
+    it('should render an enabled button', () => {
         const props = renderComponent()
 
         const button = screen.getByRole('button', { name: props.text })
 
+        expect(button).toBeInTheDocument()
         expect(button).toBeEnabled()
     })
 
     describe('when clicked', () => {
         it('should call onClick function', async () => {
-            const props = renderComponent({ hasOnClick: true })
+            const props = renderComponent({
+                hasOnClick: true
+            })
 
             const button = screen.getByRole('button', { name: props.text })
             await userEvent.click(button)
@@ -45,7 +48,9 @@ describe('Button Comp', () => {
 
     describe('when disabled', () => {
         it('should have gray style', () => {
-            const props = renderComponent({ isDisabled: true })
+            const props = renderComponent({
+                isDisabled: true
+            })
 
             const button = screen.getByRole('button', { name: props.text })
 
@@ -54,7 +59,10 @@ describe('Button Comp', () => {
 
         describe('and when clicked', () => {
             it('should not call onClick function', async () => {
-                const props = renderComponent({ isDisabled: true, hasOnClick: true })
+                const props = renderComponent({
+                    isDisabled: true,
+                    hasOnClick: true
+                })
 
                 const button = screen.getByRole('button', { name: props.text })
                 await userEvent.click(button)
@@ -66,7 +74,9 @@ describe('Button Comp', () => {
 
     describe('when loading', () => {
         it('should decrease opacity', () => {
-            renderComponent({ isLoading: true })
+            renderComponent({
+                isLoading: true
+            })
 
             const button = screen.getByRole('button')
 
@@ -74,7 +84,9 @@ describe('Button Comp', () => {
         })
 
         it('should be disabled', () => {
-            renderComponent({ isLoading: true })
+            renderComponent({
+                isLoading: true
+            })
 
             const button = screen.getByRole('button')
 
@@ -82,7 +94,9 @@ describe('Button Comp', () => {
         })
 
         it('should show a loading message', () => {
-            const props = renderComponent({ isLoading: true })
+            const props = renderComponent({
+                isLoading: true
+            })
 
             const buttonText = screen.queryByText(props.text)
             const loadingMessage = screen.getByText('Carregando...')

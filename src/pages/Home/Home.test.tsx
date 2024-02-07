@@ -72,13 +72,21 @@ describe('Home Page', () => {
     })
 
     describe('when click in new game button', () => {
-        it('should call the remove scenario storage function and the navigation function to scenario page', async () => {
+        it('should call removeScenarioStorage function', async () => {
             await renderPage()
 
             const newGameButton = screen.getByRole('button', { name: 'Novo jogo' })
             await userEvent.click(newGameButton)
 
             expect(mockRemoveScenarioStorage).toHaveBeenCalledTimes(1)
+        })
+
+        it('should call navigate function to scenario page', async () => {
+            await renderPage()
+
+            const newGameButton = screen.getByRole('button', { name: 'Novo jogo' })
+            await userEvent.click(newGameButton)
+
             expect(mockNavigate).toHaveBeenCalledTimes(1)
             expect(mockNavigate).toHaveBeenCalledWith(DefaultRoutePathEnum.Scenario)
         })
@@ -111,7 +119,7 @@ describe('Home Page', () => {
             })
 
             describe('and when click in new adventure button', () => {
-                it('should call the remove scenario storage function and the navigation function to scenario page', async () => {
+                it('should call removeScenarioStorage function', async () => {
                     await renderPage({
                         openModal: true
                     })
@@ -120,6 +128,16 @@ describe('Home Page', () => {
                     await userEvent.click(newAdventureButton)
 
                     expect(mockRemoveScenarioStorage).toHaveBeenCalledTimes(1)
+                })
+
+                it('should call navigate function to scenario page', async () => {
+                    await renderPage({
+                        openModal: true
+                    })
+
+                    const newAdventureButton = screen.getByRole('button', { name: 'Nova aventura' })
+                    await userEvent.click(newAdventureButton)
+
                     expect(mockNavigate).toHaveBeenCalledTimes(1)
                     expect(mockNavigate).toHaveBeenCalledWith(DefaultRoutePathEnum.Scenario)
                 })
@@ -165,7 +183,7 @@ describe('Home Page', () => {
             })
 
             describe('and when click in continue button', () => {
-                it('should call the navigation function to scenario page', async () => {
+                it('should call navigate function to scenario page', async () => {
                     await renderPage({
                         hasLastScenario: true,
                         openModal: true
@@ -202,7 +220,7 @@ describe('Home Page', () => {
                     expect(newAdventureButtonOn).toBeInTheDocument()
                 })
 
-                it('should call the remove scenario storage function', async () => {
+                it('should call removeScenarioStorage function', async () => {
                     await renderPage({
                         hasLastScenario: true,
                         openModal: true

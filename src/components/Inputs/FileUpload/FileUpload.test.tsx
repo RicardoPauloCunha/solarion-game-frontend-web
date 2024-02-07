@@ -50,7 +50,7 @@ describe('FileUpload Comp', () => {
     })
 
     describe('when upload a file', () => {
-        it('should replace the fake input placeholder for file name', async () => {
+        it('should replace the fake input placeholder for the file name', async () => {
             const props = renderComponent()
             const file = generateFile()
 
@@ -64,8 +64,10 @@ describe('FileUpload Comp', () => {
             expect(fileName).toBeInTheDocument()
         })
 
-        it('should call the onChange function', async () => {
-            const props = renderComponent({ hasOnChangeValue: true })
+        it('should call onChangeValue function', async () => {
+            const props = renderComponent({
+                hasOnChangeValue: true
+            })
             const file = generateFile()
 
             const input = screen.getByLabelText(props.placeholder)
@@ -96,8 +98,10 @@ describe('FileUpload Comp', () => {
 
     describe('when disabled', () => {
         describe('and when upload a file', () => {
-            it('should not replace the fake input placeholder for file name', async () => {
-                const props = renderComponent({ isDisabled: true })
+            it('should not replace the fake input placeholder for the file name', async () => {
+                const props = renderComponent({
+                    isDisabled: true
+                })
                 const file = generateFile()
 
                 const input = screen.getByLabelText(props.placeholder)
@@ -110,8 +114,11 @@ describe('FileUpload Comp', () => {
                 expect(fileName).toBeNull()
             })
 
-            it('should not call the onChange function', async () => {
-                const props = renderComponent({ hasOnChangeValue: true, isDisabled: true })
+            it('should not call onChangeValue function', async () => {
+                const props = renderComponent({
+                    hasOnChangeValue: true,
+                    isDisabled: true
+                })
                 const file = generateFile()
 
                 const input = screen.getByLabelText(props.placeholder)

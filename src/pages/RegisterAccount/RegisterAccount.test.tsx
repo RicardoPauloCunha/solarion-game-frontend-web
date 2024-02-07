@@ -23,8 +23,8 @@ jest.mock('react-router', () => ({
 
 const renderPage = async (options?: {
     submitValidAccountForm?: boolean,
-    mockSuccessfulCreateCommonUserRequest?: boolean,
-    mockFailCreateCommonUserRequest?: boolean,
+    mockSuccessfulCreateCommonUserApi?: boolean,
+    mockFailCreateCommonUserApi?: boolean,
 }) => {
     defineValidatorErrorDictionary()
 
@@ -34,14 +34,14 @@ const renderPage = async (options?: {
     const result = 'jwt-token'
     const errorMessage = 'Não foi possível completar a requisição.'
 
-    if (options?.mockSuccessfulCreateCommonUserRequest) {
+    if (options?.mockSuccessfulCreateCommonUserApi) {
         mockCreateCommonUserApi.mockResolvedValue({
             message: '',
             responseStatus: 200,
             result
         })
     }
-    else if (options?.mockFailCreateCommonUserRequest) {
+    else if (options?.mockFailCreateCommonUserApi) {
         mockCreateCommonUserApi.mockRejectedValue(createAxiosError(400, errorMessage))
     }
 
@@ -104,7 +104,7 @@ describe('RegisterAccount Page', () => {
     })
 
     describe('when click in the bottom link', () => {
-        it('should call the navigation function to login page', async () => {
+        it('should call navigate function to login page', async () => {
             await renderPage()
 
             const link = screen.getByRole('link', { name: 'Já tenho uma conta' })
@@ -241,7 +241,7 @@ describe('RegisterAccount Page', () => {
         })
 
         describe('and when form is valid', () => {
-            it('should call the create common user request', async () => {
+            it('should call createCommonUserApi request', async () => {
                 const props = await renderPage({
                     submitValidAccountForm: true
                 })
@@ -254,11 +254,11 @@ describe('RegisterAccount Page', () => {
                 })
             })
 
-            describe('and when the create common user request succeeds', () => {
-                it('should call the set token storage function', async () => {
+            describe('and when createCommonUserApi request succeeds', () => {
+                it('should call setTokenStorage function', async () => {
                     const props = await renderPage({
                         submitValidAccountForm: true,
-                        mockSuccessfulCreateCommonUserRequest: true
+                        mockSuccessfulCreateCommonUserApi: true
                     })
 
                     expect(mockSetTokenStorage).toHaveBeenCalledTimes(1)
@@ -268,7 +268,7 @@ describe('RegisterAccount Page', () => {
                 it('should open success modal', async () => {
                     await renderPage({
                         submitValidAccountForm: true,
-                        mockSuccessfulCreateCommonUserRequest: true
+                        mockSuccessfulCreateCommonUserApi: true
                     })
 
                     const modalTitle = screen.getByRole('heading', { name: 'Conta criada' })
@@ -277,19 +277,19 @@ describe('RegisterAccount Page', () => {
                         'Conta de usuário criada com sucesso.',
                         'Agora você pode salvar a pontuação das suas aventuras.'
                     ]
-                    const okButton = screen.getByRole('button', { name: 'Entendi' })
+                    const modalButton = screen.getByRole('button', { name: 'Entendi' })
 
                     expect(modalTitle).toBeInTheDocument()
                     expect(modalMessagesText).toEqual(modalMessagesTextData)
-                    expect(okButton).toBeInTheDocument()
+                    expect(modalButton).toBeInTheDocument()
                 })
             })
 
-            describe('and when the create common user request fails', () => {
+            describe('and when createCommonUserApi request fails', () => {
                 it('should show a warning with the error', async () => {
                     const props = await renderPage({
                         submitValidAccountForm: true,
-                        mockFailCreateCommonUserRequest: true
+                        mockFailCreateCommonUserApi: true
                     })
 
                     const warning = screen.getByRole('alert')
@@ -302,16 +302,16 @@ describe('RegisterAccount Page', () => {
         })
     })
 
-    describe('when success modal is opened', () => {
-        describe('and when click in ok button', () => {
-            it('should call the navigation function to my scores page', async () => {
+    describe('when success modal is open', () => {
+        describe('and when click in modal button', () => {
+            it('should call navigate function to my scores page', async () => {
                 await renderPage({
                     submitValidAccountForm: true,
-                    mockSuccessfulCreateCommonUserRequest: true
+                    mockSuccessfulCreateCommonUserApi: true
                 })
 
-                const link = screen.getByRole('button', { name: 'Entendi' })
-                await userEvent.click(link)
+                const modalButton = screen.getByRole('button', { name: 'Entendi' })
+                await userEvent.click(modalButton)
 
                 expect(mockNavigate).toHaveBeenCalledTimes(1)
                 expect(mockNavigate).toHaveBeenCalledWith(DefaultRoutePathEnum.MyScores)
@@ -319,14 +319,14 @@ describe('RegisterAccount Page', () => {
         })
 
         describe('and when click to close the modal', () => {
-            it('should call the navigation function to my scores page', async () => {
+            it('should call navigate function to my scores page', async () => {
                 await renderPage({
                     submitValidAccountForm: true,
-                    mockSuccessfulCreateCommonUserRequest: true
+                    mockSuccessfulCreateCommonUserApi: true
                 })
 
-                const closeButton = screen.getByRole('switch', { name: 'Fechar modal' })
-                await userEvent.click(closeButton)
+                const closeIcon = screen.getByRole('switch', { name: 'Fechar modal' })
+                await userEvent.click(closeIcon)
 
                 expect(mockNavigate).toHaveBeenCalledTimes(1)
                 expect(mockNavigate).toHaveBeenCalledWith(DefaultRoutePathEnum.MyScores)

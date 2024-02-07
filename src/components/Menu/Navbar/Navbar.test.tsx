@@ -54,9 +54,9 @@ describe('Navbar Comp', () => {
 
     describe('when not logged', () => {
         it.each([
-            ['SolarionGame', DefaultRoutePathEnum.Home],
-            ['Entrar', DefaultRoutePathEnum.Login],
-        ])('should render default links', async (linkName, linkPath) => {
+            [DefaultRoutePathEnum.Home, 'SolarionGame'],
+            [DefaultRoutePathEnum.Login, 'Entrar'],
+        ])('should render a link to %p', async (linkPath, linkName) => {
             renderComponent(UserTypeEnum.None, { hasNoLoggedUser: true })
 
             const link = screen.getByRole('link', { name: linkName })
@@ -90,9 +90,9 @@ describe('Navbar Comp', () => {
         })
 
         it.each([
-            ['Perfil', DefaultRoutePathEnum.Profile],
-            ['Sair', DefaultRoutePathEnum.Home],
-        ])('should render logged links', async (linkName, linkPath) => {
+            [DefaultRoutePathEnum.Profile, 'Perfil'],
+            [DefaultRoutePathEnum.Home, 'Sair'],
+        ])('should render a link to %p', async (linkPath, linkName) => {
             renderComponent(UserTypeEnum.None)
 
             const link = screen.getByRole('link', { name: linkName })
@@ -118,9 +118,9 @@ describe('Navbar Comp', () => {
 
         describe('and when is admin', () => {
             it.each([
-                ['Dashboard', DefaultRoutePathEnum.Dashboard],
-                ['Pontuações', DefaultRoutePathEnum.Scores],
-            ])('should also render admin links', async (linkName, linkPath) => {
+                [DefaultRoutePathEnum.Dashboard, 'Dashboard'],
+                [DefaultRoutePathEnum.Scores, 'Pontuações'],
+            ])('should also render a link to %p', async (linkPath, linkName) => {
                 renderComponent(UserTypeEnum.Admin)
 
                 const link = screen.getByRole('link', { name: linkName })
@@ -149,8 +149,8 @@ describe('Navbar Comp', () => {
 
         describe('and when is common', () => {
             it.each([
-                ['Minhas pontuações', DefaultRoutePathEnum.MyScores],
-            ])('should also render common links', async (linkName, linkPath) => {
+                [DefaultRoutePathEnum.MyScores, 'Minhas pontuações'],
+            ])('should also render a link to %p', async (linkPath, linkName) => {
                 renderComponent(UserTypeEnum.Common)
 
                 const link = screen.getByRole('link', { name: linkName })

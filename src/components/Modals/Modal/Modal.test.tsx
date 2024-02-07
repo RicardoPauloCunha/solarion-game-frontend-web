@@ -44,11 +44,11 @@ describe('Modal Comp', () => {
     })
 
     describe('when click in icon to close', () => {
-        it('should call the onClose function', async () => {
+        it('should call onClose function', async () => {
             const props = renderComponent()
 
-            const closeButton = screen.getByRole('switch', { name: 'Fechar modal' })
-            await userEvent.click(closeButton)
+            const closeIcon = screen.getByRole('switch', { name: 'Fechar modal' })
+            await userEvent.click(closeIcon)
 
             expect(props.onClose).toHaveBeenCalledTimes(1)
         })

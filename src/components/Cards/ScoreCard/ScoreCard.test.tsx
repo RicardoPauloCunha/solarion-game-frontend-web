@@ -83,8 +83,11 @@ describe('ScoreCard Comp', () => {
         expect(decisionsPreview).toBeInTheDocument()
     })
 
-    it('should render a card to save', () => {
-        const props = renderComponent({ hasOnSave: true, hasOnDelete: true })
+    it('should render a save card', () => {
+        const props = renderComponent({
+            hasOnSave: true,
+            hasOnDelete: true
+        })
 
         const saveHeader = screen.getByRole('heading', { name: 'Pontuação da última aventura' })
         const removeButton = screen.getByRole('deletion')
@@ -98,7 +101,9 @@ describe('ScoreCard Comp', () => {
     })
 
     it('should render a card with username', () => {
-        const props = renderComponent({ hasUserName: true })
+        const props = renderComponent({
+            hasUserName: true
+        })
 
         const userNameHeader = screen.getByRole('heading', { name: props.data.userName })
         const saveHeader = screen.queryByRole('heading', { name: 'Pontuação da última aventura' })
@@ -111,8 +116,11 @@ describe('ScoreCard Comp', () => {
         expect(saveButton).toBeNull()
     })
 
-    it('should prioritize render a card with username over a card to save', () => {
-        const props = renderComponent({ hasUserName: true, hasOnSave: true })
+    it('should prioritize render a card with username over a save card', () => {
+        const props = renderComponent({
+            hasUserName: true,
+            hasOnSave: true
+        })
 
         const userNameHeader = screen.getByRole('heading', { name: props.data.userName })
         const saveHeader = screen.queryByRole('heading', { name: 'Pontuação da última aventura' })
@@ -127,7 +135,9 @@ describe('ScoreCard Comp', () => {
 
     describe('when no decisions', () => {
         it('should not render a preview list of decisions', () => {
-            renderComponent({ hasNoDecisions: true })
+            renderComponent({
+                hasNoDecisions: true
+            })
 
             const preview = screen.queryByRole('listitem')
 
@@ -156,7 +166,9 @@ describe('ScoreCard Comp', () => {
 
         describe('and when no decisions', () => {
             it('should not render a full list of decisions', async () => {
-                renderComponent({ hasNoDecisions: true })
+                renderComponent({
+                    hasNoDecisions: true
+                })
 
                 const toggle = screen.getByRole('switch')
                 await userEvent.click(toggle)
@@ -169,8 +181,10 @@ describe('ScoreCard Comp', () => {
     })
 
     describe('when click to save', () => {
-        it('should call the save function', async () => {
-            const props = renderComponent({ hasOnSave: true })
+        it('should call onSave function', async () => {
+            const props = renderComponent({
+                hasOnSave: true
+            })
 
             const button = screen.getByRole('button', { name: 'Salvar' })
             await userEvent.click(button)
@@ -180,8 +194,10 @@ describe('ScoreCard Comp', () => {
     })
 
     describe('when click to delete', () => {
-        it('should call the delete function', async () => {
-            const props = renderComponent({ hasOnDelete: true })
+        it('should call onDelete function', async () => {
+            const props = renderComponent({
+                hasOnDelete: true
+            })
 
             const button = screen.getByRole('deletion')
             await userEvent.click(button)

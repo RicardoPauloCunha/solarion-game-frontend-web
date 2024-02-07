@@ -69,8 +69,10 @@ describe('Textarea Comp', () => {
             expect(inputWithValue).toBeInTheDocument()
         })
 
-        it('should call the onChange function', async () => {
-            const props = renderComponent({ hasOnChangeValue: true })
+        it('should call onChangeValue function', async () => {
+            const props = renderComponent({
+                hasOnChangeValue: true
+            })
             const text = 'Lorem Ipsum é simplesmente uma simulação de texto da indústria tipográfica e de impressos'
 
             const input = screen.getByPlaceholderText(props.placeholder)
@@ -84,7 +86,9 @@ describe('Textarea Comp', () => {
     describe('when disabled', () => {
         describe('and when type a text', () => {
             it('should not change the value of the textarea', async () => {
-                const props = renderComponent({ isDisabled: true })
+                const props = renderComponent({
+                    isDisabled: true
+                })
                 const text = 'Lorem Ipsum é simplesmente uma simulação de texto da indústria tipográfica e de impressos'
 
                 const input = screen.getByPlaceholderText(props.placeholder)
@@ -95,8 +99,11 @@ describe('Textarea Comp', () => {
                 expect(inputWithValue).toBeNull()
             })
 
-            it('should not call the onChange function', async () => {
-                const props = renderComponent({ hasOnChangeValue: true, isDisabled: true })
+            it('should not call onChangeValue function', async () => {
+                const props = renderComponent({
+                    hasOnChangeValue: true,
+                    isDisabled: true
+                })
                 const text = 'Lorem Ipsum é simplesmente uma simulação de texto da indústria tipográfica e de impressos'
 
                 const input = screen.getByPlaceholderText(props.placeholder)

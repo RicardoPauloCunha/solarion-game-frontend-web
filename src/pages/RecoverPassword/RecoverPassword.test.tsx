@@ -19,11 +19,11 @@ jest.mock('react-router', () => ({
 
 const renderPage = async (options?: {
     submitValidSolicitForm?: boolean,
-    mockSuccessfulSolicitPasswordRecoveryRequest?: boolean,
-    mockFailSolicitPasswordRecoveryRequest?: boolean,
+    mockSuccessfulSolicitPasswordRecoveryApi?: boolean,
+    mockFailSolicitPasswordRecoveryApi?: boolean,
     submitValidRecoveryForm?: boolean
-    mockSuccessfulReplyPasswordRecoveryRequest?: boolean,
-    mockFailReplyPasswordRecoveryRequest?: boolean,
+    mockSuccessfulReplyPasswordRecoveryApi?: boolean,
+    mockFailReplyPasswordRecoveryApi?: boolean,
 }) => {
     defineValidatorErrorDictionary()
 
@@ -32,25 +32,25 @@ const renderPage = async (options?: {
     const password = 'password'
     const errorMessage = 'Não foi possível completar a requisição.'
 
-    if (options?.mockSuccessfulSolicitPasswordRecoveryRequest) {
+    if (options?.mockSuccessfulSolicitPasswordRecoveryApi) {
         mockSolicitPasswordRecoveryApi.mockResolvedValue({
             message: '',
             responseStatus: 200,
             result: null
         })
     }
-    else if (options?.mockFailSolicitPasswordRecoveryRequest) {
+    else if (options?.mockFailSolicitPasswordRecoveryApi) {
         mockSolicitPasswordRecoveryApi.mockRejectedValue(createAxiosError(400, errorMessage))
     }
 
-    if (options?.mockSuccessfulReplyPasswordRecoveryRequest) {
+    if (options?.mockSuccessfulReplyPasswordRecoveryApi) {
         mockReplyPasswordRecoveryApi.mockResolvedValue({
             message: '',
             responseStatus: 200,
             result: null
         })
     }
-    else if (options?.mockFailReplyPasswordRecoveryRequest) {
+    else if (options?.mockFailReplyPasswordRecoveryApi) {
         mockReplyPasswordRecoveryApi.mockRejectedValue(createAxiosError(400, errorMessage))
     }
 
@@ -99,7 +99,7 @@ describe('RecoverPassword Page', () => {
     })
 
     describe('when click in the bottom link', () => {
-        it('should call the navigation function to login page', async () => {
+        it('should call navigate function to login page', async () => {
             await renderPage()
 
             const link = screen.getByRole('link', { name: 'Tentar entrar novamente' })
@@ -110,10 +110,10 @@ describe('RecoverPassword Page', () => {
         })
 
         describe('and when recovery solicitation is sent', () => {
-            it('should call the navigation function to recover password page', async () => {
+            it('should call navigate function to recover password page', async () => {
                 await renderPage({
                     submitValidSolicitForm: true,
-                    mockSuccessfulSolicitPasswordRecoveryRequest: true
+                    mockSuccessfulSolicitPasswordRecoveryApi: true
                 })
 
                 const link = screen.getByRole('link', { name: 'Voltar' })
@@ -123,10 +123,10 @@ describe('RecoverPassword Page', () => {
                 expect(mockNavigate).toHaveBeenCalledWith(DefaultRoutePathEnum.RecoverPassword, expect.anything())
             })
 
-            it('should replace password recovery form by solicit recovery form', async () => {
+            it('should replace recovery form by solicit form', async () => {
                 const props = await renderPage({
                     submitValidSolicitForm: true,
-                    mockSuccessfulSolicitPasswordRecoveryRequest: true
+                    mockSuccessfulSolicitPasswordRecoveryApi: true
                 })
 
                 const link = screen.getByRole('link', { name: 'Voltar' })
@@ -161,7 +161,7 @@ describe('RecoverPassword Page', () => {
         })
     })
 
-    describe('when submit solicit recovery form', () => {
+    describe('when submit solicit form', () => {
         describe('and when invalid inputs value', () => {
             it('should show a invalid value warning', async () => {
                 await renderPage()
@@ -247,7 +247,7 @@ describe('RecoverPassword Page', () => {
         })
 
         describe('and when form is valid', () => {
-            it('should call the solicit password recovery request', async () => {
+            it('should call solicitPasswordRecoveryApi request', async () => {
                 const props = await renderPage({
                     submitValidSolicitForm: true
                 })
@@ -258,11 +258,11 @@ describe('RecoverPassword Page', () => {
                 })
             })
 
-            describe('and when the solicit password recovery request succeeds', () => {
-                it('should replace solicit recovery form by password recovery form', async () => {
+            describe('and when solicitPasswordRecoveryApi request succeeds', () => {
+                it('should replace solicit form by recovery form', async () => {
                     const props = await renderPage({
                         submitValidSolicitForm: true,
-                        mockSuccessfulSolicitPasswordRecoveryRequest: true
+                        mockSuccessfulSolicitPasswordRecoveryApi: true
                     })
 
                     const emailInput = screen.queryByLabelText('Email')
@@ -293,11 +293,11 @@ describe('RecoverPassword Page', () => {
                 })
             })
 
-            describe('and when the solicit password recovery request fails', () => {
+            describe('and when solicitPasswordRecoveryApi request fails', () => {
                 it('should show a warning with the error', async () => {
                     const props = await renderPage({
                         submitValidSolicitForm: true,
-                        mockFailSolicitPasswordRecoveryRequest: true
+                        mockFailSolicitPasswordRecoveryApi: true
                     })
 
                     const warning = screen.getByRole('alert')
@@ -310,12 +310,12 @@ describe('RecoverPassword Page', () => {
         })
     })
 
-    describe('when submit password recovery form', () => {
+    describe('when submit recovery form', () => {
         describe('and when invalid inputs value', () => {
             it('should show a invalid value warning', async () => {
                 await renderPage({
                     submitValidSolicitForm: true,
-                    mockSuccessfulSolicitPasswordRecoveryRequest: true
+                    mockSuccessfulSolicitPasswordRecoveryApi: true
                 })
 
                 await testSubmitForm('Alterar senha')
@@ -331,7 +331,7 @@ describe('RecoverPassword Page', () => {
                 it('should show a required error in the inputs', async () => {
                     await renderPage({
                         submitValidSolicitForm: true,
-                        mockSuccessfulSolicitPasswordRecoveryRequest: true
+                        mockSuccessfulSolicitPasswordRecoveryApi: true
                     })
 
                     await testSubmitForm('Alterar senha')
@@ -351,7 +351,7 @@ describe('RecoverPassword Page', () => {
                 it('should show a length error in the inputs', async () => {
                     await renderPage({
                         submitValidSolicitForm: true,
-                        mockSuccessfulSolicitPasswordRecoveryRequest: true
+                        mockSuccessfulSolicitPasswordRecoveryApi: true
                     })
 
                     await testTypeInInput('Código de verificação', '1')
@@ -373,7 +373,7 @@ describe('RecoverPassword Page', () => {
                 it('should show a length error in the inputs', async () => {
                     await renderPage({
                         submitValidSolicitForm: true,
-                        mockSuccessfulSolicitPasswordRecoveryRequest: true
+                        mockSuccessfulSolicitPasswordRecoveryApi: true
                     })
 
                     await testTypeInInput('Código de verificação', '1234567')
@@ -402,7 +402,7 @@ describe('RecoverPassword Page', () => {
                 ])('should show a comparison error in the passwords input for %p', async (confirmPassword, password) => {
                     await renderPage({
                         submitValidSolicitForm: true,
-                        mockSuccessfulSolicitPasswordRecoveryRequest: true
+                        mockSuccessfulSolicitPasswordRecoveryApi: true
                     })
 
                     await testTypeInInput('Nova senha', password)
@@ -421,10 +421,10 @@ describe('RecoverPassword Page', () => {
         })
 
         describe('and when form is valid', () => {
-            it('should call the solicit password recovery request', async () => {
+            it('should call replyPasswordRecoveryApi request', async () => {
                 const props = await renderPage({
                     submitValidSolicitForm: true,
-                    mockSuccessfulSolicitPasswordRecoveryRequest: true,
+                    mockSuccessfulSolicitPasswordRecoveryApi: true,
                     submitValidRecoveryForm: true
                 })
 
@@ -436,13 +436,13 @@ describe('RecoverPassword Page', () => {
                 })
             })
 
-            describe('and when the solicit password recovery request succeeds', () => {
+            describe('and when replyPasswordRecoveryApi request succeeds', () => {
                 it('should open success modal', async () => {
                     await renderPage({
                         submitValidSolicitForm: true,
-                        mockSuccessfulSolicitPasswordRecoveryRequest: true,
+                        mockSuccessfulSolicitPasswordRecoveryApi: true,
                         submitValidRecoveryForm: true,
-                        mockSuccessfulReplyPasswordRecoveryRequest: true
+                        mockSuccessfulReplyPasswordRecoveryApi: true
                     })
 
                     const modalTitle = screen.getByRole('heading', { name: 'Senha alterada' })
@@ -451,21 +451,21 @@ describe('RecoverPassword Page', () => {
                         'Senha da conta alterada com sucesso.',
                         'Faça login usando o email e a nova senha para continuar a registrar a pontuação das suas aventuras.'
                     ]
-                    const okButton = screen.getByRole('button', { name: 'Entendi' })
+                    const modalButton = screen.getByRole('button', { name: 'Entendi' })
 
                     expect(modalTitle).toBeInTheDocument()
                     expect(modalMessagesText).toEqual(modalMessagesTextData)
-                    expect(okButton).toBeInTheDocument()
+                    expect(modalButton).toBeInTheDocument()
                 })
             })
 
-            describe('and when the solicit password recovery request fails', () => {
+            describe('and when replyPasswordRecoveryApi request fails', () => {
                 it('should show a warning with the error', async () => {
                     const props = await renderPage({
                         submitValidSolicitForm: true,
-                        mockSuccessfulSolicitPasswordRecoveryRequest: true,
+                        mockSuccessfulSolicitPasswordRecoveryApi: true,
                         submitValidRecoveryForm: true,
-                        mockFailReplyPasswordRecoveryRequest: true
+                        mockFailReplyPasswordRecoveryApi: true
                     })
 
                     const warning = screen.getByRole('alert')
@@ -478,18 +478,18 @@ describe('RecoverPassword Page', () => {
         })
     })
 
-    describe('when success modal is opened', () => {
-        describe('and when click in ok button', () => {
-            it('should call the navigation function to login page', async () => {
+    describe('when success modal is open', () => {
+        describe('and when click in modal button', () => {
+            it('should call navigate function to login page', async () => {
                 await renderPage({
                     submitValidSolicitForm: true,
-                    mockSuccessfulSolicitPasswordRecoveryRequest: true,
+                    mockSuccessfulSolicitPasswordRecoveryApi: true,
                     submitValidRecoveryForm: true,
-                    mockSuccessfulReplyPasswordRecoveryRequest: true
+                    mockSuccessfulReplyPasswordRecoveryApi: true
                 })
 
-                const link = screen.getByRole('button', { name: 'Entendi' })
-                await userEvent.click(link)
+                const modalButton = screen.getByRole('button', { name: 'Entendi' })
+                await userEvent.click(modalButton)
 
                 expect(mockNavigate).toHaveBeenCalledTimes(1)
                 expect(mockNavigate).toHaveBeenCalledWith(DefaultRoutePathEnum.Login)
@@ -497,16 +497,16 @@ describe('RecoverPassword Page', () => {
         })
 
         describe('and when click to close the modal', () => {
-            it('should call the navigation function to login page', async () => {
+            it('should call navigate function to login page', async () => {
                 await renderPage({
                     submitValidSolicitForm: true,
-                    mockSuccessfulSolicitPasswordRecoveryRequest: true,
+                    mockSuccessfulSolicitPasswordRecoveryApi: true,
                     submitValidRecoveryForm: true,
-                    mockSuccessfulReplyPasswordRecoveryRequest: true
+                    mockSuccessfulReplyPasswordRecoveryApi: true
                 })
 
-                const closeButton = screen.getByRole('switch', { name: 'Fechar modal' })
-                await userEvent.click(closeButton)
+                const closeIcon = screen.getByRole('switch', { name: 'Fechar modal' })
+                await userEvent.click(closeIcon)
 
                 expect(mockNavigate).toHaveBeenCalledTimes(1)
                 expect(mockNavigate).toHaveBeenCalledWith(DefaultRoutePathEnum.Login)

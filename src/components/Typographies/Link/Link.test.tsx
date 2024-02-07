@@ -40,7 +40,7 @@ describe('Link Comp', () => {
         expect(link).toBeInTheDocument()
     })
 
-    it('should navigate to the path', async () => {
+    it('should call navigate function to the path', async () => {
         const props = renderComponent()
 
         const link = screen.getByRole('link', { name: props.text })
@@ -50,14 +50,18 @@ describe('Link Comp', () => {
         expect(mockNavigate).toHaveBeenCalledWith(props.path, expect.anything())
     })
 
-    describe('when clicked', () => {
-        it('should call onClick function', async () => {
-            const props = renderComponent({ hasOnClick: true })
+    describe('when have OnClick function', () => {
+        describe('and when clicked', () => {
+            it('should call onClick function', async () => {
+                const props = renderComponent({
+                    hasOnClick: true
+                })
 
-            const link = screen.getByRole('link', { name: props.text })
-            await userEvent.click(link)
+                const link = screen.getByRole('link', { name: props.text })
+                await userEvent.click(link)
 
-            expect(props.onClick).toHaveBeenCalledTimes(1)
+                expect(props.onClick).toHaveBeenCalledTimes(1)
+            })
         })
     })
 })

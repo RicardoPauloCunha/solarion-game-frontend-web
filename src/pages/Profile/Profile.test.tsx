@@ -9,7 +9,7 @@ import { UserSimpleViewModel } from "../../hooks/api/user"
 import { AuthContext, AuthContextData } from "../../hooks/contexts/auth"
 import * as tokenStorageFile from "../../hooks/storage/token"
 import { UserTypeEnum } from "../../types/enums/userType"
-import { textAwait as testAwait, testClearInputs, testSubmitForm, testTypeInInput } from "../../utils/test"
+import { testClearInputs, testSubmitForm, testTypeInInput } from "../../utils/test"
 
 const mockGetLoggedUserApi = jest.spyOn(userApiFile, 'getLoggedUserApi')
 const mockEditUserDataApi = jest.spyOn(userApiFile, 'editUserDataApi')
@@ -24,14 +24,15 @@ jest.mock('react-router', () => ({
 }))
 
 const renderPage = async (options?: {
-    mockSuccessfulGetLoggedUserRequest?: boolean,
-    mockFailGetLoggedUserRequest?: boolean,
-    submitValidInforForm?: boolean,
-    mockSuccessfulEditUserDataRequest?: boolean,
-    mockFailEditUserDataRequest?: boolean,
+    mockSuccessfulGetLoggedUserApi?: boolean,
+    mockFailGetLoggedUserApi?: boolean,
+    waitForInfoFormEnabled?: boolean,
+    submitValidInfoForm?: boolean,
+    mockSuccessfulEditUserDataApi?: boolean,
+    mockFailEditUserDataApi?: boolean,
     submitValidPasswordForm?: boolean,
-    mockSuccessfulEditUserPasswordRequest?: boolean,
-    mockFailEditUserPasswordRequest?: boolean,
+    mockSuccessfulEditUserPasswordApi?: boolean,
+    mockFailEditUserPasswordApi?: boolean,
 }) => {
     defineValidatorErrorDictionary()
 
@@ -45,30 +46,30 @@ const renderPage = async (options?: {
     const token = 'jwt-token'
     const errorMessage = 'Não foi possível completar a requisição.'
 
-    if (options?.mockSuccessfulGetLoggedUserRequest)
+    if (options?.mockSuccessfulGetLoggedUserApi)
         mockGetLoggedUserApi.mockResolvedValue(simpleUser)
-    else if (options?.mockFailGetLoggedUserRequest)
+    else if (options?.mockFailGetLoggedUserApi)
         mockGetLoggedUserApi.mockRejectedValue(createAxiosError(400, errorMessage))
 
-    if (options?.mockSuccessfulEditUserDataRequest) {
+    if (options?.mockSuccessfulEditUserDataApi) {
         mockEditUserDataApi.mockResolvedValue({
             message: '',
             responseStatus: 200,
             result: token
         })
     }
-    else if (options?.mockFailEditUserDataRequest) {
+    else if (options?.mockFailEditUserDataApi) {
         mockEditUserDataApi.mockRejectedValue(createAxiosError(400, errorMessage))
     }
 
-    if (options?.mockSuccessfulEditUserPasswordRequest) {
+    if (options?.mockSuccessfulEditUserPasswordApi) {
         mockEditUserPasswordApi.mockResolvedValue({
             message: '',
             responseStatus: 200,
             result: null
         })
     }
-    else if (options?.mockFailEditUserPasswordRequest) {
+    else if (options?.mockFailEditUserPasswordApi) {
         mockEditUserPasswordApi.mockRejectedValue(createAxiosError(400, errorMessage))
     }
 
@@ -88,9 +89,15 @@ const renderPage = async (options?: {
         </AuthContext.Provider>, { wrapper: BrowserRouter })
     })
 
-    await testAwait(10)
+    if (options?.waitForInfoFormEnabled) {
+        await waitFor(() => {
+            const infoFormButton = screen.getByRole('button', { name: 'Alterar informações' })
 
-    if (options?.submitValidInforForm)
+            expect(infoFormButton).toBeEnabled()
+        })
+    }
+
+    if (options?.submitValidInfoForm)
         await testSubmitForm('Alterar informações')
 
     if (options?.submitValidPasswordForm) {
@@ -115,69 +122,105 @@ const renderPage = async (options?: {
     }
 }
 
-// TODO: Test if the warning is in the correct form
-
 describe('Profile Page', () => {
     it('should render the profile page', async () => {
         await renderPage({
-            mockSuccessfulGetLoggedUserRequest: true
+            mockSuccessfulGetLoggedUserApi: true
         })
 
         const infoTitle = screen.getByRole('heading', { name: 'Minhas informações' })
         const nameInput = screen.getByLabelText('Nome')
         const emailInput = screen.getByLabelText('Email')
-        const infoButton = screen.getByRole('button', { name: 'Alterar informações' })
+        const infoButton = screen.getByRole('button', { name: 'Carregando...' })
+
         const passwordTitle = screen.getByRole('heading', { name: 'Senha de acesso' })
         const passwordInput = screen.getByLabelText('Senha')
         const newPasswordInput = screen.getByLabelText('Nova senha')
         const confirmNewPasswordInput = screen.getByLabelText('Confirme sua nova senha')
         const passwordButton = screen.getByRole('button', { name: 'Alterar senha' })
+
         const warning = screen.queryByRole('alert')
         const modalTitle = screen.queryByRole('Dados alterados')
 
         expect(infoTitle).toBeInTheDocument()
         expect(nameInput).toBeInTheDocument()
+        expect(nameInput).toBeDisabled()
         expect(emailInput).toBeInTheDocument()
+        expect(emailInput).toBeDisabled()
         expect(infoButton).toBeInTheDocument()
+        expect(infoButton).toBeDisabled()
+
         expect(passwordTitle).toBeInTheDocument()
         expect(passwordInput).toBeInTheDocument()
+        expect(passwordInput).toBeEnabled()
         expect(newPasswordInput).toBeInTheDocument()
+        expect(newPasswordInput).toBeEnabled()
         expect(confirmNewPasswordInput).toBeInTheDocument()
+        expect(confirmNewPasswordInput).toBeEnabled()
         expect(passwordButton).toBeInTheDocument()
+        expect(passwordButton).toBeEnabled()
+
         expect(warning).toBeNull()
         expect(modalTitle).toBeNull()
     })
 
-    describe('when get logged user request fails', () => {
-        it('should show the loading button in info section', async () => {
+    describe('when getLoggedUserApi request succeeds', () => {
+        it('should enable the inputs and buttons in info section', async () => {
             await renderPage({
-                mockFailGetLoggedUserRequest: true
+                mockSuccessfulGetLoggedUserApi: true
             })
 
-            const infoButton = screen.getByRole('button', { name: 'Carregando...' })
-            const passwordButton = screen.getByRole('button', { name: 'Alterar senha' })
+            await waitFor(() => {
+                const infoButton = screen.getByRole('button', { name: 'Alterar informações' })
 
-            expect(infoButton).toBeInTheDocument()
-            expect(passwordButton).toBeInTheDocument()
-        })
-
-        it('should disable the inputs in info section', async () => {
-            await renderPage({
-                mockFailGetLoggedUserRequest: true
+                expect(infoButton).toBeEnabled()
             })
 
             const nameInput = screen.getByLabelText('Nome')
             const emailInput = screen.getByLabelText('Email')
 
+            expect(nameInput).toBeEnabled()
+            expect(emailInput).toBeEnabled()
+        })
+    })
+
+    describe('when getLoggedUserApi request fails', () => {
+        it('should disable the inputs and buttons in info section', async () => {
+            await renderPage({
+                mockFailGetLoggedUserApi: true
+            })
+
+            await waitFor(() => {
+                const infoButton = screen.getByRole('button', { name: 'Carregando...' })
+
+                expect(infoButton).toBeDisabled()
+            })
+
+            const nameInput = screen.getByLabelText('Nome')
+            const emailInput = screen.getByLabelText('Email')
+
+            expect(nameInput).toBeDisabled()
+            expect(emailInput).toBeDisabled()
+        })
+
+        it('should not disable the inputs and buttons in password section', async () => {
+            await renderPage({
+                mockFailGetLoggedUserApi: true
+            })
+
+            await waitFor(() => {
+                const passwordButton = screen.getByRole('button', { name: 'Alterar senha' })
+
+                expect(passwordButton).toBeEnabled()
+            })
+
             const passwordInput = screen.getByLabelText('Senha')
             const newPasswordInput = screen.getByLabelText('Nova senha')
             const confirmNewPasswordInput = screen.getByLabelText('Confirme sua nova senha')
 
-            expect(nameInput).toBeDisabled()
-            expect(emailInput).toBeDisabled()
-            expect(passwordInput).not.toBeDisabled()
-            expect(newPasswordInput).not.toBeDisabled()
-            expect(confirmNewPasswordInput).not.toBeDisabled()
+            expect(passwordInput).toBeEnabled()
+            expect(newPasswordInput).toBeEnabled()
+            expect(confirmNewPasswordInput).toBeEnabled()
         })
     })
 
@@ -185,7 +228,8 @@ describe('Profile Page', () => {
         describe('and when invalid inputs value', () => {
             it('should show a invalid value warning', async () => {
                 await renderPage({
-                    mockSuccessfulGetLoggedUserRequest: true
+                    mockSuccessfulGetLoggedUserApi: true,
+                    waitForInfoFormEnabled: true
                 })
 
                 await testClearInputs([
@@ -204,7 +248,8 @@ describe('Profile Page', () => {
             describe('and when no value', () => {
                 it('should show a required error in the inputs', async () => {
                     await renderPage({
-                        mockSuccessfulGetLoggedUserRequest: true
+                        mockSuccessfulGetLoggedUserApi: true,
+                        waitForInfoFormEnabled: true
                     })
 
                     await testClearInputs([
@@ -226,7 +271,8 @@ describe('Profile Page', () => {
             describe('and when length is shorter', () => {
                 it('should show a length error in the inputs', async () => {
                     await renderPage({
-                        mockSuccessfulGetLoggedUserRequest: true
+                        mockSuccessfulGetLoggedUserApi: true,
+                        waitForInfoFormEnabled: true
                     })
 
                     await testClearInputs([
@@ -250,7 +296,8 @@ describe('Profile Page', () => {
             describe('and when length is greater', () => {
                 it('should show a length error in the inputs', async () => {
                     await renderPage({
-                        mockSuccessfulGetLoggedUserRequest: true
+                        mockSuccessfulGetLoggedUserApi: true,
+                        waitForInfoFormEnabled: true
                     })
 
                     await testClearInputs([
@@ -281,7 +328,8 @@ describe('Profile Page', () => {
                     ['email@.e'],
                 ])('should show a email error in the inputs for %p', async (emailInputValue) => {
                     await renderPage({
-                        mockSuccessfulGetLoggedUserRequest: true
+                        mockSuccessfulGetLoggedUserApi: true,
+                        waitForInfoFormEnabled: true
                     })
 
                     await testClearInputs(['Email'])
@@ -299,10 +347,11 @@ describe('Profile Page', () => {
         })
 
         describe('and when form is valid', () => {
-            it('should call the edit user data request', async () => {
+            it('should call editUserDataApi request', async () => {
                 const props = await renderPage({
-                    mockSuccessfulGetLoggedUserRequest: true,
-                    submitValidInforForm: true
+                    mockSuccessfulGetLoggedUserApi: true,
+                    waitForInfoFormEnabled: true,
+                    submitValidInfoForm: true
                 })
 
                 expect(mockEditUserDataApi).toHaveBeenCalledTimes(1)
@@ -312,12 +361,13 @@ describe('Profile Page', () => {
                 })
             })
 
-            describe('and when the edit user data request succeeds', () => {
+            describe('and when editUserDataApi request succeeds', () => {
                 it('should clear the inputs of password form', async () => {
                     await renderPage({
-                        mockSuccessfulGetLoggedUserRequest: true,
-                        submitValidInforForm: true,
-                        mockSuccessfulEditUserDataRequest: true
+                        mockSuccessfulGetLoggedUserApi: true,
+                        waitForInfoFormEnabled: true,
+                        submitValidInfoForm: true,
+                        mockSuccessfulEditUserDataApi: true
                     })
 
                     const passwordInput = screen.getByLabelText('Senha')
@@ -329,11 +379,12 @@ describe('Profile Page', () => {
                     expect(confirmNewPasswordInput).not.toHaveValue()
                 })
 
-                it('should call the set token storage function', async () => {
+                it('should call setTokenStorage function', async () => {
                     const props = await renderPage({
-                        mockSuccessfulGetLoggedUserRequest: true,
-                        submitValidInforForm: true,
-                        mockSuccessfulEditUserDataRequest: true
+                        mockSuccessfulGetLoggedUserApi: true,
+                        waitForInfoFormEnabled: true,
+                        submitValidInfoForm: true,
+                        mockSuccessfulEditUserDataApi: true
                     })
 
                     expect(mockSetTokenStorage).toHaveBeenCalledTimes(1)
@@ -342,9 +393,10 @@ describe('Profile Page', () => {
 
                 it('should open success modal', async () => {
                     await renderPage({
-                        mockSuccessfulGetLoggedUserRequest: true,
-                        submitValidInforForm: true,
-                        mockSuccessfulEditUserDataRequest: true
+                        mockSuccessfulGetLoggedUserApi: true,
+                        waitForInfoFormEnabled: true,
+                        submitValidInfoForm: true,
+                        mockSuccessfulEditUserDataApi: true
                     })
 
                     const modalTitle = screen.getByRole('heading', { name: 'Dados alterados' })
@@ -352,20 +404,21 @@ describe('Profile Page', () => {
                     const modalMessagesTextData = [
                         'Os dados da sua conta foram alterados com sucesso.'
                     ]
-                    const okButton = screen.getByRole('button', { name: 'Entendi' })
+                    const modalButton = screen.getByRole('button', { name: 'Entendi' })
 
                     expect(modalTitle).toBeInTheDocument()
                     expect(modalMessagesText).toEqual(modalMessagesTextData)
-                    expect(okButton).toBeInTheDocument()
+                    expect(modalButton).toBeInTheDocument()
                 })
             })
 
-            describe('and when the edit user data request fails', () => {
+            describe('and when editUserDataApi request fails', () => {
                 it('should show a warning with the error', async () => {
                     const props = await renderPage({
-                        mockSuccessfulGetLoggedUserRequest: true,
-                        submitValidInforForm: true,
-                        mockFailEditUserDataRequest: true
+                        mockSuccessfulGetLoggedUserApi: true,
+                        waitForInfoFormEnabled: true,
+                        submitValidInfoForm: true,
+                        mockFailEditUserDataApi: true
                     })
 
                     const warning = screen.getByRole('alert')
@@ -382,7 +435,7 @@ describe('Profile Page', () => {
         describe('and when invalid inputs value', () => {
             it('should show a invalid value warning', async () => {
                 await renderPage({
-                    mockSuccessfulGetLoggedUserRequest: true
+                    mockSuccessfulGetLoggedUserApi: true
                 })
 
                 await testSubmitForm('Alterar senha')
@@ -397,7 +450,7 @@ describe('Profile Page', () => {
             describe('and when no value', () => {
                 it('should show a required error in the inputs', async () => {
                     await renderPage({
-                        mockSuccessfulGetLoggedUserRequest: true
+                        mockSuccessfulGetLoggedUserApi: true
                     })
 
                     await testSubmitForm('Alterar senha')
@@ -416,7 +469,7 @@ describe('Profile Page', () => {
             describe('and when length is shorter', () => {
                 it('should show a length error in the inputs', async () => {
                     await renderPage({
-                        mockSuccessfulGetLoggedUserRequest: true
+                        mockSuccessfulGetLoggedUserApi: true
                     })
 
                     await testTypeInInput('Senha', 'p')
@@ -437,7 +490,7 @@ describe('Profile Page', () => {
             describe('and when length is greater', () => {
                 it('should show a length error in the inputs', async () => {
                     await renderPage({
-                        mockSuccessfulGetLoggedUserRequest: true
+                        mockSuccessfulGetLoggedUserApi: true
                     })
 
                     await testTypeInInput('Senha', 'passwordpasswordpassword1')
@@ -465,7 +518,7 @@ describe('Profile Page', () => {
                     ['pass word', 'password'],
                 ])('should show a comparison error in the passwords input for %p', async (confirmPassword, password) => {
                     await renderPage({
-                        mockSuccessfulGetLoggedUserRequest: true
+                        mockSuccessfulGetLoggedUserApi: true
                     })
 
                     await testTypeInInput('Nova senha', password)
@@ -484,9 +537,9 @@ describe('Profile Page', () => {
         })
 
         describe('and when form is valid', () => {
-            it('should call the edit user password request', async () => {
+            it('should call editUserPasswordApi request', async () => {
                 const props = await renderPage({
-                    mockSuccessfulGetLoggedUserRequest: true,
+                    mockSuccessfulGetLoggedUserApi: true,
                     submitValidPasswordForm: true
                 })
 
@@ -497,12 +550,12 @@ describe('Profile Page', () => {
                 })
             })
 
-            describe('and when the edit user password request succeeds', () => {
+            describe('and when editUserPasswordApi request succeeds', () => {
                 it('should open success modal', async () => {
                     await renderPage({
-                        mockSuccessfulGetLoggedUserRequest: true,
+                        mockSuccessfulGetLoggedUserApi: true,
                         submitValidPasswordForm: true,
-                        mockSuccessfulEditUserPasswordRequest: true
+                        mockSuccessfulEditUserPasswordApi: true
                     })
 
                     const modalTitle = screen.getByRole('heading', { name: 'Dados alterados' })
@@ -510,20 +563,20 @@ describe('Profile Page', () => {
                     const modalMessagesTextData = [
                         'Os dados da sua conta foram alterados com sucesso.'
                     ]
-                    const okButton = screen.getByRole('button', { name: 'Entendi' })
+                    const modalButton = screen.getByRole('button', { name: 'Entendi' })
 
                     expect(modalTitle).toBeInTheDocument()
                     expect(modalMessagesText).toEqual(modalMessagesTextData)
-                    expect(okButton).toBeInTheDocument()
+                    expect(modalButton).toBeInTheDocument()
                 })
             })
 
-            describe('and when the edit user password request fails', () => {
+            describe('and when editUserPasswordApi request fails', () => {
                 it('should show a warning with the error', async () => {
                     const props = await renderPage({
-                        mockSuccessfulGetLoggedUserRequest: true,
+                        mockSuccessfulGetLoggedUserApi: true,
                         submitValidPasswordForm: true,
-                        mockFailEditUserPasswordRequest: true
+                        mockFailEditUserPasswordApi: true
                     })
 
                     const warning = screen.getByRole('alert')
@@ -536,17 +589,18 @@ describe('Profile Page', () => {
         })
     })
 
-    describe('when success modal is opened', () => {
-        describe('and when click in ok button', () => {
+    describe('when success modal is open', () => {
+        describe('and when click in modal button', () => {
             it('should close the modal', async () => {
                 await renderPage({
-                    mockSuccessfulGetLoggedUserRequest: true,
-                    submitValidInforForm: true,
-                    mockSuccessfulEditUserDataRequest: true
+                    mockSuccessfulGetLoggedUserApi: true,
+                    waitForInfoFormEnabled: true,
+                    submitValidInfoForm: true,
+                    mockSuccessfulEditUserDataApi: true
                 })
 
-                const link = screen.getByRole('button', { name: 'Entendi' })
-                await userEvent.click(link)
+                const modalButton = screen.getByRole('button', { name: 'Entendi' })
+                await userEvent.click(modalButton)
 
                 const modalTitle = screen.queryByRole('heading', { name: 'Dados alterados' })
 
@@ -557,13 +611,14 @@ describe('Profile Page', () => {
         describe('and when click to close the modal', () => {
             it('should close the modal', async () => {
                 await renderPage({
-                    mockSuccessfulGetLoggedUserRequest: true,
-                    submitValidInforForm: true,
-                    mockSuccessfulEditUserDataRequest: true
+                    mockSuccessfulGetLoggedUserApi: true,
+                    waitForInfoFormEnabled: true,
+                    submitValidInfoForm: true,
+                    mockSuccessfulEditUserDataApi: true
                 })
 
-                const closeButton = screen.getByRole('switch', { name: 'Fechar modal' })
-                await userEvent.click(closeButton)
+                const closeIcon = screen.getByRole('switch', { name: 'Fechar modal' })
+                await userEvent.click(closeIcon)
 
                 const modalTitle = screen.queryByRole('heading', { name: 'Dados alterados' })
 

@@ -50,7 +50,7 @@ describe('LoadingText Comp', () => {
         })
 
         describe('and when have default text', () => {
-            it('should render default text', () => {
+            it('should render the default text', () => {
                 const props = renderComponent(false, { hasDefaultText: true })
 
                 const defaultText = screen.getByText(props.defaultText)

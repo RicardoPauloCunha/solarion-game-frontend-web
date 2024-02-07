@@ -50,7 +50,7 @@ const renderComponent = (options?: {
 }
 
 describe('Checkbox Comp', () => {
-    it('should render a checkbox list unchecked', () => {
+    it('should render a list of unchecked checkboxes', () => {
         const props = renderComponent()
 
         const label = screen.getByText(props.label)
@@ -67,7 +67,9 @@ describe('Checkbox Comp', () => {
     })
 
     it('should render with one option checked', () => {
-        const props = renderComponent({ hasFirstOptionChecked: true })
+        const props = renderComponent({
+            hasFirstOptionChecked: true
+        })
 
         const checkboxes = screen.getAllByRole('checkbox')
 
@@ -79,8 +81,10 @@ describe('Checkbox Comp', () => {
         })
     })
 
-    it('should render a checkbox list checked', () => {
-        renderComponent({ hasOptionListChecked: true })
+    it('should render a list of checked checkboxes', () => {
+        renderComponent({
+            hasOptionListChecked: true
+        })
 
         const checkboxes = screen.getAllByRole('checkbox')
 
@@ -99,8 +103,10 @@ describe('Checkbox Comp', () => {
             expect(input).toBeChecked()
         })
 
-        it('should call the onChange function with the option value', async () => {
-            const props = renderComponent({ hasOnChangeValue: true })
+        it('should call onChangeValue function with the option value', async () => {
+            const props = renderComponent({
+                hasOnChangeValue: true
+            })
             const option = props.options[0]
 
             const input = screen.getByLabelText(option.label)
@@ -128,7 +134,9 @@ describe('Checkbox Comp', () => {
 
     describe('when disabled', () => {
         it('should disable all options', () => {
-            renderComponent({ isDisabled: true })
+            renderComponent({
+                isDisabled: true
+            })
 
             const checkboxes = screen.getAllByRole('checkbox')
 
@@ -137,8 +145,11 @@ describe('Checkbox Comp', () => {
             })
         })
 
-        it('should not call the onChange function', async () => {
-            const props = renderComponent({ isDisabled: true, hasOnChangeValue: true })
+        it('should not call onChangeValue function', async () => {
+            const props = renderComponent({
+                isDisabled: true,
+                hasOnChangeValue: true
+            })
 
             const input = screen.getByLabelText(props.options[0].label)
             await userEvent.click(input)
@@ -148,7 +159,9 @@ describe('Checkbox Comp', () => {
 
         describe('and when clicked', () => {
             it('should not check the option', async () => {
-                const props = renderComponent({ isDisabled: true })
+                const props = renderComponent({
+                    isDisabled: true
+                })
 
                 const input = screen.getByLabelText(props.options[0].label)
                 await userEvent.click(input)
@@ -160,7 +173,9 @@ describe('Checkbox Comp', () => {
 
     describe('when one option is disabled', () => {
         it('should only disable that option', () => {
-            const props = renderComponent({ hasFirstOptionDisabled: true })
+            const props = renderComponent({
+                hasFirstOptionDisabled: true
+            })
 
             const input = screen.getByLabelText(props.options[0].label)
             const checkboxes = screen.getAllByRole('checkbox').filter(x => x.id !== input.id)
@@ -168,13 +183,15 @@ describe('Checkbox Comp', () => {
             expect(input).toBeDisabled()
 
             checkboxes.forEach(x => {
-                expect(x).not.toBeDisabled()
+                expect(x).toBeEnabled()
             })
         })
 
         describe('and when clicked', () => {
             it('should not check that option', async () => {
-                const props = renderComponent({ hasFirstOptionDisabled: true })
+                const props = renderComponent({
+                    hasFirstOptionDisabled: true
+                })
 
                 const input = screen.getByLabelText(props.options[0].label)
                 await userEvent.click(input)
@@ -183,7 +200,9 @@ describe('Checkbox Comp', () => {
             })
 
             it('should be able to check another option', async () => {
-                const props = renderComponent({ hasFirstOptionDisabled: true })
+                const props = renderComponent({
+                    hasFirstOptionDisabled: true
+                })
 
                 const input = screen.getByLabelText(props.options[1].label)
                 await userEvent.click(input)

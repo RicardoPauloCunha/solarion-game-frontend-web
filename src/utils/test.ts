@@ -17,5 +17,3 @@ export const testClearInputs = async (inputsName: string[]) => {
         await userEvent.clear(input)
     })
 }
-
-export const textAwait = (ms: number) => new Promise((r) => setTimeout(r, ms))

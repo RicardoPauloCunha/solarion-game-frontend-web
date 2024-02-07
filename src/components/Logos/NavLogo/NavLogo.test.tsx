@@ -16,7 +16,7 @@ const renderComponent = () => {
 }
 
 describe('NavLogo Comp', () => {
-    it('should render logo name', () => {
+    it('should render the logo name', () => {
         renderComponent()
 
         const homeLink = screen.getByText('SolarionGame')
@@ -24,7 +24,7 @@ describe('NavLogo Comp', () => {
         expect(homeLink).toBeInTheDocument()
     })
 
-    it('should navigate to home', async () => {
+    it('should call navigate function to home', async () => {
         renderComponent()
 
         const homeLink = screen.getByText('SolarionGame')

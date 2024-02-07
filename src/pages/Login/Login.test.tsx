@@ -23,8 +23,8 @@ jest.mock('react-router', () => ({
 
 const renderPage = async (options?: {
     submitValidLoginForm?: boolean,
-    mockSuccessfulLoginRequest?: boolean,
-    mockFailLoginRequest?: boolean,
+    mockSuccessfulLoginApi?: boolean,
+    mockFailLoginApi?: boolean,
 }) => {
     defineValidatorErrorDictionary()
 
@@ -33,14 +33,14 @@ const renderPage = async (options?: {
     const result = 'jwt-token'
     const errorMessage = 'Não foi possível completar a requisição.'
 
-    if (options?.mockSuccessfulLoginRequest) {
+    if (options?.mockSuccessfulLoginApi) {
         mockLoginApi.mockResolvedValue({
             message: '',
             responseStatus: 200,
             result
         })
     }
-    else if (options?.mockFailLoginRequest) {
+    else if (options?.mockFailLoginApi) {
         mockLoginApi.mockRejectedValue(createAxiosError(400, errorMessage))
     }
 
@@ -93,11 +93,11 @@ describe('Login page', () => {
         expect(signupLink).toBeInTheDocument()
     })
 
-    describe('when click in the link', () => {
+    describe('when click in the bottom link', () => {
         it.each([
-            ['recover password', 'Esqueci minha senha', DefaultRoutePathEnum.RecoverPassword],
-            ['register account', 'Registrar-se', DefaultRoutePathEnum.RegisterAccount],
-        ])('should call the navigation function to %p page', async (caseName, linkName, linkPath) => {
+            [DefaultRoutePathEnum.RecoverPassword, 'Esqueci minha senha'],
+            [DefaultRoutePathEnum.RegisterAccount, 'Registrar-se'],
+        ])('should call navigate function to %p', async (linkPath, linkName) => {
             await renderPage()
 
             const link = screen.getByRole('link', { name: linkName })
@@ -200,8 +200,10 @@ describe('Login page', () => {
         })
 
         describe('and when form is valid', () => {
-            it('should call the login request', async () => {
-                const props = await renderPage({ submitValidLoginForm: true })
+            it('should call loginApi request', async () => {
+                const props = await renderPage({
+                    submitValidLoginForm: true
+                })
 
                 expect(mockLoginApi).toHaveBeenCalledTimes(1)
                 expect(mockLoginApi).toHaveBeenCalledWith({
@@ -210,34 +212,43 @@ describe('Login page', () => {
                 })
             })
 
-            describe('and when the login request succeeds', () => {
-                it('should call the set token storage function', async () => {
-                    const props = await renderPage({ submitValidLoginForm: true, mockSuccessfulLoginRequest: true })
+            describe('and when loginApi request succeeds', () => {
+                it('should call setTokenStorage function', async () => {
+                    const props = await renderPage({
+                        submitValidLoginForm: true,
+                        mockSuccessfulLoginApi: true
+                    })
 
                     expect(mockSetTokenStorage).toHaveBeenCalledTimes(1)
                     expect(mockSetTokenStorage).toHaveBeenCalledWith(props.result)
                 })
 
                 it.each([
-                    ['scores', UserTypeEnum.Admin, DefaultRoutePathEnum.Scores],
-                    ['my scores', UserTypeEnum.Common, DefaultRoutePathEnum.MyScores],
-                ])('should call the navigation function to %p page', async (caseName, userType, linkPath) => {
+                    [DefaultRoutePathEnum.Scores, UserTypeEnum.Admin],
+                    [DefaultRoutePathEnum.MyScores, UserTypeEnum.Common],
+                ])('should call navigate function to %p', async (linkPath, userType) => {
                     mockDefineLoggedUserByToken.mockReturnValue({
                         userId: 1,
                         name: 'Name',
                         userType
                     })
 
-                    await renderPage({ submitValidLoginForm: true, mockSuccessfulLoginRequest: true })
+                    await renderPage({
+                        submitValidLoginForm: true,
+                        mockSuccessfulLoginApi: true
+                    })
 
                     expect(mockNavigate).toHaveBeenCalledTimes(1)
                     expect(mockNavigate).toHaveBeenCalledWith(linkPath)
                 })
             })
 
-            describe('and when the login request fails', () => {
+            describe('and when loginApi request fails', () => {
                 it('should show a warning with the error', async () => {
-                    const props = await renderPage({ submitValidLoginForm: true, mockFailLoginRequest: true })
+                    const props = await renderPage({
+                        submitValidLoginForm: true,
+                        mockFailLoginApi: true
+                    })
 
                     const warning = screen.getByRole('alert')
                     const warningMessage = screen.getByText(props.errorMessage)

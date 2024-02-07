@@ -33,7 +33,7 @@ const renderComponent = (options?: {
 }
 
 describe('Input Comp', () => {
-    it('should render a input', () => {
+    it('should render an input', () => {
         const props = renderComponent()
 
         const label = screen.getByText(props.label)
@@ -69,8 +69,10 @@ describe('Input Comp', () => {
             expect(inputWithValue).toBeInTheDocument()
         })
 
-        it('should call the onChange function', async () => {
-            const props = renderComponent({ hasOnChangeValue: true })
+        it('should call onChangeValue function', async () => {
+            const props = renderComponent({
+                hasOnChangeValue: true
+            })
             const text = 'Ricardo Paulo'
 
             const input = screen.getByPlaceholderText(props.placeholder)
@@ -84,7 +86,9 @@ describe('Input Comp', () => {
     describe('when disabled', () => {
         describe('and when type a text', () => {
             it('should not change the value of the input', async () => {
-                const props = renderComponent({ isDisabled: true })
+                const props = renderComponent({
+                    isDisabled: true
+                })
                 const text = 'Ricardo Paulo'
 
                 const input = screen.getByPlaceholderText(props.placeholder)
@@ -95,8 +99,11 @@ describe('Input Comp', () => {
                 expect(inputWithValue).toBeNull()
             })
 
-            it('should not call the onChange function', async () => {
-                const props = renderComponent({ hasOnChangeValue: true, isDisabled: true })
+            it('should not call onChangeValue function', async () => {
+                const props = renderComponent({
+                    hasOnChangeValue: true,
+                    isDisabled: true
+                })
                 const text = 'Ricardo Paulo'
 
                 const input = screen.getByPlaceholderText(props.placeholder)

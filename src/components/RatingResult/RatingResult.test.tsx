@@ -33,7 +33,7 @@ describe('RatingResult Comp', () => {
         [RatingTypeEnum.B, CatBImg],
         [RatingTypeEnum.C, CatCImg],
         [RatingTypeEnum.D, CatDImg],
-    ])('should match the grade with the image', (ratingType, img) => {
+    ])('should match the grade %p with the image %p', (ratingType, img) => {
         const props = renderComponent(ratingType)
 
         const grade = screen.getByText(getRatingTypeEnumValue(props.ratingType))

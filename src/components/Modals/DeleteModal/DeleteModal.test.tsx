@@ -64,12 +64,12 @@ describe('SuccessModal Comp', () => {
         expect(removeButton).toBeInTheDocument()
     })
 
-    describe('when click in button', () => {
-        it('should call the onConfirm function', async () => {
+    describe('when click in modal button', () => {
+        it('should call onConfirm function', async () => {
             const props = renderComponent()
 
-            const button = screen.getByRole('button', { name: 'Remover' })
-            await userEvent.click(button)
+            const modalButton = screen.getByRole('button', { name: 'Remover' })
+            await userEvent.click(modalButton)
 
             expect(props.onConfirm).toHaveBeenCalledTimes(1)
         })
@@ -77,7 +77,9 @@ describe('SuccessModal Comp', () => {
 
     describe('when has error', () => {
         it('should show a warning', async () => {
-            renderComponent({ hasWarning: true })
+            renderComponent({
+                hasWarning: true
+            })
 
             const warning = screen.getByRole('alert')
 
