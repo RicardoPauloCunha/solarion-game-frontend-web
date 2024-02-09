@@ -1,4 +1,4 @@
-import { render, screen } from "@testing-library/react"
+import { render, screen, within } from "@testing-library/react"
 import userEvent from "@testing-library/user-event"
 import { BrowserRouter } from "react-router-dom"
 import RegisterAccount from "."
@@ -90,7 +90,7 @@ describe('RegisterAccount Page', () => {
         const warning = screen.queryByRole('alert')
         const createAccountButton = screen.getByRole('button', { name: 'Criar conta' })
         const loginLink = screen.getByRole('link', { name: 'Já tenho uma conta' })
-        const modalTitle = screen.queryByRole('heading', { name: 'Conta criada' })
+        const modal = screen.queryByRole('dialog')
 
         expect(title).toBeInTheDocument()
         expect(nameInput).toBeInTheDocument()
@@ -100,7 +100,7 @@ describe('RegisterAccount Page', () => {
         expect(warning).toBeNull()
         expect(createAccountButton).toBeInTheDocument()
         expect(loginLink).toBeInTheDocument()
-        expect(modalTitle).toBeNull()
+        expect(modal).toBeNull()
     })
 
     describe('when click in the bottom link', () => {
@@ -271,13 +271,14 @@ describe('RegisterAccount Page', () => {
                         mockSuccessfulCreateCommonUserApi: true
                     })
 
-                    const modalTitle = screen.getByRole('heading', { name: 'Conta criada' })
-                    const modalMessagesText = screen.getAllByRole('alertdialog').map(x => x.textContent)
+                    const modal = screen.getByRole('dialog')
+                    const modalTitle = within(modal).getByRole('heading', { name: 'Conta criada' })
+                    const modalMessagesText = within(modal).getAllByRole('alertdialog').map(x => x.textContent)
                     const modalMessagesTextData = [
                         'Conta de usuário criada com sucesso.',
                         'Agora você pode salvar a pontuação das suas aventuras.'
                     ]
-                    const modalButton = screen.getByRole('button', { name: 'Entendi' })
+                    const modalButton = within(modal).getByRole('button', { name: 'Entendi' })
 
                     expect(modalTitle).toBeInTheDocument()
                     expect(modalMessagesText).toEqual(modalMessagesTextData)
@@ -310,7 +311,8 @@ describe('RegisterAccount Page', () => {
                     mockSuccessfulCreateCommonUserApi: true
                 })
 
-                const modalButton = screen.getByRole('button', { name: 'Entendi' })
+                const modal = screen.getByRole('dialog')
+                const modalButton = within(modal).getByRole('button', { name: 'Entendi' })
                 await userEvent.click(modalButton)
 
                 expect(mockNavigate).toHaveBeenCalledTimes(1)
@@ -325,7 +327,8 @@ describe('RegisterAccount Page', () => {
                     mockSuccessfulCreateCommonUserApi: true
                 })
 
-                const closeIcon = screen.getByRole('switch', { name: 'Fechar modal' })
+                const modal = screen.getByRole('dialog')
+                const closeIcon = within(modal).getByRole('switch', { name: 'Fechar modal' })
                 await userEvent.click(closeIcon)
 
                 expect(mockNavigate).toHaveBeenCalledTimes(1)

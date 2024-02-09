@@ -25,6 +25,7 @@ const ScoreCard = ({
     return (
         <Container
             className="stylized-margin"
+            aria-label="Cartão da pontuação"
         >
             {!hasUserName && onSave && <h2>Pontuação da última aventura</h2>}
             {data.userName && <h3>{data.userName}</h3>}

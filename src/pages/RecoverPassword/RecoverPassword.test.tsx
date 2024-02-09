@@ -1,4 +1,4 @@
-import { render, screen } from "@testing-library/react"
+import { render, screen, within } from "@testing-library/react"
 import userEvent from "@testing-library/user-event"
 import { BrowserRouter } from "react-router-dom"
 import RecoverPassword from "."
@@ -88,14 +88,14 @@ describe('RecoverPassword Page', () => {
         const warning = screen.queryByRole('alert')
         const forwardButton = screen.getByRole('button', { name: 'Avançar' })
         const loginLink = screen.getByRole('link', { name: 'Tentar entrar novamente' })
-        const modalTitle = screen.queryByRole('heading', { name: 'Senha alterada' })
+        const modal = screen.queryByRole('dialog')
 
         expect(title).toBeInTheDocument()
         expect(emailInput).toBeInTheDocument()
         expect(warning).toBeNull()
         expect(forwardButton).toBeInTheDocument()
         expect(loginLink).toBeInTheDocument()
-        expect(modalTitle).toBeNull()
+        expect(modal).toBeNull()
     })
 
     describe('when click in the bottom link', () => {
@@ -138,6 +138,11 @@ describe('RecoverPassword Page', () => {
                 const confirmPasswordInput = screen.queryByLabelText('Confirme sua nova senha')
                 const changePasswordButton = screen.queryByRole('button', { name: 'Alterar senha' })
                 const backLink = screen.queryByRole('link', { name: 'Voltar' })
+                const emailInput = screen.getByLabelText('Email')
+                const forwardButton = screen.getByRole('button', { name: 'Avançar' })
+                const loginLink = screen.getByRole('link', { name: 'Tentar entrar novamente' })
+                const warning = screen.queryByRole('alert')
+                const modal = screen.queryByRole('dialog')
 
                 expect(text).toBeNull()
                 expect(codeInput).toBeNull()
@@ -145,18 +150,11 @@ describe('RecoverPassword Page', () => {
                 expect(confirmPasswordInput).toBeNull()
                 expect(changePasswordButton).toBeNull()
                 expect(backLink).toBeNull()
-
-                const emailInput = screen.getByLabelText('Email')
-                const warning = screen.queryByRole('alert')
-                const forwardButton = screen.getByRole('button', { name: 'Avançar' })
-                const loginLink = screen.getByRole('link', { name: 'Tentar entrar novamente' })
-                const modalTitle = screen.queryByRole('heading', { name: 'Senha alterada' })
-
                 expect(emailInput).toBeInTheDocument()
                 expect(warning).toBeNull()
                 expect(forwardButton).toBeInTheDocument()
                 expect(loginLink).toBeInTheDocument()
-                expect(modalTitle).toBeNull()
+                expect(modal).toBeNull()
             })
         })
     })
@@ -268,28 +266,26 @@ describe('RecoverPassword Page', () => {
                     const emailInput = screen.queryByLabelText('Email')
                     const forwardButton = screen.queryByRole('button', { name: 'Avançar' })
                     const loginLink = screen.queryByRole('link', { name: 'Tentar entrar novamente' })
-
-                    expect(emailInput).toBeNull()
-                    expect(forwardButton).toBeNull()
-                    expect(loginLink).toBeNull()
-
                     const text = screen.getByText(`Foi enviado para o email (${props.form.email}) o código de verificação para a recuperação de senha.`)
                     const codeInput = screen.getByLabelText('Código de verificação')
                     const passwordInput = screen.getByLabelText('Nova senha')
                     const confirmPasswordInput = screen.getByLabelText('Confirme sua nova senha')
-                    const warning = screen.queryByRole('alert')
                     const changePasswordButton = screen.getByRole('button', { name: 'Alterar senha' })
                     const backLink = screen.getByRole('link', { name: 'Voltar' })
-                    const modalTitle = screen.queryByRole('heading', { name: 'Senha alterada' })
+                    const warning = screen.queryByRole('alert')
+                    const modal = screen.queryByRole('dialog')
 
+                    expect(emailInput).toBeNull()
+                    expect(forwardButton).toBeNull()
+                    expect(loginLink).toBeNull()
                     expect(text).toBeInTheDocument()
                     expect(codeInput).toBeInTheDocument()
                     expect(passwordInput).toBeInTheDocument()
                     expect(confirmPasswordInput).toBeInTheDocument()
-                    expect(warning).toBeNull()
                     expect(changePasswordButton).toBeInTheDocument()
                     expect(backLink).toBeInTheDocument()
-                    expect(modalTitle).toBeNull()
+                    expect(warning).toBeNull()
+                    expect(modal).toBeNull()
                 })
             })
 
@@ -445,13 +441,14 @@ describe('RecoverPassword Page', () => {
                         mockSuccessfulReplyPasswordRecoveryApi: true
                     })
 
-                    const modalTitle = screen.getByRole('heading', { name: 'Senha alterada' })
-                    const modalMessagesText = screen.getAllByRole('alertdialog').map(x => x.textContent)
+                    const modal = screen.getByRole('dialog')
+                    const modalTitle = within(modal).getByRole('heading', { name: 'Senha alterada' })
+                    const modalMessagesText = within(modal).getAllByRole('alertdialog').map(x => x.textContent)
                     const modalMessagesTextData = [
                         'Senha da conta alterada com sucesso.',
                         'Faça login usando o email e a nova senha para continuar a registrar a pontuação das suas aventuras.'
                     ]
-                    const modalButton = screen.getByRole('button', { name: 'Entendi' })
+                    const modalButton = within(modal).getByRole('button', { name: 'Entendi' })
 
                     expect(modalTitle).toBeInTheDocument()
                     expect(modalMessagesText).toEqual(modalMessagesTextData)
@@ -488,7 +485,8 @@ describe('RecoverPassword Page', () => {
                     mockSuccessfulReplyPasswordRecoveryApi: true
                 })
 
-                const modalButton = screen.getByRole('button', { name: 'Entendi' })
+                const modal = screen.getByRole('dialog')
+                const modalButton = within(modal).getByRole('button', { name: 'Entendi' })
                 await userEvent.click(modalButton)
 
                 expect(mockNavigate).toHaveBeenCalledTimes(1)
@@ -505,7 +503,8 @@ describe('RecoverPassword Page', () => {
                     mockSuccessfulReplyPasswordRecoveryApi: true
                 })
 
-                const closeIcon = screen.getByRole('switch', { name: 'Fechar modal' })
+                const modal = screen.getByRole('dialog')
+                const closeIcon = within(modal).getByRole('switch', { name: 'Fechar modal' })
                 await userEvent.click(closeIcon)
 
                 expect(mockNavigate).toHaveBeenCalledTimes(1)

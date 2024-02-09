@@ -1,4 +1,4 @@
-import { render, screen } from "@testing-library/react"
+import { render, screen, within } from "@testing-library/react"
 import userEvent from "@testing-library/user-event"
 import { BrowserRouter } from "react-router-dom"
 import Home from "."
@@ -50,6 +50,8 @@ const renderPage = async (options?: {
     }
 }
 
+// TODO: Test with scenario finished
+
 describe('Home Page', () => {
     it('should render the home page', async () => {
         await renderPage()
@@ -60,7 +62,7 @@ describe('Home Page', () => {
         const text = screen.getByText('Huum... Parece que a missão de hoje nos levará à Torre do Necromante... para tentar recuperar o Cajado de Solarion das garras de Xarth, o Senhor do Terror.')
         const newGameButton = screen.getByRole('button', { name: 'Novo jogo' })
         const continuePlayingButton = screen.getByRole('button', { name: 'Continuar jogando' })
-        const modalTitle = screen.queryByRole('heading', { name: 'Continuar jogando' })
+        const modal = screen.queryByRole('dialog')
 
         expect(navbar).toBeInTheDocument()
         expect(image).toBeInTheDocument()
@@ -68,7 +70,7 @@ describe('Home Page', () => {
         expect(text).toBeInTheDocument()
         expect(newGameButton).toBeInTheDocument()
         expect(continuePlayingButton).toBeInTheDocument()
-        expect(modalTitle).toBeNull()
+        expect(modal).toBeNull()
     })
 
     describe('when click in new game button', () => {
@@ -98,21 +100,24 @@ describe('Home Page', () => {
                 openModal: true
             })
 
-            const modalTitle = screen.getByRole('heading', { name: 'Continuar jogando' })
+            const modal = screen.getByRole('dialog')
+            const modalTitle = within(modal).getByRole('heading', { name: 'Continuar jogando' })
 
+            expect(modal).toBeInTheDocument()
             expect(modalTitle).toBeInTheDocument()
         })
     })
 
-    describe('when open the modal', () => {
+    describe('when modal is open', () => {
         describe('and when no last scenario', () => {
-            it('should open a empty modal', async () => {
+            it('should render a empty warning', async () => {
                 await renderPage({
                     openModal: true
                 })
 
-                const text = screen.getByText('Nenhum registro da sua última aventura foi encontrado.')
-                const newAdventureButton = screen.getByRole('button', { name: 'Nova aventura' })
+                const modal = screen.getByRole('dialog')
+                const text = within(modal).getByText('Nenhum registro da sua última aventura foi encontrado.')
+                const newAdventureButton = within(modal).getByRole('button', { name: 'Nova aventura' })
 
                 expect(text).toBeInTheDocument()
                 expect(newAdventureButton).toBeInTheDocument()
@@ -124,7 +129,8 @@ describe('Home Page', () => {
                         openModal: true
                     })
 
-                    const newAdventureButton = screen.getByRole('button', { name: 'Nova aventura' })
+                    const modal = screen.getByRole('dialog')
+                    const newAdventureButton = within(modal).getByRole('button', { name: 'Nova aventura' })
                     await userEvent.click(newAdventureButton)
 
                     expect(mockRemoveScenarioStorage).toHaveBeenCalledTimes(1)
@@ -135,7 +141,8 @@ describe('Home Page', () => {
                         openModal: true
                     })
 
-                    const newAdventureButton = screen.getByRole('button', { name: 'Nova aventura' })
+                    const modal = screen.getByRole('dialog')
+                    const newAdventureButton = within(modal).getByRole('button', { name: 'Nova aventura' })
                     await userEvent.click(newAdventureButton)
 
                     expect(mockNavigate).toHaveBeenCalledTimes(1)
@@ -151,12 +158,13 @@ describe('Home Page', () => {
                     openModal: true
                 })
 
-                const text = screen.getByText('O progresso da sua última aventura foi salvo.')
-                const hero = screen.getByText(getHeroTypeEnumValue(getHeroTypeByDecision(scenario.decisions[0])))
-                const date = screen.getByText(formatDateToView(scenario.creationDate))
-                const decisionsPreview = screen.getByText(`\u2022 ${getDecisionTypeEnumValue(scenario.decisions[0])}..`)
-                const continueButton = screen.getByRole('button', { name: 'Continuar' })
-                const removeButton = screen.getByRole('button', { name: 'Remover' })
+                const modal = screen.getByRole('dialog')
+                const text = within(modal).getByText('O progresso da sua última aventura foi salvo.')
+                const hero = within(modal).getByText(getHeroTypeEnumValue(getHeroTypeByDecision(scenario.decisions[0])))
+                const date = within(modal).getByText(formatDateToView(scenario.creationDate))
+                const decisionsPreview = within(modal).getByText(`\u2022 ${getDecisionTypeEnumValue(scenario.decisions[0])}..`)
+                const continueButton = within(modal).getByRole('button', { name: 'Continuar' })
+                const removeButton = within(modal).getByRole('button', { name: 'Remover' })
 
                 expect(text).toBeInTheDocument()
                 expect(hero).toBeInTheDocument()
@@ -174,8 +182,9 @@ describe('Home Page', () => {
                         openModal: true
                     })
 
-                    const field = screen.queryByText('Decisões:')
-                    const preview = screen.queryByRole('list')
+                    const modal = screen.getByRole('dialog')
+                    const field = within(modal).queryByText('Decisões:')
+                    const preview = within(modal).queryByRole('list')
 
                     expect(field).toBeNull()
                     expect(preview).toBeNull()
@@ -189,7 +198,8 @@ describe('Home Page', () => {
                         openModal: true
                     })
 
-                    const continueButton = screen.getByRole('button', { name: 'Continuar' })
+                    const modal = screen.getByRole('dialog')
+                    const continueButton = within(modal).getByRole('button', { name: 'Continuar' })
                     await userEvent.click(continueButton)
 
                     expect(mockNavigate).toHaveBeenCalledTimes(1)
@@ -204,17 +214,18 @@ describe('Home Page', () => {
                         openModal: true
                     })
 
-                    const removeButton = screen.getByRole('button', { name: 'Remover' })
+                    const modal = screen.getByRole('dialog')
+                    const removeButton = within(modal).getByRole('button', { name: 'Remover' })
                     await userEvent.click(removeButton)
 
-                    const textOff = screen.queryByText('O progresso da sua última aventura foi salvo.')
-                    const continueButtonOff = screen.queryByRole('button', { name: 'Continuar' })
+                    const textOff = within(modal).queryByText('O progresso da sua última aventura foi salvo.')
+                    const continueButtonOff = within(modal).queryByRole('button', { name: 'Continuar' })
 
                     expect(textOff).toBeNull()
                     expect(continueButtonOff).toBeNull()
 
-                    const textOn = screen.getByText('Nenhum registro da sua última aventura foi encontrado.')
-                    const newAdventureButtonOn = screen.getByRole('button', { name: 'Nova aventura' })
+                    const textOn = within(modal).getByText('Nenhum registro da sua última aventura foi encontrado.')
+                    const newAdventureButtonOn = within(modal).getByRole('button', { name: 'Nova aventura' })
 
                     expect(textOn).toBeInTheDocument()
                     expect(newAdventureButtonOn).toBeInTheDocument()
@@ -226,7 +237,8 @@ describe('Home Page', () => {
                         openModal: true
                     })
 
-                    const removeButton = screen.getByRole('button', { name: 'Remover' })
+                    const modal = screen.getByRole('dialog')
+                    const removeButton = within(modal).getByRole('button', { name: 'Remover' })
                     await userEvent.click(removeButton)
 
                     expect(mockRemoveScenarioStorage).toHaveBeenCalledTimes(1)

@@ -1,4 +1,4 @@
-import { render, screen, waitFor } from "@testing-library/react"
+import { render, screen, waitFor, within } from "@testing-library/react"
 import userEvent from "@testing-library/user-event"
 import { BrowserRouter } from "react-router-dom"
 import Profile from "."
@@ -23,10 +23,18 @@ jest.mock('react-router', () => ({
     useNavigate: () => mockNavigate
 }))
 
+const generateSimpleUser = (): UserSimpleViewModel => {
+    return {
+        userId: 1,
+        name: "Name",
+        email: "email@mail"
+    }
+}
+
 const renderPage = async (options?: {
     mockSuccessfulGetLoggedUserApi?: boolean,
     mockFailGetLoggedUserApi?: boolean,
-    waitForInfoFormEnabled?: boolean,
+    waitInitialLoadingFinish?: boolean,
     submitValidInfoForm?: boolean,
     mockSuccessfulEditUserDataApi?: boolean,
     mockFailEditUserDataApi?: boolean,
@@ -38,11 +46,7 @@ const renderPage = async (options?: {
 
     const password = 'password'
     const newPassword = 'wordpass'
-    const simpleUser: UserSimpleViewModel = {
-        userId: 1,
-        name: "Name",
-        email: "email@mail"
-    }
+    const simpleUser = generateSimpleUser()
     const token = 'jwt-token'
     const errorMessage = 'Não foi possível completar a requisição.'
 
@@ -89,7 +93,7 @@ const renderPage = async (options?: {
         </AuthContext.Provider>, { wrapper: BrowserRouter })
     })
 
-    if (options?.waitForInfoFormEnabled) {
+    if (options?.waitInitialLoadingFinish) {
         await waitFor(() => {
             const infoFormButton = screen.getByRole('button', { name: 'Alterar informações' })
 
@@ -122,6 +126,8 @@ const renderPage = async (options?: {
     }
 }
 
+// TODO: Test if the data get by request is typed in the inputs using 'getByDisplayValue'
+
 describe('Profile Page', () => {
     it('should render the profile page', async () => {
         await renderPage({
@@ -132,15 +138,13 @@ describe('Profile Page', () => {
         const nameInput = screen.getByLabelText('Nome')
         const emailInput = screen.getByLabelText('Email')
         const infoButton = screen.getByRole('button', { name: 'Carregando...' })
-
         const passwordTitle = screen.getByRole('heading', { name: 'Senha de acesso' })
         const passwordInput = screen.getByLabelText('Senha')
         const newPasswordInput = screen.getByLabelText('Nova senha')
         const confirmNewPasswordInput = screen.getByLabelText('Confirme sua nova senha')
         const passwordButton = screen.getByRole('button', { name: 'Alterar senha' })
-
         const warning = screen.queryByRole('alert')
-        const modalTitle = screen.queryByRole('Dados alterados')
+        const modal = screen.queryByRole('dialog')
 
         expect(infoTitle).toBeInTheDocument()
         expect(nameInput).toBeInTheDocument()
@@ -149,7 +153,6 @@ describe('Profile Page', () => {
         expect(emailInput).toBeDisabled()
         expect(infoButton).toBeInTheDocument()
         expect(infoButton).toBeDisabled()
-
         expect(passwordTitle).toBeInTheDocument()
         expect(passwordInput).toBeInTheDocument()
         expect(passwordInput).toBeEnabled()
@@ -159,9 +162,8 @@ describe('Profile Page', () => {
         expect(confirmNewPasswordInput).toBeEnabled()
         expect(passwordButton).toBeInTheDocument()
         expect(passwordButton).toBeEnabled()
-
         expect(warning).toBeNull()
-        expect(modalTitle).toBeNull()
+        expect(modal).toBeNull()
     })
 
     describe('when getLoggedUserApi request succeeds', () => {
@@ -229,7 +231,7 @@ describe('Profile Page', () => {
             it('should show a invalid value warning', async () => {
                 await renderPage({
                     mockSuccessfulGetLoggedUserApi: true,
-                    waitForInfoFormEnabled: true
+                    waitInitialLoadingFinish: true
                 })
 
                 await testClearInputs([
@@ -249,7 +251,7 @@ describe('Profile Page', () => {
                 it('should show a required error in the inputs', async () => {
                     await renderPage({
                         mockSuccessfulGetLoggedUserApi: true,
-                        waitForInfoFormEnabled: true
+                        waitInitialLoadingFinish: true
                     })
 
                     await testClearInputs([
@@ -272,7 +274,7 @@ describe('Profile Page', () => {
                 it('should show a length error in the inputs', async () => {
                     await renderPage({
                         mockSuccessfulGetLoggedUserApi: true,
-                        waitForInfoFormEnabled: true
+                        waitInitialLoadingFinish: true
                     })
 
                     await testClearInputs([
@@ -297,7 +299,7 @@ describe('Profile Page', () => {
                 it('should show a length error in the inputs', async () => {
                     await renderPage({
                         mockSuccessfulGetLoggedUserApi: true,
-                        waitForInfoFormEnabled: true
+                        waitInitialLoadingFinish: true
                     })
 
                     await testClearInputs([
@@ -329,7 +331,7 @@ describe('Profile Page', () => {
                 ])('should show a email error in the inputs for %p', async (emailInputValue) => {
                     await renderPage({
                         mockSuccessfulGetLoggedUserApi: true,
-                        waitForInfoFormEnabled: true
+                        waitInitialLoadingFinish: true
                     })
 
                     await testClearInputs(['Email'])
@@ -350,7 +352,7 @@ describe('Profile Page', () => {
             it('should call editUserDataApi request', async () => {
                 const props = await renderPage({
                     mockSuccessfulGetLoggedUserApi: true,
-                    waitForInfoFormEnabled: true,
+                    waitInitialLoadingFinish: true,
                     submitValidInfoForm: true
                 })
 
@@ -365,7 +367,7 @@ describe('Profile Page', () => {
                 it('should clear the inputs of password form', async () => {
                     await renderPage({
                         mockSuccessfulGetLoggedUserApi: true,
-                        waitForInfoFormEnabled: true,
+                        waitInitialLoadingFinish: true,
                         submitValidInfoForm: true,
                         mockSuccessfulEditUserDataApi: true
                     })
@@ -382,7 +384,7 @@ describe('Profile Page', () => {
                 it('should call setTokenStorage function', async () => {
                     const props = await renderPage({
                         mockSuccessfulGetLoggedUserApi: true,
-                        waitForInfoFormEnabled: true,
+                        waitInitialLoadingFinish: true,
                         submitValidInfoForm: true,
                         mockSuccessfulEditUserDataApi: true
                     })
@@ -394,17 +396,18 @@ describe('Profile Page', () => {
                 it('should open success modal', async () => {
                     await renderPage({
                         mockSuccessfulGetLoggedUserApi: true,
-                        waitForInfoFormEnabled: true,
+                        waitInitialLoadingFinish: true,
                         submitValidInfoForm: true,
                         mockSuccessfulEditUserDataApi: true
                     })
 
-                    const modalTitle = screen.getByRole('heading', { name: 'Dados alterados' })
-                    const modalMessagesText = screen.getAllByRole('alertdialog').map(x => x.textContent)
+                    const modal = screen.getByRole('dialog')
+                    const modalTitle = within(modal).getByRole('heading', { name: 'Dados alterados' })
+                    const modalMessagesText = within(modal).getAllByRole('alertdialog').map(x => x.textContent)
                     const modalMessagesTextData = [
                         'Os dados da sua conta foram alterados com sucesso.'
                     ]
-                    const modalButton = screen.getByRole('button', { name: 'Entendi' })
+                    const modalButton = within(modal).getByRole('button', { name: 'Entendi' })
 
                     expect(modalTitle).toBeInTheDocument()
                     expect(modalMessagesText).toEqual(modalMessagesTextData)
@@ -416,7 +419,7 @@ describe('Profile Page', () => {
                 it('should show a warning with the error', async () => {
                     const props = await renderPage({
                         mockSuccessfulGetLoggedUserApi: true,
-                        waitForInfoFormEnabled: true,
+                        waitInitialLoadingFinish: true,
                         submitValidInfoForm: true,
                         mockFailEditUserDataApi: true
                     })
@@ -558,12 +561,13 @@ describe('Profile Page', () => {
                         mockSuccessfulEditUserPasswordApi: true
                     })
 
-                    const modalTitle = screen.getByRole('heading', { name: 'Dados alterados' })
-                    const modalMessagesText = screen.getAllByRole('alertdialog').map(x => x.textContent)
+                    const modal = screen.getByRole('dialog')
+                    const modalTitle = within(modal).getByRole('heading', { name: 'Dados alterados' })
+                    const modalMessagesText = within(modal).getAllByRole('alertdialog').map(x => x.textContent)
                     const modalMessagesTextData = [
                         'Os dados da sua conta foram alterados com sucesso.'
                     ]
-                    const modalButton = screen.getByRole('button', { name: 'Entendi' })
+                    const modalButton = within(modal).getByRole('button', { name: 'Entendi' })
 
                     expect(modalTitle).toBeInTheDocument()
                     expect(modalMessagesText).toEqual(modalMessagesTextData)
@@ -594,17 +598,18 @@ describe('Profile Page', () => {
             it('should close the modal', async () => {
                 await renderPage({
                     mockSuccessfulGetLoggedUserApi: true,
-                    waitForInfoFormEnabled: true,
+                    waitInitialLoadingFinish: true,
                     submitValidInfoForm: true,
                     mockSuccessfulEditUserDataApi: true
                 })
 
-                const modalButton = screen.getByRole('button', { name: 'Entendi' })
+                const modalOn = screen.getByRole('dialog')
+                const modalButton = within(modalOn).getByRole('button', { name: 'Entendi' })
                 await userEvent.click(modalButton)
 
-                const modalTitle = screen.queryByRole('heading', { name: 'Dados alterados' })
+                const modalOff = screen.queryByRole('dialog')
 
-                expect(modalTitle).toBeNull()
+                expect(modalOff).toBeNull()
             })
         })
 
@@ -612,17 +617,18 @@ describe('Profile Page', () => {
             it('should close the modal', async () => {
                 await renderPage({
                     mockSuccessfulGetLoggedUserApi: true,
-                    waitForInfoFormEnabled: true,
+                    waitInitialLoadingFinish: true,
                     submitValidInfoForm: true,
                     mockSuccessfulEditUserDataApi: true
                 })
 
-                const closeIcon = screen.getByRole('switch', { name: 'Fechar modal' })
+                const modalOn = screen.getByRole('dialog')
+                const closeIcon = within(modalOn).getByRole('switch', { name: 'Fechar modal' })
                 await userEvent.click(closeIcon)
 
-                const modalTitle = screen.queryByRole('heading', { name: 'Dados alterados' })
+                const modalOff = screen.queryByRole('dialog')
 
-                expect(modalTitle).toBeNull()
+                expect(modalOff).toBeNull()
             })
         })
     })

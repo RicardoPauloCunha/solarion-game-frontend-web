@@ -129,7 +129,6 @@ const MyScores = () => {
             }).catch(baseError => {
                 setWarning(getAxiosError(baseError))
             }).finally(() => setIsLoading(LoadingEnum.None))
-
         }
         else if (scoreIndex === -1 && lastScore) {
             handleRemoveLastScore()
