@@ -2,24 +2,20 @@ import { render, screen } from "@testing-library/react"
 import { BrowserRouter } from "react-router-dom"
 import PageContainer from "."
 
+const TEXT_CONTENT = 'Text content'
+
 const renderComponent = () => {
-    let textContext = 'Conteúdo da página'
-
     render(<PageContainer>
-        <p>{textContext}</p>
+        <p>{TEXT_CONTENT}</p>
     </PageContainer>, { wrapper: BrowserRouter })
-
-    return {
-        textContext
-    }
 }
 
 describe('PageContainer Comp', () => {
     it('should render a page container', () => {
-        const props = renderComponent()
+        renderComponent()
 
         const navbar = screen.getByRole('menubar')
-        const content = screen.getByText(props.textContext)
+        const content = screen.getByText(TEXT_CONTENT)
 
         expect(navbar).toBeInTheDocument()
         expect(content).toBeInTheDocument()

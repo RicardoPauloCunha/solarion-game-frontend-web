@@ -21,27 +21,26 @@ jest.mock('react-router', () => ({
     useNavigate: () => mockNavigate
 }))
 
+const EMAIL = 'email@mail.com'
+const PASSWORD = 'password'
+const TOKEN = 'jwt-token'
+const ERROR_MESSAGE = 'Error message.'
+
 const renderPage = async (options?: {
     submitValidLoginForm?: boolean,
-    mockSuccessfulLoginApi?: boolean,
     mockFailLoginApi?: boolean,
 }) => {
     defineValidatorErrorDictionary()
 
-    const email = 'email@mail.com'
-    const password = 'password'
-    const result = 'jwt-token'
-    const errorMessage = 'Não foi possível completar a requisição.'
-
-    if (options?.mockSuccessfulLoginApi) {
+    if (options?.mockFailLoginApi) {
+        mockLoginApi.mockRejectedValue(createAxiosError(400, ERROR_MESSAGE))
+    }
+    else {
         mockLoginApi.mockResolvedValue({
             message: '',
             responseStatus: 200,
-            result
+            result: TOKEN
         })
-    }
-    else if (options?.mockFailLoginApi) {
-        mockLoginApi.mockRejectedValue(createAxiosError(400, errorMessage))
     }
 
     render(<AuthContext.Provider
@@ -53,18 +52,9 @@ const renderPage = async (options?: {
     </AuthContext.Provider>, { wrapper: BrowserRouter })
 
     if (options?.submitValidLoginForm) {
-        await testTypeInInput('Email', email)
-        await testTypeInInput('Senha', password)
+        await testTypeInInput('Email', EMAIL)
+        await testTypeInInput('Senha', PASSWORD)
         await testSubmitForm('Entrar')
-    }
-
-    return {
-        form: {
-            email,
-            password
-        },
-        result,
-        errorMessage
     }
 }
 
@@ -124,22 +114,28 @@ describe('Login page', () => {
 
             describe('and when no value', () => {
                 it('should show a required error in the inputs', async () => {
+                    const errors = [
+                        ErrorDictionary.mixed.required,
+                        ErrorDictionary.mixed.required
+                    ]
+
                     await renderPage()
 
                     await testSubmitForm('Entrar')
 
                     const inputsErrorText = screen.getAllByRole('alertdialog').map(x => x.textContent)
-                    const inputsErrorTextData = [
-                        ErrorDictionary.mixed.required,
-                        ErrorDictionary.mixed.required
-                    ]
 
-                    expect(inputsErrorText).toEqual(inputsErrorTextData)
+                    expect(inputsErrorText).toEqual(errors)
                 })
             })
 
             describe('and when length is shorter', () => {
                 it('should show a length error in the inputs', async () => {
+                    const errors = [
+                        replaceVariableInErrorDictionaryMessage(ErrorDictionary.string.min, '3'),
+                        replaceVariableInErrorDictionaryMessage(ErrorDictionary.string.min, '6'),
+                    ]
+
                     await renderPage()
 
                     await testTypeInInput('Email', 'e')
@@ -147,17 +143,18 @@ describe('Login page', () => {
                     await testSubmitForm('Entrar')
 
                     const inputsErrorText = screen.getAllByRole('alertdialog').map(x => x.textContent)
-                    const inputsErrorTextData = [
-                        replaceVariableInErrorDictionaryMessage(ErrorDictionary.string.min, '3'),
-                        replaceVariableInErrorDictionaryMessage(ErrorDictionary.string.min, '6'),
-                    ]
 
-                    expect(inputsErrorText).toEqual(inputsErrorTextData)
+                    expect(inputsErrorText).toEqual(errors)
                 })
             })
 
             describe('and when length is greater', () => {
                 it('should show a length error in the inputs', async () => {
+                    const errors = [
+                        replaceVariableInErrorDictionaryMessage(ErrorDictionary.string.max, '80'),
+                        replaceVariableInErrorDictionaryMessage(ErrorDictionary.string.max, '24'),
+                    ]
+
                     await renderPage()
 
                     await testTypeInInput('Email', 'emailemailemailemailemailemailemailemailemailemailemailemailemailemailemailemail1')
@@ -165,12 +162,8 @@ describe('Login page', () => {
                     await testSubmitForm('Entrar')
 
                     const inputsErrorText = screen.getAllByRole('alertdialog').map(x => x.textContent)
-                    const inputsErrorTextData = [
-                        replaceVariableInErrorDictionaryMessage(ErrorDictionary.string.max, '80'),
-                        replaceVariableInErrorDictionaryMessage(ErrorDictionary.string.max, '24'),
-                    ]
 
-                    expect(inputsErrorText).toEqual(inputsErrorTextData)
+                    expect(inputsErrorText).toEqual(errors)
                 })
             })
 
@@ -183,44 +176,44 @@ describe('Login page', () => {
                     ['email@.'],
                     ['email@.e'],
                 ])('should show a email error in the inputs for %p', async (emailInputValue) => {
+                    const errors = [
+                        ErrorDictionary.string.email,
+                        ErrorDictionary.mixed.required,
+                    ]
+
                     await renderPage()
 
                     await testTypeInInput('Email', emailInputValue)
                     await testSubmitForm('Entrar')
 
                     const inputsErrorText = screen.getAllByRole('alertdialog').map(x => x.textContent)
-                    const inputsErrorTextData = [
-                        ErrorDictionary.string.email,
-                        ErrorDictionary.mixed.required,
-                    ]
 
-                    expect(inputsErrorText).toEqual(inputsErrorTextData)
+                    expect(inputsErrorText).toEqual(errors)
                 })
             })
         })
 
         describe('and when form is valid', () => {
             it('should call loginApi request', async () => {
-                const props = await renderPage({
+                await renderPage({
                     submitValidLoginForm: true
                 })
 
                 expect(mockLoginApi).toHaveBeenCalledTimes(1)
                 expect(mockLoginApi).toHaveBeenCalledWith({
-                    email: props.form.email,
-                    password: props.form.password
+                    email: EMAIL,
+                    password: PASSWORD
                 })
             })
 
             describe('and when loginApi request succeeds', () => {
                 it('should call setTokenStorage function', async () => {
-                    const props = await renderPage({
+                    await renderPage({
                         submitValidLoginForm: true,
-                        mockSuccessfulLoginApi: true
                     })
 
                     expect(mockSetTokenStorage).toHaveBeenCalledTimes(1)
-                    expect(mockSetTokenStorage).toHaveBeenCalledWith(props.result)
+                    expect(mockSetTokenStorage).toHaveBeenCalledWith(TOKEN)
                 })
 
                 it.each([
@@ -235,7 +228,6 @@ describe('Login page', () => {
 
                     await renderPage({
                         submitValidLoginForm: true,
-                        mockSuccessfulLoginApi: true
                     })
 
                     expect(mockNavigate).toHaveBeenCalledTimes(1)
@@ -245,13 +237,13 @@ describe('Login page', () => {
 
             describe('and when loginApi request fails', () => {
                 it('should show a warning with the error', async () => {
-                    const props = await renderPage({
+                    await renderPage({
                         submitValidLoginForm: true,
                         mockFailLoginApi: true
                     })
 
                     const warning = screen.getByRole('alert')
-                    const warningMessage = screen.getByText(props.errorMessage)
+                    const warningMessage = screen.getByText(ERROR_MESSAGE)
 
                     expect(warning).toBeInTheDocument()
                     expect(warningMessage).toBeInTheDocument()

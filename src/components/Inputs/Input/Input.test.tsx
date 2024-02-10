@@ -3,41 +3,35 @@ import userEvent from "@testing-library/user-event"
 import { Form } from "@unform/web"
 import Input from "."
 
+const NAME = 'testInput'
+const LABEL = 'Input label'
+const PLACEHOLDER = 'Input placeholder'
+const VALUE = 'Input value'
+const mockOnChangeValue = jest.fn()
+
 const renderComponent = (options?: {
     hasOnChangeValue?: boolean,
     isDisabled?: boolean,
 }) => {
-    const name = 'username'
-    const label = 'Nome do usuário'
-    const placeholder = 'Coloque o seu nome'
-    const onChangeValue = jest.fn()
-
     render(<Form
         onSubmit={() => { }}
     >
         <Input
-            name={name}
-            label={label}
-            placeholder={placeholder}
-            onChangeValue={options?.hasOnChangeValue ? onChangeValue : undefined}
+            name={NAME}
+            label={LABEL}
+            placeholder={PLACEHOLDER}
+            onChangeValue={options?.hasOnChangeValue ? mockOnChangeValue : undefined}
             disabled={options?.isDisabled}
         />
     </Form>)
-
-    return {
-        name,
-        label,
-        placeholder,
-        onChangeValue
-    }
 }
 
 describe('Input Comp', () => {
     it('should render an input', () => {
-        const props = renderComponent()
+        renderComponent()
 
-        const label = screen.getByText(props.label)
-        const input = screen.getByPlaceholderText(props.placeholder)
+        const label = screen.getByText(LABEL)
+        const input = screen.getByPlaceholderText(PLACEHOLDER)
 
         expect(label).toBeInTheDocument()
         expect(input).toBeInTheDocument()
@@ -45,12 +39,12 @@ describe('Input Comp', () => {
 
     describe('when click on label', () => {
         it('should focus on input', async () => {
-            const props = renderComponent()
+            renderComponent()
 
-            const label = screen.getByText(props.label)
+            const label = screen.getByText(LABEL)
             await userEvent.click(label)
 
-            const input = screen.getByPlaceholderText(props.placeholder)
+            const input = screen.getByPlaceholderText(PLACEHOLDER)
 
             expect(input).toHaveFocus()
         })
@@ -58,58 +52,54 @@ describe('Input Comp', () => {
 
     describe('when type a text', () => {
         it('should change the value of the input', async () => {
-            const props = renderComponent()
-            const text = 'Ricardo Paulo'
+            renderComponent()
 
-            const input = screen.getByPlaceholderText(props.placeholder)
-            await userEvent.type(input, text)
+            const input = screen.getByPlaceholderText(PLACEHOLDER)
+            await userEvent.type(input, VALUE)
 
-            const inputWithValue = screen.getByDisplayValue(text)
+            const inputWithValue = screen.getByDisplayValue(VALUE)
 
             expect(inputWithValue).toBeInTheDocument()
         })
 
         it('should call onChangeValue function', async () => {
-            const props = renderComponent({
+            renderComponent({
                 hasOnChangeValue: true
             })
-            const text = 'Ricardo Paulo'
 
-            const input = screen.getByPlaceholderText(props.placeholder)
-            await userEvent.type(input, text)
+            const input = screen.getByPlaceholderText(PLACEHOLDER)
+            await userEvent.type(input, VALUE)
 
-            expect(props.onChangeValue).toHaveBeenCalledTimes(text.length)
-            expect(props.onChangeValue).toHaveBeenLastCalledWith(text)
+            expect(mockOnChangeValue).toHaveBeenCalledTimes(VALUE.length)
+            expect(mockOnChangeValue).toHaveBeenLastCalledWith(VALUE)
         })
     })
 
     describe('when disabled', () => {
         describe('and when type a text', () => {
             it('should not change the value of the input', async () => {
-                const props = renderComponent({
+                renderComponent({
                     isDisabled: true
                 })
-                const text = 'Ricardo Paulo'
 
-                const input = screen.getByPlaceholderText(props.placeholder)
-                await userEvent.type(input, text)
+                const input = screen.getByPlaceholderText(PLACEHOLDER)
+                await userEvent.type(input, VALUE)
 
-                const inputWithValue = screen.queryByDisplayValue(text)
+                const inputWithValue = screen.queryByDisplayValue(VALUE)
 
                 expect(inputWithValue).toBeNull()
             })
 
             it('should not call onChangeValue function', async () => {
-                const props = renderComponent({
+                renderComponent({
                     hasOnChangeValue: true,
                     isDisabled: true
                 })
-                const text = 'Ricardo Paulo'
 
-                const input = screen.getByPlaceholderText(props.placeholder)
-                await userEvent.type(input, text)
+                const input = screen.getByPlaceholderText(PLACEHOLDER)
+                await userEvent.type(input, VALUE)
 
-                expect(props.onChangeValue).not.toHaveBeenCalled()
+                expect(mockOnChangeValue).not.toHaveBeenCalled()
             })
         })
     })

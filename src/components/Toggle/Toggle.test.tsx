@@ -2,40 +2,33 @@ import { render, screen } from "@testing-library/react"
 import userEvent from "@testing-library/user-event"
 import Toggle from "."
 
+const TEXT = 'Field'
+const TEXT_CONTENT = 'Text content'
+const TEXT_CONTENT_PREVIEW = 'Text content preview.'
+const mockOnOpen = jest.fn()
+
 const renderComponent = (options?: {
     isOpenDefault?: boolean,
     hasPreview?: boolean,
     hasOnOpen?: boolean
 }) => {
-    const text = 'Detalhes'
-    const textContent = 'Detalhes mais detalhados sobre os detalhes.'
-    const previewTextContent = 'Pré-visualização dos detalhes.'
-    const onOpen = jest.fn()
-
     render(<Toggle
-        text={text}
+        text={TEXT}
         isOpenDefault={options?.isOpenDefault}
-        preview={options?.hasPreview ? <p>{previewTextContent}</p> : undefined}
-        onOpen={options?.hasOnOpen ? onOpen : undefined}
+        preview={options?.hasPreview ? <p>{TEXT_CONTENT_PREVIEW}</p> : undefined}
+        onOpen={options?.hasOnOpen ? mockOnOpen : undefined}
     >
-        <p>{textContent}</p>
+        <p>{TEXT_CONTENT}</p>
     </Toggle>)
-
-    return ({
-        text,
-        textContent,
-        previewTextContent,
-        onOpen
-    })
 }
 
 describe('Toggle', () => {
     it('should render a closed toggle', () => {
-        const props = renderComponent()
+        renderComponent()
 
-        const field = screen.getByText(props.text)
+        const field = screen.getByText(TEXT)
         const toggle = screen.getByRole('switch')
-        const content = screen.queryByText(props.textContent)
+        const content = screen.queryByText(TEXT_CONTENT)
 
         expect(field).toBeInTheDocument()
         expect(toggle).toBeInTheDocument()
@@ -43,13 +36,13 @@ describe('Toggle', () => {
     })
 
     it('should render an open toggle', () => {
-        const props = renderComponent({
+        renderComponent({
             isOpenDefault: true
         })
 
-        const fieldName = screen.getByText(props.text)
+        const fieldName = screen.getByText(TEXT)
         const toggle = screen.getByRole('switch')
-        const content = screen.getByText(props.textContent)
+        const content = screen.getByText(TEXT_CONTENT)
 
         expect(fieldName).toBeInTheDocument()
         expect(toggle).toBeInTheDocument()
@@ -59,29 +52,29 @@ describe('Toggle', () => {
     describe('when have a preview', () => {
         describe('and when is closed', () => {
             it('should show the preview', () => {
-                const props = renderComponent({
+                renderComponent({
                     hasPreview: true
                 })
 
-                const preview = screen.getByText(props.previewTextContent)
+                const preview = screen.getByText(TEXT_CONTENT_PREVIEW)
 
                 expect(preview).toBeInTheDocument()
             })
 
             describe('and when clicked', () => {
                 it('should hide the preview', async () => {
-                    const props = renderComponent({
+                    renderComponent({
                         hasPreview: true
                     })
 
-                    const previewOn = screen.getByText(props.previewTextContent)
+                    const previewOn = screen.getByText(TEXT_CONTENT_PREVIEW)
 
                     expect(previewOn).toBeInTheDocument()
 
                     const button = screen.getByRole('switch')
                     await userEvent.click(button)
 
-                    const previewOff = screen.queryByText(props.previewTextContent)
+                    const previewOff = screen.queryByText(TEXT_CONTENT_PREVIEW)
 
                     expect(previewOff).toBeNull()
                 })
@@ -90,31 +83,31 @@ describe('Toggle', () => {
 
         describe('and when is open', () => {
             it('should not render the preview', () => {
-                const props = renderComponent({
+                renderComponent({
                     isOpenDefault: true,
                     hasPreview: true
                 })
 
-                const preview = screen.queryByText(props.previewTextContent)
+                const preview = screen.queryByText(TEXT_CONTENT_PREVIEW)
 
                 expect(preview).toBeNull()
             })
 
             describe('and when clicked', () => {
                 it('should show the preview', async () => {
-                    const props = renderComponent({
+                    renderComponent({
                         isOpenDefault: true,
                         hasPreview: true
                     })
 
-                    const previewOff = screen.queryByText(props.previewTextContent)
+                    const previewOff = screen.queryByText(TEXT_CONTENT_PREVIEW)
 
                     expect(previewOff).toBeNull()
 
                     const button = screen.getByRole('switch')
                     await userEvent.click(button)
 
-                    const previewOn = screen.getByText(props.previewTextContent)
+                    const previewOn = screen.getByText(TEXT_CONTENT_PREVIEW)
 
                     expect(previewOn).toBeInTheDocument()
                 })
@@ -124,51 +117,51 @@ describe('Toggle', () => {
 
     describe('when is clicked', () => {
         it('should show the content', async () => {
-            const props = renderComponent()
+            renderComponent()
 
-            const contentOff = screen.queryByText(props.textContent)
+            const contentOff = screen.queryByText(TEXT_CONTENT)
 
             expect(contentOff).toBeNull()
 
             const button = screen.getByRole('switch')
             await userEvent.click(button)
 
-            const contentOn = screen.getByText(props.textContent)
+            const contentOn = screen.getByText(TEXT_CONTENT)
 
             expect(contentOn).toBeInTheDocument()
         })
 
         it('should call onOpen function', async () => {
-            const props = renderComponent({
+            renderComponent({
                 hasOnOpen: true
             })
 
             const button = screen.getByRole('switch')
             await userEvent.click(button)
 
-            expect(props.onOpen).toHaveBeenCalledTimes(1)
+            expect(mockOnOpen).toHaveBeenCalledTimes(1)
         })
 
         describe('and when clicked again', () => {
             it('should hide the content', async () => {
-                const toggleProps = renderComponent()
+                renderComponent()
 
                 const button = screen.getByRole('switch')
                 await userEvent.click(button)
 
-                const contentOn = screen.getByText(toggleProps.textContent)
+                const contentOn = screen.getByText(TEXT_CONTENT)
 
                 expect(contentOn).toBeInTheDocument()
 
                 await userEvent.click(button)
 
-                const contentOff = screen.queryByText(toggleProps.textContent)
+                const contentOff = screen.queryByText(TEXT_CONTENT)
 
                 expect(contentOff).toBeNull()
             })
 
             it('should call onOpen function only when opening', async () => {
-                const toggleProps = renderComponent({
+                renderComponent({
                     hasOnOpen: true
                 })
 
@@ -176,7 +169,7 @@ describe('Toggle', () => {
                 await userEvent.click(button)
                 await userEvent.click(button)
 
-                expect(toggleProps.onOpen).toHaveBeenCalledTimes(1)
+                expect(mockOnOpen).toHaveBeenCalledTimes(1)
             })
         })
     })

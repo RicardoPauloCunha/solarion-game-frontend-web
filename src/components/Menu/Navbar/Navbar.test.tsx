@@ -17,35 +17,33 @@ jest.mock('react-router', () => ({
 const generateLoggedUser = (userType: UserTypeEnum): LoggedUserData => {
     return {
         userId: 1,
-        name: 'Ricardo Paulo',
+        name: 'User name',
         userType
     }
 }
 
-const renderComponent = (userType: UserTypeEnum, options?: {
-    hasNoLoggedUser?: boolean
-}) => {
-    const loggedUser = generateLoggedUser(userType)
+const NONE_USER = generateLoggedUser(UserTypeEnum.None)
+const ADMIN_USER = generateLoggedUser(UserTypeEnum.Admin)
+const COMMON_USER = generateLoggedUser(UserTypeEnum.Common)
 
+const renderComponent = (options?: {
+    loggedUser?: LoggedUserData
+}) => {
     render(<AuthContext.Provider
         value={{
-            loggedUser: options?.hasNoLoggedUser ? undefined : loggedUser,
+            loggedUser: options?.loggedUser,
             setLoggedUser: mockSetLoggedUser
         } as unknown as AuthContextData}
     >
         <Navbar />
     </AuthContext.Provider>, { wrapper: BrowserRouter })
-
-    return {
-        ...loggedUser
-    }
 }
 
 // TODO: Test open/close menu in mobile
 
 describe('Navbar Comp', () => {
     it('should render a navbar', () => {
-        renderComponent(UserTypeEnum.None, { hasNoLoggedUser: true })
+        renderComponent()
 
         const navbar = screen.getByRole('menubar')
 
@@ -57,7 +55,7 @@ describe('Navbar Comp', () => {
             [DefaultRoutePathEnum.Home, 'SolarionGame'],
             [DefaultRoutePathEnum.Login, 'Entrar'],
         ])('should render a link to %p', async (linkPath, linkName) => {
-            renderComponent(UserTypeEnum.None, { hasNoLoggedUser: true })
+            renderComponent()
 
             const link = screen.getByRole('link', { name: linkName })
             await userEvent.click(link)
@@ -68,21 +66,24 @@ describe('Navbar Comp', () => {
         })
 
         it('should only render default links', () => {
-            renderComponent(UserTypeEnum.None, { hasNoLoggedUser: true })
-
-            const linksText = screen.getAllByRole('link').map(x => x.textContent)
-            const linksTextData = [
+            const texts = [
                 'SolarionGame',
                 'Entrar'
             ]
 
-            expect(linksText).toEqual(linksTextData)
+            renderComponent()
+
+            const linkTexts = screen.getAllByRole('link').map(x => x.textContent)
+
+            expect(linkTexts).toEqual(texts)
         })
     })
 
     describe('when logged', () => {
         it('should not render login link', async () => {
-            renderComponent(UserTypeEnum.None)
+            renderComponent({
+                loggedUser: NONE_USER
+            })
 
             const loginLink = screen.queryByRole('link', { name: 'Entrar' })
 
@@ -93,7 +94,9 @@ describe('Navbar Comp', () => {
             [DefaultRoutePathEnum.Profile, 'Perfil'],
             [DefaultRoutePathEnum.Home, 'Sair'],
         ])('should render a link to %p', async (linkPath, linkName) => {
-            renderComponent(UserTypeEnum.None)
+            renderComponent({
+                loggedUser: NONE_USER
+            })
 
             const link = screen.getByRole('link', { name: linkName })
             await userEvent.click(link)
@@ -104,16 +107,19 @@ describe('Navbar Comp', () => {
         })
 
         it('should only render logged links', () => {
-            renderComponent(UserTypeEnum.None)
-
-            const linksText = screen.getAllByRole('link').map(x => x.textContent)
-            const linksTextData = [
+            const texts = [
                 'SolarionGame',
                 'Perfil',
                 'Sair',
             ]
 
-            expect(linksText).toEqual(linksTextData)
+            renderComponent({
+                loggedUser: NONE_USER
+            })
+
+            const linkTexts = screen.getAllByRole('link').map(x => x.textContent)
+
+            expect(linkTexts).toEqual(texts)
         })
 
         describe('and when is admin', () => {
@@ -121,7 +127,9 @@ describe('Navbar Comp', () => {
                 [DefaultRoutePathEnum.Dashboard, 'Dashboard'],
                 [DefaultRoutePathEnum.Scores, 'Pontuações'],
             ])('should also render a link to %p', async (linkPath, linkName) => {
-                renderComponent(UserTypeEnum.Admin)
+                renderComponent({
+                    loggedUser: ADMIN_USER
+                })
 
                 const link = screen.getByRole('link', { name: linkName })
                 await userEvent.click(link)
@@ -132,10 +140,7 @@ describe('Navbar Comp', () => {
             })
 
             it('should only render admin links', () => {
-                renderComponent(UserTypeEnum.Admin)
-
-                const linksText = screen.getAllByRole('link').map(x => x.textContent)
-                const linksTextData = [
+                const texts = [
                     'SolarionGame',
                     'Dashboard',
                     'Pontuações',
@@ -143,7 +148,13 @@ describe('Navbar Comp', () => {
                     'Sair',
                 ]
 
-                expect(linksText).toEqual(linksTextData)
+                renderComponent({
+                    loggedUser: ADMIN_USER
+                })
+
+                const linkTexts = screen.getAllByRole('link').map(x => x.textContent)
+
+                expect(linkTexts).toEqual(texts)
             })
         })
 
@@ -151,7 +162,9 @@ describe('Navbar Comp', () => {
             it.each([
                 [DefaultRoutePathEnum.MyScores, 'Minhas pontuações'],
             ])('should also render a link to %p', async (linkPath, linkName) => {
-                renderComponent(UserTypeEnum.Common)
+                renderComponent({
+                    loggedUser: COMMON_USER
+                })
 
                 const link = screen.getByRole('link', { name: linkName })
                 await userEvent.click(link)
@@ -162,17 +175,20 @@ describe('Navbar Comp', () => {
             })
 
             it('should only render common links', () => {
-                renderComponent(UserTypeEnum.Common)
-
-                const linksText = screen.getAllByRole('link').map(x => x.textContent)
-                const linksTextData = [
+                const texts = [
                     'SolarionGame',
                     'Minhas pontuações',
                     'Perfil',
                     'Sair',
                 ]
 
-                expect(linksText).toEqual(linksTextData)
+                renderComponent({
+                    loggedUser: COMMON_USER
+                })
+
+                const linkTexts = screen.getAllByRole('link').map(x => x.textContent)
+
+                expect(linkTexts).toEqual(texts)
             })
         })
     })

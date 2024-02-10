@@ -3,63 +3,63 @@ import userEvent from "@testing-library/user-event"
 import { Form } from "@unform/web"
 import Checkbox, { OptionData } from "."
 
+const NAME = 'testCheckbox'
+const LABEL = 'Checkboxes label'
+const OPTIONS: OptionData[] = [
+    { label: 'Option 1', value: '1' },
+    { label: 'Option 2', value: '2' },
+    { label: 'Option 3', value: '3' },
+]
+const FIRST_OPTION = OPTIONS[0]
+const mockOnChangeValue = jest.fn()
+
+const generateFirstOptionDisabled = () => {
+    const options = OPTIONS.map(x => ({
+        ...x,
+        disabled: x.value === FIRST_OPTION.value
+    }))
+    const firstOption = options[0]
+
+    return {
+        options,
+        firstOption
+    }
+}
+
 const renderComponent = (options?: {
-    hasFirstOptionChecked?: boolean,
-    hasOptionListChecked?: boolean,
+    initialData?: string[],
+    options?: OptionData[],
     hasOnChangeValue?: boolean,
     isDisabled?: boolean,
-    hasFirstOptionDisabled?: boolean
 }) => {
-    const name = 'options'
-    const label = 'Opções'
-    const checkboxOptions: OptionData[] = [
-        { label: 'Option 1', value: '1', disabled: options?.hasFirstOptionDisabled },
-        { label: 'Option 2', value: '2' },
-        { label: 'Option 3', value: '3' },
-    ]
-    const onChangeValue = jest.fn()
-    let initialData: string[] = []
-
-    if (options?.hasFirstOptionChecked)
-        initialData = [checkboxOptions[0].value]
-    else if (options?.hasOptionListChecked)
-        initialData = checkboxOptions.map(x => x.value)
-
     render(<Form
         onSubmit={() => { }}
         initialData={{
-            [name]: options?.hasFirstOptionChecked || options?.hasOptionListChecked ? initialData : undefined
+            [NAME]: options?.initialData
         }}
     >
         <Checkbox
-            name={name}
-            label={label}
-            options={checkboxOptions}
-            onChangeValue={options?.hasOnChangeValue ? onChangeValue : undefined}
+            name={NAME}
+            label={LABEL}
+            options={options?.options ? options.options : OPTIONS}
+            onChangeValue={options?.hasOnChangeValue ? mockOnChangeValue : undefined}
             disabled={options?.isDisabled}
         />
     </Form>)
-
-    return {
-        name,
-        label,
-        options: checkboxOptions,
-        initialData,
-        onChangeValue
-    }
 }
 
 describe('Checkbox Comp', () => {
     it('should render a list of unchecked checkboxes', () => {
-        const props = renderComponent()
+        const ids = OPTIONS.map(x => `${NAME}-${x.value}`)
 
-        const label = screen.getByText(props.label)
+        renderComponent()
+
+        const label = screen.getByText(LABEL)
         const checkboxes = screen.getAllByRole('checkbox')
-        const checkboxesId = checkboxes.map(x => x.id)
-        const checkboxesIdData = props.options.map(x => `${props.name}-${x.value}`)
+        const checkboxIds = checkboxes.map(x => x.id)
 
         expect(label).toBeInTheDocument()
-        expect(checkboxesId).toEqual(checkboxesIdData)
+        expect(checkboxIds).toEqual(ids)
 
         checkboxes.forEach(x => {
             expect(x).not.toBeChecked()
@@ -67,14 +67,16 @@ describe('Checkbox Comp', () => {
     })
 
     it('should render with one option checked', () => {
-        const props = renderComponent({
-            hasFirstOptionChecked: true
+        const initialData = [FIRST_OPTION.value]
+
+        renderComponent({
+            initialData
         })
 
         const checkboxes = screen.getAllByRole('checkbox')
 
         checkboxes.forEach(x => {
-            if (props.initialData.some(y => `${props.name}-${y}` === x.id))
+            if (initialData.some(y => `${NAME}-${y}` === x.id))
                 expect(x).toBeChecked()
             else
                 expect(x).not.toBeChecked()
@@ -82,8 +84,10 @@ describe('Checkbox Comp', () => {
     })
 
     it('should render a list of checked checkboxes', () => {
+        const initialData = OPTIONS.map(x => x.value)
+
         renderComponent({
-            hasOptionListChecked: true
+            initialData
         })
 
         const checkboxes = screen.getAllByRole('checkbox')
@@ -95,32 +99,31 @@ describe('Checkbox Comp', () => {
 
     describe('when clicked', () => {
         it('should check the option', async () => {
-            const props = renderComponent()
+            renderComponent()
 
-            const input = screen.getByLabelText(props.options[0].label)
+            const input = screen.getByLabelText(FIRST_OPTION.label)
             await userEvent.click(input)
 
             expect(input).toBeChecked()
         })
 
         it('should call onChangeValue function with the option value', async () => {
-            const props = renderComponent({
+            renderComponent({
                 hasOnChangeValue: true
             })
-            const option = props.options[0]
 
-            const input = screen.getByLabelText(option.label)
+            const input = screen.getByLabelText(FIRST_OPTION.label)
             await userEvent.click(input)
 
-            expect(props.onChangeValue).toHaveBeenCalledTimes(1)
-            expect(props.onChangeValue).toHaveBeenCalledWith(option.value)
+            expect(mockOnChangeValue).toHaveBeenCalledTimes(1)
+            expect(mockOnChangeValue).toHaveBeenCalledWith(FIRST_OPTION.value)
         })
 
         describe('and when clicked again', () => {
             it('should uncheck the option', async () => {
-                const props = renderComponent()
+                renderComponent()
 
-                const input = screen.getByLabelText(props.options[0].label)
+                const input = screen.getByLabelText(FIRST_OPTION.label)
                 await userEvent.click(input)
 
                 expect(input).toBeChecked()
@@ -145,39 +148,41 @@ describe('Checkbox Comp', () => {
             })
         })
 
-        it('should not call onChangeValue function', async () => {
-            const props = renderComponent({
-                isDisabled: true,
-                hasOnChangeValue: true
-            })
-
-            const input = screen.getByLabelText(props.options[0].label)
-            await userEvent.click(input)
-
-            expect(props.onChangeValue).not.toHaveBeenCalled()
-        })
-
         describe('and when clicked', () => {
             it('should not check the option', async () => {
-                const props = renderComponent({
+                renderComponent({
                     isDisabled: true
                 })
 
-                const input = screen.getByLabelText(props.options[0].label)
+                const input = screen.getByLabelText(FIRST_OPTION.label)
                 await userEvent.click(input)
 
                 expect(input).not.toBeChecked()
+            })
+
+            it('should not call onChangeValue function', async () => {
+                renderComponent({
+                    isDisabled: true,
+                    hasOnChangeValue: true
+                })
+
+                const input = screen.getByLabelText(FIRST_OPTION.label)
+                await userEvent.click(input)
+
+                expect(mockOnChangeValue).not.toHaveBeenCalled()
             })
         })
     })
 
     describe('when one option is disabled', () => {
         it('should only disable that option', () => {
-            const props = renderComponent({
-                hasFirstOptionDisabled: true
+            const data = generateFirstOptionDisabled()
+
+            renderComponent({
+                options: data.options
             })
 
-            const input = screen.getByLabelText(props.options[0].label)
+            const input = screen.getByLabelText(data.firstOption.label)
             const checkboxes = screen.getAllByRole('checkbox').filter(x => x.id !== input.id)
 
             expect(input).toBeDisabled()
@@ -189,22 +194,27 @@ describe('Checkbox Comp', () => {
 
         describe('and when clicked', () => {
             it('should not check that option', async () => {
-                const props = renderComponent({
-                    hasFirstOptionDisabled: true
+                const data = generateFirstOptionDisabled()
+
+                renderComponent({
+                    options: data.options
                 })
 
-                const input = screen.getByLabelText(props.options[0].label)
+                const input = screen.getByLabelText(data.firstOption.label)
                 await userEvent.click(input)
 
                 expect(input).not.toBeChecked()
             })
 
             it('should be able to check another option', async () => {
-                const props = renderComponent({
-                    hasFirstOptionDisabled: true
+                const data = generateFirstOptionDisabled()
+                const secondOption = data.options[1]
+
+                renderComponent({
+                    options: data.options
                 })
 
-                const input = screen.getByLabelText(props.options[1].label)
+                const input = screen.getByLabelText(secondOption.label)
                 await userEvent.click(input)
 
                 expect(input).toBeChecked()

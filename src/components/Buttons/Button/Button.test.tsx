@@ -2,32 +2,27 @@ import { render, screen } from "@testing-library/react"
 import userEvent from '@testing-library/user-event'
 import Button from "."
 
+const BUTTON_TEXT = 'Button text'
+const mockOnClick = jest.fn()
+
 const renderComponent = (options?: {
     hasOnClick?: boolean,
     isDisabled?: boolean,
     isLoading?: boolean
 }) => {
-    const text = 'Click here!'
-    const onClick = jest.fn()
-
     render(<Button
-        text={text}
-        onClick={options?.hasOnClick ? onClick : undefined}
+        text={BUTTON_TEXT}
+        onClick={options?.hasOnClick ? mockOnClick : undefined}
         disabled={options?.isDisabled}
         isLoading={options?.isLoading}
     />)
-
-    return {
-        text,
-        onClick,
-    }
 }
 
 describe('Button Comp', () => {
     it('should render an enabled button', () => {
-        const props = renderComponent()
+        renderComponent()
 
-        const button = screen.getByRole('button', { name: props.text })
+        const button = screen.getByRole('button', { name: BUTTON_TEXT })
 
         expect(button).toBeInTheDocument()
         expect(button).toBeEnabled()
@@ -35,39 +30,39 @@ describe('Button Comp', () => {
 
     describe('when clicked', () => {
         it('should call onClick function', async () => {
-            const props = renderComponent({
+            renderComponent({
                 hasOnClick: true
             })
 
-            const button = screen.getByRole('button', { name: props.text })
+            const button = screen.getByRole('button', { name: BUTTON_TEXT })
             await userEvent.click(button)
 
-            expect(props.onClick).toHaveBeenCalledTimes(1)
+            expect(mockOnClick).toHaveBeenCalledTimes(1)
         })
     })
 
     describe('when disabled', () => {
         it('should have gray style', () => {
-            const props = renderComponent({
+            renderComponent({
                 isDisabled: true
             })
 
-            const button = screen.getByRole('button', { name: props.text })
+            const button = screen.getByRole('button', { name: BUTTON_TEXT })
 
             expect(button).toHaveStyle({ backgroundColor: 'var(--color-light-gray)' })
         })
 
         describe('and when clicked', () => {
             it('should not call onClick function', async () => {
-                const props = renderComponent({
+                renderComponent({
                     isDisabled: true,
                     hasOnClick: true
                 })
 
-                const button = screen.getByRole('button', { name: props.text })
+                const button = screen.getByRole('button', { name: BUTTON_TEXT })
                 await userEvent.click(button)
 
-                expect(props.onClick).not.toHaveBeenCalled()
+                expect(mockOnClick).not.toHaveBeenCalled()
             })
         })
     })
@@ -94,11 +89,11 @@ describe('Button Comp', () => {
         })
 
         it('should show a loading message', () => {
-            const props = renderComponent({
+            renderComponent({
                 isLoading: true
             })
 
-            const buttonText = screen.queryByText(props.text)
+            const buttonText = screen.queryByText(BUTTON_TEXT)
             const loadingMessage = screen.getByText('Carregando...')
 
             expect(buttonText).toBeNull()

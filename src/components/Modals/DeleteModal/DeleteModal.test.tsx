@@ -5,73 +5,65 @@ import { WarningData } from "../../Cards/WarningCard"
 
 const generateWarning = (): WarningData => {
     return {
-        title: 'Algo deu errado',
-        message: 'Oh não, parece que ocorreu algum erro na operação.'
+        title: 'Warning title',
+        message: 'Warning message.'
     }
 }
+
+const TITLE = 'Modal title'
+const MESSAGES = [
+    'Message 01',
+    'Message 02',
+    'Message 03',
+]
+const VALUES = [
+    'Value 01',
+    'Value 02',
+]
+const WARNING = generateWarning()
+const mockOnClose = jest.fn()
+const mockOnConfirm = jest.fn()
 
 const renderComponent = (options?: {
     hasWarning?: boolean
 }) => {
-    const title = 'Título do modal'
-    const messages = [
-        'Mensagem 01',
-        'Mensagem 02',
-        'Mensagem 03',
-    ]
-    const values = [
-        'Valor 01',
-        'Valor 02',
-    ]
-    const onClose = jest.fn()
-    const onConfirm = jest.fn()
-    const warning = generateWarning()
-
     render(<DeleteModal
-        title={title}
-        messages={messages}
+        title={TITLE}
+        messages={MESSAGES}
         isOpen={true}
-        onClose={onClose}
-        values={values}
-        warning={options?.hasWarning ? warning : undefined}
+        onClose={mockOnClose}
+        values={VALUES}
+        warning={options?.hasWarning ? WARNING : undefined}
         isLoading={false}
-        onConfirm={onConfirm}
+        onConfirm={mockOnConfirm}
     />)
-
-    return {
-        title,
-        messages,
-        values,
-        warning,
-        onClose,
-        onConfirm
-    }
 }
 
 describe('SuccessModal Comp', () => {
     it('should render a modal', () => {
-        const props = renderComponent()
+        const texts = VALUES.map(x => `\u2022 ${x}`)
 
-        const messagesText = screen.getAllByRole('alertdialog').map(x => x.textContent)
-        const valuesText = screen.getAllByRole('listitem').map(x => x.textContent)
-        const valuesTextData = props.values.map(x => `\u2022 ${x}`)
+        renderComponent()
+
+        const messageTexts = screen.getAllByRole('alertdialog').map(x => x.textContent)
+        const valueTexts = screen.getAllByRole('listitem').map(x => x.textContent)
         const warning = screen.queryByRole('alert')
         const removeButton = screen.getByRole('button', { name: 'Remover' })
 
-        expect(messagesText).toEqual(props.messages)
-        expect(valuesText).toEqual(valuesTextData)
+        expect(messageTexts).toEqual(MESSAGES)
+        expect(valueTexts).toEqual(texts)
         expect(warning).toBeNull()
         expect(removeButton).toBeInTheDocument()
     })
 
     describe('when click in modal button', () => {
         it('should call onConfirm function', async () => {
-            const props = renderComponent()
+            renderComponent()
 
             const modalButton = screen.getByRole('button', { name: 'Remover' })
             await userEvent.click(modalButton)
 
-            expect(props.onConfirm).toHaveBeenCalledTimes(1)
+            expect(mockOnConfirm).toHaveBeenCalledTimes(1)
         })
     })
 

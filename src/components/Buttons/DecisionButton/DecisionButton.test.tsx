@@ -2,28 +2,23 @@ import { render, screen } from "@testing-library/react"
 import userEvent from "@testing-library/user-event"
 import DecisionButton from "."
 
+const BUTTON_TEXT = 'Button text'
+const mockOnClick = jest.fn()
+
 const renderComponent = (options?: {
     hasOnClick?: boolean
 }) => {
-    const text = 'Click here!'
-    const onClick = jest.fn()
-
     render(<DecisionButton
-        text={text}
-        onClick={options?.hasOnClick ? onClick : undefined}
+        text={BUTTON_TEXT}
+        onClick={options?.hasOnClick ? mockOnClick : undefined}
     />)
-
-    return {
-        text,
-        onClick
-    }
 }
 
 describe('DecisionButton Comp', () => {
     it('should render an enabled button', () => {
-        const props = renderComponent()
+        renderComponent()
 
-        const button = screen.getByRole('button', { name: props.text })
+        const button = screen.getByRole('button', { name: BUTTON_TEXT })
 
         expect(button).toBeInTheDocument()
         expect(button).toBeEnabled()
@@ -31,14 +26,14 @@ describe('DecisionButton Comp', () => {
 
     describe('when clicked', () => {
         it('should call onClick function', async () => {
-            const props = renderComponent({
+            renderComponent({
                 hasOnClick: true
             })
 
-            const button = screen.getByRole('button', { name: props.text })
+            const button = screen.getByRole('button', { name: BUTTON_TEXT })
             await userEvent.click(button)
 
-            expect(props.onClick).toHaveBeenCalledTimes(1)
+            expect(mockOnClick).toHaveBeenCalledTimes(1)
         })
     })
 })

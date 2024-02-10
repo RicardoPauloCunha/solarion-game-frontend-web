@@ -1,39 +1,40 @@
 import { render, screen } from "@testing-library/react"
 import LoadingText from "."
 
-const renderComponent = (isLoading: boolean, options?: {
+const LOADING_TEXT = "Loading text..."
+const DEFAULT_TEXT = "Default text"
+
+const renderComponent = (options?: {
+    isLoading?: boolean
     hasDefaultText?: boolean,
 }) => {
-    const loadingText = "Carregando processo..."
-    const defaultText = "Processo XXX"
-
     render(<LoadingText
-        isLoading={isLoading}
-        loadingText={loadingText}
-        defaultText={options?.hasDefaultText ? defaultText : undefined}
+        isLoading={!!options?.isLoading}
+        loadingText={LOADING_TEXT}
+        defaultText={options?.hasDefaultText ? DEFAULT_TEXT : undefined}
     />)
-
-    return {
-        loadingText,
-        defaultText
-    }
 }
 
 describe('LoadingText Comp', () => {
     describe('when loading', () => {
         it('should render a loading text', () => {
-            const props = renderComponent(true)
+            renderComponent({
+                isLoading: true
+            })
 
-            const loadingText = screen.getByText(props.loadingText)
+            const loadingText = screen.getByText(LOADING_TEXT)
 
             expect(loadingText).toBeInTheDocument()
         })
 
         it('should replace default text for loading text', () => {
-            const props = renderComponent(true, { hasDefaultText: true })
+            renderComponent({
+                isLoading: true,
+                hasDefaultText: true
+            })
 
-            const defaultText = screen.queryByText(props.defaultText)
-            const loadingText = screen.getByText(props.loadingText)
+            const defaultText = screen.queryByText(DEFAULT_TEXT)
+            const loadingText = screen.getByText(LOADING_TEXT)
 
             expect(defaultText).toBeNull()
             expect(loadingText).toBeInTheDocument()
@@ -42,18 +43,20 @@ describe('LoadingText Comp', () => {
 
     describe('when not loading', () => {
         it('should not render a loading text', () => {
-            const props = renderComponent(false)
+            renderComponent()
 
-            const loadingText = screen.queryByText(props.loadingText)
+            const loadingText = screen.queryByText(LOADING_TEXT)
 
             expect(loadingText).toBeNull()
         })
 
         describe('and when have default text', () => {
             it('should render the default text', () => {
-                const props = renderComponent(false, { hasDefaultText: true })
+                renderComponent({
+                    hasDefaultText: true
+                })
 
-                const defaultText = screen.getByText(props.defaultText)
+                const defaultText = screen.getByText(DEFAULT_TEXT)
 
                 expect(defaultText).toBeInTheDocument()
             })
@@ -61,10 +64,10 @@ describe('LoadingText Comp', () => {
 
         describe('and when no default text', () => {
             it('should not render', () => {
-                const props = renderComponent(false)
+                renderComponent()
 
-                const defaultText = screen.queryByText(props.defaultText)
-                const loadingText = screen.queryByText(props.loadingText)
+                const defaultText = screen.queryByText(DEFAULT_TEXT)
+                const loadingText = screen.queryByText(LOADING_TEXT)
 
                 expect(defaultText).toBeNull()
                 expect(loadingText).toBeNull()

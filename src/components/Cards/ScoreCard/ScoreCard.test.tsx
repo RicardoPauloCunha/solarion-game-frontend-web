@@ -35,44 +35,37 @@ const generateScore = (options?: {
                 decisionTypeValue: getDecisionTypeEnumValue(DecisionTypeEnum.CH8_ROT_WAR_AC2_DEC_Sword)
             }
         ],
-        userName: options?.hasUserName ? 'Ricardo Paulo' : ''
+        userName: options?.hasUserName ? 'User name' : ''
     }
 }
 
+const SCORE = generateScore()
+const mockOnSave = jest.fn()
+const mockOnDelete = jest.fn()
+
 const renderComponent = (options?: {
-    hasUserName?: boolean,
-    hasNoDecisions?: boolean,
+    scoreData?: ScoreViewModel,
     hasOnSave?: boolean,
     hasOnDelete?: boolean
 }) => {
-    const data = generateScore({ hasUserName: options?.hasUserName, hasNoDecisions: options?.hasNoDecisions })
-    const onSave = jest.fn()
-    const onDelete = jest.fn()
-
     render(<ScoreCard
-        data={data}
-        onSave={options?.hasOnSave ? onSave : undefined}
-        onDelete={options?.hasOnDelete ? onDelete : undefined}
+        data={options?.scoreData ? options.scoreData : SCORE}
+        onSave={options?.hasOnSave ? mockOnSave : undefined}
+        onDelete={options?.hasOnDelete ? mockOnDelete : undefined}
     />)
-
-    return {
-        data,
-        onSave,
-        onDelete
-    }
 }
 
 describe('ScoreCard Comp', () => {
     it('should render a default card', () => {
-        const props = renderComponent()
+        renderComponent()
 
         const header = screen.queryByRole('heading')
         const removeButton = screen.queryByRole('deletion')
         const saveButton = screen.queryByRole('button', { name: 'Salvar' })
-        const scoreRating = screen.getByText(props.data.ratingTypeValue)
-        const scoreHero = screen.getByText(props.data.heroTypeValue)
-        const scoreDate = screen.getByText(props.data.creationDate)
-        const decisionsPreview = screen.getByText(`\u2022 ${props.data.decisions[0].decisionTypeValue}..`)
+        const scoreRating = screen.getByText(SCORE.ratingTypeValue)
+        const scoreHero = screen.getByText(SCORE.heroTypeValue)
+        const scoreDate = screen.getByText(SCORE.creationDate)
+        const decisionsPreview = screen.getByText(`\u2022 ${SCORE.decisions[0].decisionTypeValue}..`)
 
         expect(header).toBeNull()
         expect(removeButton).toBeNull()
@@ -84,7 +77,7 @@ describe('ScoreCard Comp', () => {
     })
 
     it('should render a save card', () => {
-        const props = renderComponent({
+        renderComponent({
             hasOnSave: true,
             hasOnDelete: true
         })
@@ -92,7 +85,7 @@ describe('ScoreCard Comp', () => {
         const saveHeader = screen.getByRole('heading', { name: 'Pontuação da última aventura' })
         const removeButton = screen.getByRole('deletion')
         const saveButton = screen.getByRole('button', { name: 'Salvar' })
-        const userNameHeader = screen.queryByRole('heading', { name: props.data.userName })
+        const userNameHeader = screen.queryByRole('heading', { name: SCORE.userName })
 
         expect(saveHeader).toBeInTheDocument()
         expect(removeButton).toBeInTheDocument()
@@ -101,11 +94,13 @@ describe('ScoreCard Comp', () => {
     })
 
     it('should render a card with username', () => {
-        const props = renderComponent({
-            hasUserName: true
+        const scoreData = generateScore({ hasUserName: true })
+
+        renderComponent({
+            scoreData
         })
 
-        const userNameHeader = screen.getByRole('heading', { name: props.data.userName })
+        const userNameHeader = screen.getByRole('heading', { name: scoreData.userName })
         const saveHeader = screen.queryByRole('heading', { name: 'Pontuação da última aventura' })
         const removeButton = screen.queryByRole('deletion')
         const saveButton = screen.queryByRole('button', { name: 'Salvar' })
@@ -117,12 +112,14 @@ describe('ScoreCard Comp', () => {
     })
 
     it('should prioritize render a card with username over a save card', () => {
-        const props = renderComponent({
-            hasUserName: true,
+        const scoreData = generateScore({ hasUserName: true })
+
+        renderComponent({
+            scoreData,
             hasOnSave: true
         })
 
-        const userNameHeader = screen.getByRole('heading', { name: props.data.userName })
+        const userNameHeader = screen.getByRole('heading', { name: scoreData.userName })
         const saveHeader = screen.queryByRole('heading', { name: 'Pontuação da última aventura' })
         const removeButton = screen.queryByRole('deletion')
         const saveButton = screen.queryByRole('button', { name: 'Salvar' })
@@ -135,8 +132,10 @@ describe('ScoreCard Comp', () => {
 
     describe('when no decisions', () => {
         it('should not render a preview list of decisions', () => {
+            const scoreData = generateScore({ hasNoDecisions: true })
+
             renderComponent({
-                hasNoDecisions: true
+                scoreData
             })
 
             const preview = screen.queryByRole('listitem')
@@ -147,7 +146,9 @@ describe('ScoreCard Comp', () => {
 
     describe('when details is open', () => {
         it('should render a full list of decisions', async () => {
-            const props = renderComponent()
+            const texts = SCORE.decisions.map(x => `\u2022 ${x.decisionTypeValue}`)
+
+            renderComponent()
 
             const previewItens = screen.getAllByRole('listitem')
 
@@ -156,18 +157,19 @@ describe('ScoreCard Comp', () => {
             const toggle = screen.getByRole('switch')
             await userEvent.click(toggle)
 
-            const preview = screen.queryByText(`\u2022 ${props.data.decisions[0].decisionTypeValue}..`)
-            const decisionsText = screen.getAllByRole('listitem').map(x => x.textContent)
-            const decisionsTextData = props.data.decisions.map(x => `\u2022 ${x.decisionTypeValue}`)
+            const preview = screen.queryByText(`\u2022 ${SCORE.decisions[0].decisionTypeValue}..`)
+            const decisionTexts = screen.getAllByRole('listitem').map(x => x.textContent)
 
             expect(preview).toBeNull()
-            expect(decisionsText).toEqual(decisionsTextData)
+            expect(decisionTexts).toEqual(texts)
         })
 
         describe('and when no decisions', () => {
             it('should not render a full list of decisions', async () => {
+                const scoreData = generateScore({ hasNoDecisions: true })
+
                 renderComponent({
-                    hasNoDecisions: true
+                    scoreData
                 })
 
                 const toggle = screen.getByRole('switch')
@@ -182,27 +184,27 @@ describe('ScoreCard Comp', () => {
 
     describe('when click to save', () => {
         it('should call onSave function', async () => {
-            const props = renderComponent({
+            renderComponent({
                 hasOnSave: true
             })
 
             const button = screen.getByRole('button', { name: 'Salvar' })
             await userEvent.click(button)
 
-            expect(props.onSave).toHaveBeenCalledTimes(1)
+            expect(mockOnSave).toHaveBeenCalledTimes(1)
         })
     })
 
     describe('when click to delete', () => {
         it('should call onDelete function', async () => {
-            const props = renderComponent({
+            renderComponent({
                 hasOnDelete: true
             })
 
             const button = screen.getByRole('deletion')
             await userEvent.click(button)
 
-            expect(props.onDelete).toHaveBeenCalledTimes(1)
+            expect(mockOnDelete).toHaveBeenCalledTimes(1)
         })
     })
 })

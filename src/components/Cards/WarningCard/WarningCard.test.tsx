@@ -2,36 +2,30 @@ import { render, screen } from "@testing-library/react"
 import userEvent from "@testing-library/user-event"
 import WarningCard from "."
 
+const TITLE = 'Warning title'
+const MESSAGE = 'Warning message.'
+const SUBMESSAGES = [
+    'Warning submessage 01',
+    'Warning submessage 02',
+    'Warning submessage 03',
+]
+
 const renderComponent = (options?: {
-    hasSubmessages?: boolean
+    submessages?: string[]
 }) => {
-    const title = 'Algo deu errado'
-    const message = 'Oh não, parece que ocorreu algum erro na operação.'
-    const submessages = [
-        'Ocorreu um erro no módulo X',
-        'Ocorreu um erro no módulo Y',
-        'Ocorreu um erro no módulo Z',
-    ]
-
     render(<WarningCard
-        title={title}
-        message={message}
-        submessages={options?.hasSubmessages ? submessages : undefined}
+        title={TITLE}
+        message={MESSAGE}
+        submessages={options?.submessages ? options?.submessages : undefined}
     />)
-
-    return {
-        title,
-        message,
-        submessages
-    }
 }
 
 describe('WarningCard Comp', () => {
     it('should render a default card', () => {
-        const props = renderComponent()
+        renderComponent()
 
-        const title = screen.getByText(props.title)
-        const message = screen.getByText(props.message)
+        const title = screen.getByText(TITLE)
+        const message = screen.getByText(MESSAGE)
         const detailsTitle = screen.queryByText('Detalhes')
         const submessagesList = screen.queryByRole('list')
 
@@ -43,8 +37,10 @@ describe('WarningCard Comp', () => {
 
     describe('when have submessages', () => {
         it('should render a card with details', async () => {
-            const props = renderComponent({
-                hasSubmessages: true
+            const texts = SUBMESSAGES?.map(x => `\u2022 ${x}`)
+
+            renderComponent({
+                submessages: SUBMESSAGES
             })
 
             const detailsTitle = screen.getByText('Detalhes')
@@ -56,10 +52,9 @@ describe('WarningCard Comp', () => {
             const toggle = screen.getByRole('switch')
             await userEvent.click(toggle)
 
-            const submessagesText = screen.getAllByRole('listitem').map(x => x.textContent)
-            const submessagesTextData = props.submessages?.map(x => `\u2022 ${x}`)
+            const submessageTexts = screen.getAllByRole('listitem').map(x => x.textContent)
 
-            expect(submessagesText).toEqual(submessagesTextData)
+            expect(submessageTexts).toEqual(texts)
         })
     })
 })

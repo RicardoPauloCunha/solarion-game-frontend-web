@@ -2,23 +2,20 @@ import { render, screen } from "@testing-library/react"
 import userEvent from "@testing-library/user-event"
 import ToggleIcon from "."
 
-const renderComponent = (isOpen: boolean) => {
-    const onToggle = jest.fn()
+const mockOnToggle = jest.fn()
 
+const renderComponent = (options?: {
+    isOpen?: boolean
+}) => {
     render(<ToggleIcon
-        isOpen={isOpen}
-        onToggle={onToggle}
+        isOpen={!!options?.isOpen}
+        onToggle={mockOnToggle}
     />)
-
-    return {
-        isOpen,
-        onToggle
-    }
 }
 
 describe('ToggleIcon Comp', () => {
     it('should render a closed toggle', () => {
-        renderComponent(false)
+        renderComponent()
 
         const toggle = screen.getByText('Mostrar')
 
@@ -26,7 +23,9 @@ describe('ToggleIcon Comp', () => {
     })
 
     it('should render an open toggle', () => {
-        renderComponent(true)
+        renderComponent({
+            isOpen: true
+        })
 
         const toggle = screen.getByText('Esconder')
 
@@ -35,12 +34,12 @@ describe('ToggleIcon Comp', () => {
 
     describe('when clicked', () => {
         it('should call onToggle function', async () => {
-            const props = renderComponent(false)
+            renderComponent()
 
             const button = screen.getByRole('switch')
             await userEvent.click(button)
 
-            expect(props.onToggle).toHaveBeenCalledTimes(1)
+            expect(mockOnToggle).toHaveBeenCalledTimes(1)
         })
     })
 })

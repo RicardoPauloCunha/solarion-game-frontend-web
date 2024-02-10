@@ -1,31 +1,28 @@
 import { render, screen } from "@testing-library/react"
 import BulletList from "."
 
+const ITEMS = [
+    'Item 01',
+    'Item 02',
+    'Item 03',
+]
+
 const renderComponent = () => {
-    const itens = [
-        'Item 01',
-        'Item 02',
-        'Item 03',
-    ]
-
     render(<BulletList
-        items={itens}
+        items={ITEMS}
     />)
-
-    return {
-        itens
-    }
 }
 
 describe('BulletList Comp', () => {
     it('should render a string list', () => {
-        const props = renderComponent()
+        const texts = ITEMS.map(x => `\u2022 ${x}`)
+
+        renderComponent()
 
         const list = screen.getByRole('list')
-        const items = screen.getAllByRole('listitem').map(x => x.textContent)
-        const itemsData = props.itens.map(x => `\u2022 ${x}`)
+        const itemTexts = screen.getAllByRole('listitem').map(x => x.textContent)
 
         expect(list).toBeInTheDocument()
-        expect(items).toEqual(itemsData)
+        expect(itemTexts).toEqual(texts)
     })
 })

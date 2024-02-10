@@ -6,22 +6,22 @@ import CatCImg from '../../assets/images/cat-c.png'
 import CatDImg from '../../assets/images/cat-d.png'
 import { RatingTypeEnum, getRatingTypeEnumValue } from "../../types/enums/ratingType"
 
-const renderComponent = (ratingType: RatingTypeEnum) => {
+const RATING_TYPE = RatingTypeEnum.A
+
+const renderComponent = (options?: {
+    ratingType?: RatingTypeEnum
+}) => {
     render(<RatingResult
         size="small"
-        ratingType={ratingType}
+        ratingType={options?.ratingType ? options.ratingType : RATING_TYPE}
     />)
-
-    return {
-        ratingType
-    }
 }
 
 describe('RatingResult Comp', () => {
     it('should render a grade and an image', () => {
-        const props = renderComponent(RatingTypeEnum.A)
+        renderComponent()
 
-        const grade = screen.getByText(getRatingTypeEnumValue(props.ratingType))
+        const grade = screen.getByText(getRatingTypeEnumValue(RATING_TYPE))
         const image = screen.getByAltText('Reação do gato ao ver sua pontuação.')
 
         expect(grade).toBeInTheDocument()
@@ -34,9 +34,11 @@ describe('RatingResult Comp', () => {
         [RatingTypeEnum.C, CatCImg],
         [RatingTypeEnum.D, CatDImg],
     ])('should match the grade %p with the image %p', (ratingType, img) => {
-        const props = renderComponent(ratingType)
+        renderComponent({
+            ratingType
+        })
 
-        const grade = screen.getByText(getRatingTypeEnumValue(props.ratingType))
+        const grade = screen.getByText(getRatingTypeEnumValue(ratingType))
         const image = screen.getByAltText('Reação do gato ao ver sua pontuação.')
 
         expect(grade).toBeInTheDocument()

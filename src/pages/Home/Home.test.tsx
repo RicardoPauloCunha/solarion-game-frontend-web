@@ -3,6 +3,7 @@ import userEvent from "@testing-library/user-event"
 import { BrowserRouter } from "react-router-dom"
 import Home from "."
 import * as scenarioStorageFile from "../../hooks/storage/scenario"
+import { ScenarioData } from "../../hooks/storage/scenario"
 import { DecisionTypeEnum, getDecisionTypeEnumValue } from "../../types/enums/decisionType"
 import { getHeroTypeByDecision, getHeroTypeEnumValue } from "../../types/enums/heroType"
 import { DefaultRoutePathEnum } from "../../types/enums/routePath"
@@ -20,7 +21,7 @@ jest.mock('react-router', () => ({
 
 const generateScenario = (options?: {
     hasNoDecisions?: boolean
-}) => {
+}): ScenarioData => {
     return {
         scenarioType: ScenarioTypeEnum.CH2_ACT1,
         decisions: options?.hasNoDecisions ? [] : [DecisionTypeEnum.CH1_ACT2_DEC_Warrior],
@@ -28,25 +29,20 @@ const generateScenario = (options?: {
     }
 }
 
-const renderPage = async (options?: {
-    hasLastScenario?: boolean,
-    hasNoDecisions?: boolean,
-    openModal?: boolean,
-}) => {
-    const scenario = generateScenario({ hasNoDecisions: options?.hasNoDecisions })
+const SCENARIO = generateScenario()
 
-    if (options?.hasLastScenario)
-        mockGetScenarioStorage.mockReturnValue(scenario)
+const renderPage = async (options?: {
+    scenario?: ScenarioData,
+    openContinuePlayingModal?: boolean,
+}) => {
+    if (options?.scenario)
+        mockGetScenarioStorage.mockReturnValue(options?.scenario)
 
     render(<Home />, { wrapper: BrowserRouter })
 
-    if (options?.openModal) {
+    if (options?.openContinuePlayingModal) {
         const continuePlayingButton = screen.getByRole('button', { name: 'Continuar jogando' })
         await userEvent.click(continuePlayingButton)
-    }
-
-    return {
-        scenario
     }
 }
 
@@ -97,7 +93,7 @@ describe('Home Page', () => {
     describe('when click in continue button', () => {
         it('should open the modal', async () => {
             await renderPage({
-                openModal: true
+                openContinuePlayingModal: true
             })
 
             const modal = screen.getByRole('dialog')
@@ -112,7 +108,7 @@ describe('Home Page', () => {
         describe('and when no last scenario', () => {
             it('should render a empty warning', async () => {
                 await renderPage({
-                    openModal: true
+                    openContinuePlayingModal: true
                 })
 
                 const modal = screen.getByRole('dialog')
@@ -126,7 +122,7 @@ describe('Home Page', () => {
             describe('and when click in new adventure button', () => {
                 it('should call removeScenarioStorage function', async () => {
                     await renderPage({
-                        openModal: true
+                        openContinuePlayingModal: true
                     })
 
                     const modal = screen.getByRole('dialog')
@@ -138,7 +134,7 @@ describe('Home Page', () => {
 
                 it('should call navigate function to scenario page', async () => {
                     await renderPage({
-                        openModal: true
+                        openContinuePlayingModal: true
                     })
 
                     const modal = screen.getByRole('dialog')
@@ -153,16 +149,16 @@ describe('Home Page', () => {
 
         describe('and when have last scenario', () => {
             it('should show the last scenario', async () => {
-                const { scenario } = await renderPage({
-                    hasLastScenario: true,
-                    openModal: true
+                await renderPage({
+                    scenario: SCENARIO,
+                    openContinuePlayingModal: true,
                 })
 
                 const modal = screen.getByRole('dialog')
                 const text = within(modal).getByText('O progresso da sua última aventura foi salvo.')
-                const hero = within(modal).getByText(getHeroTypeEnumValue(getHeroTypeByDecision(scenario.decisions[0])))
-                const date = within(modal).getByText(formatDateToView(scenario.creationDate))
-                const decisionsPreview = within(modal).getByText(`\u2022 ${getDecisionTypeEnumValue(scenario.decisions[0])}..`)
+                const hero = within(modal).getByText(getHeroTypeEnumValue(getHeroTypeByDecision(SCENARIO.decisions[0])))
+                const date = within(modal).getByText(formatDateToView(SCENARIO.creationDate))
+                const decisionsPreview = within(modal).getByText(`\u2022 ${getDecisionTypeEnumValue(SCENARIO.decisions[0])}..`)
                 const continueButton = within(modal).getByRole('button', { name: 'Continuar' })
                 const removeButton = within(modal).getByRole('button', { name: 'Remover' })
 
@@ -176,10 +172,11 @@ describe('Home Page', () => {
 
             describe('and when no decisions', () => {
                 it('should not show the decisions field', async () => {
+                    const scenario = generateScenario({ hasNoDecisions: true })
+
                     await renderPage({
-                        hasLastScenario: true,
-                        hasNoDecisions: true,
-                        openModal: true
+                        openContinuePlayingModal: true,
+                        scenario,
                     })
 
                     const modal = screen.getByRole('dialog')
@@ -194,8 +191,8 @@ describe('Home Page', () => {
             describe('and when click in continue button', () => {
                 it('should call navigate function to scenario page', async () => {
                     await renderPage({
-                        hasLastScenario: true,
-                        openModal: true
+                        scenario: SCENARIO,
+                        openContinuePlayingModal: true,
                     })
 
                     const modal = screen.getByRole('dialog')
@@ -210,8 +207,8 @@ describe('Home Page', () => {
             describe('and when click in remove button', () => {
                 it('should empty the modal', async () => {
                     await renderPage({
-                        hasLastScenario: true,
-                        openModal: true
+                        scenario: SCENARIO,
+                        openContinuePlayingModal: true,
                     })
 
                     const modal = screen.getByRole('dialog')
@@ -233,8 +230,8 @@ describe('Home Page', () => {
 
                 it('should call removeScenarioStorage function', async () => {
                     await renderPage({
-                        hasLastScenario: true,
-                        openModal: true
+                        scenario: SCENARIO,
+                        openContinuePlayingModal: true,
                     })
 
                     const modal = screen.getByRole('dialog')

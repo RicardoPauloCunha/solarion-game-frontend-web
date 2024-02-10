@@ -11,56 +11,50 @@ jest.mock('react-router', () => ({
     useNavigate: () => mockNavigate
 }))
 
+const PATH = DefaultRoutePathEnum.Login
+const TEXT = "Página de login"
+const mockOnClick = jest.fn()
+
 const renderComponent = (options?: {
     hasOnClick?: boolean
 }) => {
-    const path = DefaultRoutePathEnum.Login
-    const text = "Página de login"
-    const onClick = jest.fn()
-
     render(<Link
-        to={path}
-        text={text}
-        onClick={options?.hasOnClick ? onClick : undefined}
+        to={PATH}
+        text={TEXT}
+        onClick={options?.hasOnClick ? mockOnClick : undefined}
     />, { wrapper: BrowserRouter })
-
-    return {
-        path,
-        text,
-        onClick
-    }
 }
 
 describe('Link Comp', () => {
     it('should render a link', () => {
-        const props = renderComponent()
+        renderComponent()
 
-        const link = screen.getByRole('link', { name: props.text })
+        const link = screen.getByRole('link', { name: TEXT })
 
         expect(link).toBeInTheDocument()
     })
 
     it('should call navigate function to the path', async () => {
-        const props = renderComponent()
+        renderComponent()
 
-        const link = screen.getByRole('link', { name: props.text })
+        const link = screen.getByRole('link', { name: TEXT })
         await userEvent.click(link)
 
         expect(mockNavigate).toHaveBeenCalledTimes(1)
-        expect(mockNavigate).toHaveBeenCalledWith(props.path, expect.anything())
+        expect(mockNavigate).toHaveBeenCalledWith(PATH, expect.anything())
     })
 
     describe('when have OnClick function', () => {
         describe('and when clicked', () => {
             it('should call onClick function', async () => {
-                const props = renderComponent({
+                renderComponent({
                     hasOnClick: true
                 })
 
-                const link = screen.getByRole('link', { name: props.text })
+                const link = screen.getByRole('link', { name: TEXT })
                 await userEvent.click(link)
 
-                expect(props.onClick).toHaveBeenCalledTimes(1)
+                expect(mockOnClick).toHaveBeenCalledTimes(1)
             })
         })
     })

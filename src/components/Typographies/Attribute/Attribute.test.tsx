@@ -1,27 +1,22 @@
 import { render, screen } from "@testing-library/react"
 import Attribute from "."
 
+const FIELD = "Field"
+const VALUE = "Value"
+
 const renderComponent = () => {
-    const field = "Campo"
-    const value = "Valor"
-
     render(<Attribute
-        field={field}
-        value={value}
+        field={FIELD}
+        value={VALUE}
     />)
-
-    return {
-        field,
-        value
-    }
 }
 
 describe('Attribute Comp', () => {
     it('should render a field-value', () => {
-        const props = renderComponent()
+        renderComponent()
 
-        const field = screen.getByText(props.field)
-        const value = screen.getByText(props.value)
+        const field = screen.getByText(FIELD)
+        const value = screen.getByText(VALUE)
 
         expect(field).toBeInTheDocument()
         expect(value).toBeInTheDocument()

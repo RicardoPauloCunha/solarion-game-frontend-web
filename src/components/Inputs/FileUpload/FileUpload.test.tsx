@@ -3,46 +3,40 @@ import userEvent from "@testing-library/user-event"
 import { Form } from "@unform/web"
 import FileUpload from "."
 
-const generateFile = () => {
-    return new File(['hello'], 'hello.png', { type: 'image/png' })
+const generateFile = (name: string = 'hello') => {
+    return new File([name], name + '.png', { type: 'image/png' })
 }
+
+const NAME = 'testFileUpload'
+const LABEL = 'File input label'
+const PLACEHOLDER = 'File input placeholder'
+const FILE = generateFile()
+const mockOnChangeValue = jest.fn()
 
 const renderComponent = (options?: {
     hasOnChangeValue?: boolean,
     isDisabled?: boolean,
 }) => {
-    const name = 'fileupload'
-    const label = 'Upload do arquivo'
-    const placeholder = 'Selecione o arquivo para upload'
-    const onChangeValue = jest.fn()
-
     render(<Form
         onSubmit={() => { }}
     >
         <FileUpload
-            name={name}
-            label={label}
-            placeholder={placeholder}
-            onChangeValue={options?.hasOnChangeValue ? onChangeValue : undefined}
+            name={NAME}
+            label={LABEL}
+            placeholder={PLACEHOLDER}
+            onChangeValue={options?.hasOnChangeValue ? mockOnChangeValue : undefined}
             disabled={options?.isDisabled}
         />
     </Form>)
-
-    return {
-        name,
-        label,
-        placeholder,
-        onChangeValue
-    }
 }
 
 describe('FileUpload Comp', () => {
     it('should render a fake input', () => {
-        const props = renderComponent()
+        renderComponent()
 
-        const fakeLabel = screen.getByText(props.label)
-        const fakeInput = screen.getByText(props.placeholder)
-        const input = screen.getByPlaceholderText(props.placeholder)
+        const fakeLabel = screen.getByText(LABEL)
+        const fakeInput = screen.getByText(PLACEHOLDER)
+        const input = screen.getByPlaceholderText(PLACEHOLDER)
 
         expect(fakeLabel).toBeInTheDocument()
         expect(fakeInput).toBeInTheDocument()
@@ -51,43 +45,41 @@ describe('FileUpload Comp', () => {
 
     describe('when upload a file', () => {
         it('should replace the fake input placeholder for the file name', async () => {
-            const props = renderComponent()
-            const file = generateFile()
+            renderComponent()
 
-            const input = screen.getByLabelText(props.placeholder)
-            await userEvent.upload(input, file)
+            const input = screen.getByLabelText(PLACEHOLDER)
+            await userEvent.upload(input, FILE)
 
-            const fakeInputPlaceholder = screen.queryByText(props.placeholder)
-            const fileName = screen.getByText(file.name)
+            const fakeInputPlaceholder = screen.queryByText(PLACEHOLDER)
+            const fileName = screen.getByText(FILE.name)
 
             expect(fakeInputPlaceholder).toBeNull()
             expect(fileName).toBeInTheDocument()
         })
 
         it('should call onChangeValue function', async () => {
-            const props = renderComponent({
+            renderComponent({
                 hasOnChangeValue: true
             })
-            const file = generateFile()
 
-            const input = screen.getByLabelText(props.placeholder)
-            await userEvent.upload(input, file)
+            const input = screen.getByLabelText(PLACEHOLDER)
+            await userEvent.upload(input, FILE)
 
-            expect(props.onChangeValue).toHaveBeenCalledTimes(1)
-            expect(props.onChangeValue).toHaveBeenCalledWith(expect.objectContaining({ name: file.name }))
+            expect(mockOnChangeValue).toHaveBeenCalledTimes(1)
+            expect(mockOnChangeValue).toHaveBeenCalledWith(expect.objectContaining({ name: FILE.name }))
         })
 
         describe('and when upload a file again', () => {
             it('should replace the file name for the new file name', async () => {
-                const props = renderComponent()
-                const file = generateFile()
-                const newFile = new File(['bye'], 'bye.png', { type: 'image/png' })
+                const newFile = generateFile('bye')
 
-                const input = screen.getByLabelText(props.placeholder)
-                await userEvent.upload(input, file)
+                renderComponent()
+
+                const input = screen.getByLabelText(PLACEHOLDER)
+                await userEvent.upload(input, FILE)
                 await userEvent.upload(input, newFile)
 
-                const fileName = screen.queryByText(file.name)
+                const fileName = screen.queryByText(FILE.name)
                 const newFileName = screen.getByText(newFile.name)
 
                 expect(fileName).toBeNull()
@@ -99,32 +91,30 @@ describe('FileUpload Comp', () => {
     describe('when disabled', () => {
         describe('and when upload a file', () => {
             it('should not replace the fake input placeholder for the file name', async () => {
-                const props = renderComponent({
+                renderComponent({
                     isDisabled: true
                 })
-                const file = generateFile()
 
-                const input = screen.getByLabelText(props.placeholder)
-                await userEvent.upload(input, file)
+                const input = screen.getByLabelText(PLACEHOLDER)
+                await userEvent.upload(input, FILE)
 
-                const fakeInputPlaceholder = screen.getByText(props.placeholder)
-                const fileName = screen.queryByText(file.name)
+                const fakeInputPlaceholder = screen.getByText(PLACEHOLDER)
+                const fileName = screen.queryByText(FILE.name)
 
                 expect(fakeInputPlaceholder).toBeInTheDocument()
                 expect(fileName).toBeNull()
             })
 
             it('should not call onChangeValue function', async () => {
-                const props = renderComponent({
+                renderComponent({
                     hasOnChangeValue: true,
                     isDisabled: true
                 })
-                const file = generateFile()
 
-                const input = screen.getByLabelText(props.placeholder)
-                await userEvent.upload(input, file)
+                const input = screen.getByLabelText(PLACEHOLDER)
+                await userEvent.upload(input, FILE)
 
-                expect(props.onChangeValue).not.toHaveBeenCalled()
+                expect(mockOnChangeValue).not.toHaveBeenCalled()
             })
         })
     })

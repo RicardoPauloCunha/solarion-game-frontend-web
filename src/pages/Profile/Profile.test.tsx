@@ -23,7 +23,7 @@ jest.mock('react-router', () => ({
     useNavigate: () => mockNavigate
 }))
 
-const generateSimpleUser = (): UserSimpleViewModel => {
+const generateUser = (): UserSimpleViewModel => {
     return {
         userId: 1,
         name: "Name",
@@ -31,55 +31,52 @@ const generateSimpleUser = (): UserSimpleViewModel => {
     }
 }
 
+const PASSWORD = 'password'
+const NEW_PASSWORD = 'wordpass'
+const TOKEN = 'jwt-token'
+const ERROR_MESSAGE = 'Error message.'
+const USER = generateUser()
+
 const renderPage = async (options?: {
-    mockSuccessfulGetLoggedUserApi?: boolean,
     mockFailGetLoggedUserApi?: boolean,
-    waitInitialLoadingFinish?: boolean,
+    skipInitialLoading?: boolean,
     submitValidInfoForm?: boolean,
-    mockSuccessfulEditUserDataApi?: boolean,
     mockFailEditUserDataApi?: boolean,
     submitValidPasswordForm?: boolean,
-    mockSuccessfulEditUserPasswordApi?: boolean,
     mockFailEditUserPasswordApi?: boolean,
 }) => {
     defineValidatorErrorDictionary()
 
-    const password = 'password'
-    const newPassword = 'wordpass'
-    const simpleUser = generateSimpleUser()
-    const token = 'jwt-token'
-    const errorMessage = 'Não foi possível completar a requisição.'
+    if (options?.mockFailGetLoggedUserApi)
+        mockGetLoggedUserApi.mockRejectedValue(createAxiosError(400, ERROR_MESSAGE))
+    else
+        mockGetLoggedUserApi.mockResolvedValue(USER)
 
-    if (options?.mockSuccessfulGetLoggedUserApi)
-        mockGetLoggedUserApi.mockResolvedValue(simpleUser)
-    else if (options?.mockFailGetLoggedUserApi)
-        mockGetLoggedUserApi.mockRejectedValue(createAxiosError(400, errorMessage))
-
-    if (options?.mockSuccessfulEditUserDataApi) {
+    if (options?.mockFailEditUserDataApi) {
+        mockEditUserDataApi.mockRejectedValue(createAxiosError(400, ERROR_MESSAGE))
+    }
+    else {
         mockEditUserDataApi.mockResolvedValue({
             message: '',
             responseStatus: 200,
-            result: token
+            result: TOKEN
         })
     }
-    else if (options?.mockFailEditUserDataApi) {
-        mockEditUserDataApi.mockRejectedValue(createAxiosError(400, errorMessage))
-    }
 
-    if (options?.mockSuccessfulEditUserPasswordApi) {
+    if (options?.mockFailEditUserPasswordApi) {
+        mockEditUserPasswordApi.mockRejectedValue(createAxiosError(400, ERROR_MESSAGE))
+    }
+    else {
         mockEditUserPasswordApi.mockResolvedValue({
             message: '',
             responseStatus: 200,
             result: null
         })
     }
-    else if (options?.mockFailEditUserPasswordApi) {
-        mockEditUserPasswordApi.mockRejectedValue(createAxiosError(400, errorMessage))
-    }
 
     mockDefineLoggedUserByToken.mockReturnValue({
-        userId: simpleUser.userId,
-        name: simpleUser.name,
+        userId: USER.userId,
+        name: USER.name,
         userType: UserTypeEnum.None
     })
 
@@ -93,7 +90,7 @@ const renderPage = async (options?: {
         </AuthContext.Provider>, { wrapper: BrowserRouter })
     })
 
-    if (options?.waitInitialLoadingFinish) {
+    if (!options?.skipInitialLoading) {
         await waitFor(() => {
             const infoFormButton = screen.getByRole('button', { name: 'Alterar informações' })
 
@@ -105,24 +102,10 @@ const renderPage = async (options?: {
         await testSubmitForm('Alterar informações')
 
     if (options?.submitValidPasswordForm) {
-        await testTypeInInput('Senha', password)
-        await testTypeInInput('Nova senha', newPassword)
-        await testTypeInInput('Confirme sua nova senha', newPassword)
+        await testTypeInInput('Senha', PASSWORD)
+        await testTypeInInput('Nova senha', NEW_PASSWORD)
+        await testTypeInInput('Confirme sua nova senha', NEW_PASSWORD)
         await testSubmitForm('Alterar senha')
-    }
-
-    return {
-        form: {
-            name: simpleUser.name,
-            email: simpleUser.email,
-            password,
-            newPassword
-        },
-        result: {
-            simpleUser,
-            token
-        },
-        errorMessage
     }
 }
 
@@ -131,7 +114,7 @@ const renderPage = async (options?: {
 describe('Profile Page', () => {
     it('should render the profile page', async () => {
         await renderPage({
-            mockSuccessfulGetLoggedUserApi: true
+            skipInitialLoading: true
         })
 
         const infoTitle = screen.getByRole('heading', { name: 'Minhas informações' })
@@ -168,15 +151,7 @@ describe('Profile Page', () => {
 
     describe('when getLoggedUserApi request succeeds', () => {
         it('should enable the inputs and buttons in info section', async () => {
-            await renderPage({
-                mockSuccessfulGetLoggedUserApi: true
-            })
-
-            await waitFor(() => {
-                const infoButton = screen.getByRole('button', { name: 'Alterar informações' })
-
-                expect(infoButton).toBeEnabled()
-            })
+            await renderPage()
 
             const nameInput = screen.getByLabelText('Nome')
             const emailInput = screen.getByLabelText('Email')
@@ -189,7 +164,8 @@ describe('Profile Page', () => {
     describe('when getLoggedUserApi request fails', () => {
         it('should disable the inputs and buttons in info section', async () => {
             await renderPage({
-                mockFailGetLoggedUserApi: true
+                skipInitialLoading: true,
+                mockFailGetLoggedUserApi: true,
             })
 
             await waitFor(() => {
@@ -207,6 +183,7 @@ describe('Profile Page', () => {
 
         it('should not disable the inputs and buttons in password section', async () => {
             await renderPage({
+                skipInitialLoading: true,
                 mockFailGetLoggedUserApi: true
             })
 
@@ -229,10 +206,7 @@ describe('Profile Page', () => {
     describe('when submit info form', () => {
         describe('and when invalid inputs value', () => {
             it('should show a invalid value warning', async () => {
-                await renderPage({
-                    mockSuccessfulGetLoggedUserApi: true,
-                    waitInitialLoadingFinish: true
-                })
+                await renderPage()
 
                 await testClearInputs([
                     'Nome',
@@ -249,10 +223,12 @@ describe('Profile Page', () => {
 
             describe('and when no value', () => {
                 it('should show a required error in the inputs', async () => {
-                    await renderPage({
-                        mockSuccessfulGetLoggedUserApi: true,
-                        waitInitialLoadingFinish: true
-                    })
+                    const errors = [
+                        ErrorDictionary.mixed.required,
+                        ErrorDictionary.mixed.required,
+                    ]
+
+                    await renderPage()
 
                     await testClearInputs([
                         'Nome',
@@ -261,21 +237,19 @@ describe('Profile Page', () => {
                     await testSubmitForm('Alterar informações')
 
                     const inputsErrorText = screen.getAllByRole('alertdialog').map(x => x.textContent)
-                    const inputsErrorTextData = [
-                        ErrorDictionary.mixed.required,
-                        ErrorDictionary.mixed.required,
-                    ]
 
-                    expect(inputsErrorText).toEqual(inputsErrorTextData)
+                    expect(inputsErrorText).toEqual(errors)
                 })
             })
 
             describe('and when length is shorter', () => {
                 it('should show a length error in the inputs', async () => {
-                    await renderPage({
-                        mockSuccessfulGetLoggedUserApi: true,
-                        waitInitialLoadingFinish: true
-                    })
+                    const errors = [
+                        replaceVariableInErrorDictionaryMessage(ErrorDictionary.string.min, '3'),
+                        replaceVariableInErrorDictionaryMessage(ErrorDictionary.string.min, '3'),
+                    ]
+
+                    await renderPage()
 
                     await testClearInputs([
                         'Nome',
@@ -286,21 +260,19 @@ describe('Profile Page', () => {
                     await testSubmitForm('Alterar informações')
 
                     const inputsErrorText = screen.getAllByRole('alertdialog').map(x => x.textContent)
-                    const inputsErrorTextData = [
-                        replaceVariableInErrorDictionaryMessage(ErrorDictionary.string.min, '3'),
-                        replaceVariableInErrorDictionaryMessage(ErrorDictionary.string.min, '3'),
-                    ]
 
-                    expect(inputsErrorText).toEqual(inputsErrorTextData)
+                    expect(inputsErrorText).toEqual(errors)
                 })
             })
 
             describe('and when length is greater', () => {
                 it('should show a length error in the inputs', async () => {
-                    await renderPage({
-                        mockSuccessfulGetLoggedUserApi: true,
-                        waitInitialLoadingFinish: true
-                    })
+                    const errors = [
+                        replaceVariableInErrorDictionaryMessage(ErrorDictionary.string.max, '40'),
+                        replaceVariableInErrorDictionaryMessage(ErrorDictionary.string.max, '80'),
+                    ]
+
+                    await renderPage()
 
                     await testClearInputs([
                         'Nome',
@@ -311,12 +283,8 @@ describe('Profile Page', () => {
                     await testSubmitForm('Alterar informações')
 
                     const inputsErrorText = screen.getAllByRole('alertdialog').map(x => x.textContent)
-                    const inputsErrorTextData = [
-                        replaceVariableInErrorDictionaryMessage(ErrorDictionary.string.max, '40'),
-                        replaceVariableInErrorDictionaryMessage(ErrorDictionary.string.max, '80'),
-                    ]
 
-                    expect(inputsErrorText).toEqual(inputsErrorTextData)
+                    expect(inputsErrorText).toEqual(errors)
                 })
             })
 
@@ -329,103 +297,75 @@ describe('Profile Page', () => {
                     ['email@.'],
                     ['email@.e'],
                 ])('should show a email error in the inputs for %p', async (emailInputValue) => {
-                    await renderPage({
-                        mockSuccessfulGetLoggedUserApi: true,
-                        waitInitialLoadingFinish: true
-                    })
+                    const errors = [
+                        ErrorDictionary.string.email,
+                    ]
+
+                    await renderPage()
 
                     await testClearInputs(['Email'])
                     await testTypeInInput('Email', emailInputValue)
                     await testSubmitForm('Alterar informações')
 
                     const inputsErrorText = screen.getAllByRole('alertdialog').map(x => x.textContent)
-                    const inputsErrorTextData = [
-                        ErrorDictionary.string.email,
-                    ]
 
-                    expect(inputsErrorText).toEqual(inputsErrorTextData)
+                    expect(inputsErrorText).toEqual(errors)
                 })
             })
         })
 
         describe('and when form is valid', () => {
             it('should call editUserDataApi request', async () => {
-                const props = await renderPage({
-                    mockSuccessfulGetLoggedUserApi: true,
-                    waitInitialLoadingFinish: true,
+                await renderPage({
                     submitValidInfoForm: true
                 })
 
                 expect(mockEditUserDataApi).toHaveBeenCalledTimes(1)
                 expect(mockEditUserDataApi).toHaveBeenCalledWith({
-                    name: props.form.name,
-                    email: props.form.email,
+                    name: USER.name,
+                    email: USER.email,
                 })
             })
 
             describe('and when editUserDataApi request succeeds', () => {
-                it('should clear the inputs of password form', async () => {
-                    await renderPage({
-                        mockSuccessfulGetLoggedUserApi: true,
-                        waitInitialLoadingFinish: true,
-                        submitValidInfoForm: true,
-                        mockSuccessfulEditUserDataApi: true
-                    })
-
-                    const passwordInput = screen.getByLabelText('Senha')
-                    const newPasswordInput = screen.getByLabelText('Nova senha')
-                    const confirmNewPasswordInput = screen.getByLabelText('Confirme sua nova senha')
-
-                    expect(passwordInput).not.toHaveValue()
-                    expect(newPasswordInput).not.toHaveValue()
-                    expect(confirmNewPasswordInput).not.toHaveValue()
-                })
-
                 it('should call setTokenStorage function', async () => {
-                    const props = await renderPage({
-                        mockSuccessfulGetLoggedUserApi: true,
-                        waitInitialLoadingFinish: true,
+                    await renderPage({
                         submitValidInfoForm: true,
-                        mockSuccessfulEditUserDataApi: true
                     })
 
                     expect(mockSetTokenStorage).toHaveBeenCalledTimes(1)
-                    expect(mockSetTokenStorage).toHaveBeenCalledWith(props.result.token)
+                    expect(mockSetTokenStorage).toHaveBeenCalledWith(TOKEN)
                 })
 
                 it('should open success modal', async () => {
+                    const texts = [
+                        'Os dados da sua conta foram alterados com sucesso.'
+                    ]
+
                     await renderPage({
-                        mockSuccessfulGetLoggedUserApi: true,
-                        waitInitialLoadingFinish: true,
                         submitValidInfoForm: true,
-                        mockSuccessfulEditUserDataApi: true
                     })
 
                     const modal = screen.getByRole('dialog')
                     const modalTitle = within(modal).getByRole('heading', { name: 'Dados alterados' })
-                    const modalMessagesText = within(modal).getAllByRole('alertdialog').map(x => x.textContent)
-                    const modalMessagesTextData = [
-                        'Os dados da sua conta foram alterados com sucesso.'
-                    ]
+                    const modalMessageTexts = within(modal).getAllByRole('alertdialog').map(x => x.textContent)
                     const modalButton = within(modal).getByRole('button', { name: 'Entendi' })
 
                     expect(modalTitle).toBeInTheDocument()
-                    expect(modalMessagesText).toEqual(modalMessagesTextData)
+                    expect(modalMessageTexts).toEqual(texts)
                     expect(modalButton).toBeInTheDocument()
                 })
             })
 
             describe('and when editUserDataApi request fails', () => {
                 it('should show a warning with the error', async () => {
-                    const props = await renderPage({
-                        mockSuccessfulGetLoggedUserApi: true,
-                        waitInitialLoadingFinish: true,
+                    await renderPage({
                         submitValidInfoForm: true,
                         mockFailEditUserDataApi: true
                     })
 
                     const warning = screen.getByRole('alert')
-                    const warningMessage = screen.getByText(props.errorMessage)
+                    const warningMessage = screen.getByText(ERROR_MESSAGE)
 
                     expect(warning).toBeInTheDocument()
                     expect(warningMessage).toBeInTheDocument()
@@ -438,7 +378,7 @@ describe('Profile Page', () => {
         describe('and when invalid inputs value', () => {
             it('should show a invalid value warning', async () => {
                 await renderPage({
-                    mockSuccessfulGetLoggedUserApi: true
+                    skipInitialLoading: true
                 })
 
                 await testSubmitForm('Alterar senha')
@@ -452,27 +392,33 @@ describe('Profile Page', () => {
 
             describe('and when no value', () => {
                 it('should show a required error in the inputs', async () => {
-                    await renderPage({
-                        mockSuccessfulGetLoggedUserApi: true
-                    })
-
-                    await testSubmitForm('Alterar senha')
-
-                    const inputsErrorText = screen.getAllByRole('alertdialog').map(x => x.textContent)
-                    const inputsErrorTextData = [
+                    const errors = [
                         ErrorDictionary.mixed.required,
                         ErrorDictionary.mixed.required,
                         ErrorDictionary.mixed.required,
                     ]
 
-                    expect(inputsErrorText).toEqual(inputsErrorTextData)
+                    await renderPage({
+                        skipInitialLoading: true
+                    })
+
+                    await testSubmitForm('Alterar senha')
+
+                    const inputsErrorText = screen.getAllByRole('alertdialog').map(x => x.textContent)
+
+                    expect(inputsErrorText).toEqual(errors)
                 })
             })
 
             describe('and when length is shorter', () => {
                 it('should show a length error in the inputs', async () => {
+                    const errors = [
+                        replaceVariableInErrorDictionaryMessage(ErrorDictionary.string.min, '6'),
+                        replaceVariableInErrorDictionaryMessage(ErrorDictionary.string.min, '6'),
+                    ]
+
                     await renderPage({
-                        mockSuccessfulGetLoggedUserApi: true
+                        skipInitialLoading: true
                     })
 
                     await testTypeInInput('Senha', 'p')
@@ -481,19 +427,20 @@ describe('Profile Page', () => {
                     await testSubmitForm('Alterar senha')
 
                     const inputsErrorText = screen.getAllByRole('alertdialog').map(x => x.textContent)
-                    const inputsErrorTextData = [
-                        replaceVariableInErrorDictionaryMessage(ErrorDictionary.string.min, '6'),
-                        replaceVariableInErrorDictionaryMessage(ErrorDictionary.string.min, '6'),
-                    ]
 
-                    expect(inputsErrorText).toEqual(inputsErrorTextData)
+                    expect(inputsErrorText).toEqual(errors)
                 })
             })
 
             describe('and when length is greater', () => {
                 it('should show a length error in the inputs', async () => {
+                    const errors = [
+                        replaceVariableInErrorDictionaryMessage(ErrorDictionary.string.max, '24'),
+                        replaceVariableInErrorDictionaryMessage(ErrorDictionary.string.max, '24'),
+                    ]
+
                     await renderPage({
-                        mockSuccessfulGetLoggedUserApi: true
+                        skipInitialLoading: true
                     })
 
                     await testTypeInInput('Senha', 'passwordpasswordpassword1')
@@ -502,12 +449,8 @@ describe('Profile Page', () => {
                     await testSubmitForm('Alterar senha')
 
                     const inputsErrorText = screen.getAllByRole('alertdialog').map(x => x.textContent)
-                    const inputsErrorTextData = [
-                        replaceVariableInErrorDictionaryMessage(ErrorDictionary.string.max, '24'),
-                        replaceVariableInErrorDictionaryMessage(ErrorDictionary.string.max, '24'),
-                    ]
 
-                    expect(inputsErrorText).toEqual(inputsErrorTextData)
+                    expect(inputsErrorText).toEqual(errors)
                 })
             })
 
@@ -520,8 +463,13 @@ describe('Profile Page', () => {
                     [' password', 'password'],
                     ['pass word', 'password'],
                 ])('should show a comparison error in the passwords input for %p', async (confirmPassword, password) => {
+                    const errors = [
+                        ErrorDictionary.mixed.required,
+                        'As senhas precisam ser iguais.',
+                    ]
+
                     await renderPage({
-                        mockSuccessfulGetLoggedUserApi: true
+                        skipInitialLoading: true
                     })
 
                     await testTypeInInput('Nova senha', password)
@@ -529,62 +477,73 @@ describe('Profile Page', () => {
                     await testSubmitForm('Alterar senha')
 
                     const inputsErrorText = screen.getAllByRole('alertdialog').map(x => x.textContent)
-                    const inputsErrorTextData = [
-                        ErrorDictionary.mixed.required,
-                        'As senhas precisam ser iguais.',
-                    ]
 
-                    expect(inputsErrorText).toEqual(inputsErrorTextData)
+                    expect(inputsErrorText).toEqual(errors)
                 })
             })
         })
 
         describe('and when form is valid', () => {
             it('should call editUserPasswordApi request', async () => {
-                const props = await renderPage({
-                    mockSuccessfulGetLoggedUserApi: true,
+                await renderPage({
+                    skipInitialLoading: true,
                     submitValidPasswordForm: true
                 })
 
                 expect(mockEditUserPasswordApi).toHaveBeenCalledTimes(1)
                 expect(mockEditUserPasswordApi).toHaveBeenCalledWith({
-                    password: props.form.password,
-                    newPassword: props.form.newPassword,
+                    password: PASSWORD,
+                    newPassword: NEW_PASSWORD,
                 })
             })
 
             describe('and when editUserPasswordApi request succeeds', () => {
-                it('should open success modal', async () => {
+                it('should clear the inputs of password form', async () => {
                     await renderPage({
-                        mockSuccessfulGetLoggedUserApi: true,
+                        skipInitialLoading: true,
                         submitValidPasswordForm: true,
-                        mockSuccessfulEditUserPasswordApi: true
+                    })
+
+                    const passwordInput = screen.getByLabelText('Senha')
+                    const newPasswordInput = screen.getByLabelText('Nova senha')
+                    const confirmNewPasswordInput = screen.getByLabelText('Confirme sua nova senha')
+
+                    expect(passwordInput).not.toHaveValue()
+                    expect(newPasswordInput).not.toHaveValue()
+                    expect(confirmNewPasswordInput).not.toHaveValue()
+                })
+
+                it('should open success modal', async () => {
+                    const texts = [
+                        'Os dados da sua conta foram alterados com sucesso.'
+                    ]
+
+                    await renderPage({
+                        skipInitialLoading: true,
+                        submitValidPasswordForm: true,
                     })
 
                     const modal = screen.getByRole('dialog')
                     const modalTitle = within(modal).getByRole('heading', { name: 'Dados alterados' })
-                    const modalMessagesText = within(modal).getAllByRole('alertdialog').map(x => x.textContent)
-                    const modalMessagesTextData = [
-                        'Os dados da sua conta foram alterados com sucesso.'
-                    ]
+                    const modalMessageTexts = within(modal).getAllByRole('alertdialog').map(x => x.textContent)
                     const modalButton = within(modal).getByRole('button', { name: 'Entendi' })
 
                     expect(modalTitle).toBeInTheDocument()
-                    expect(modalMessagesText).toEqual(modalMessagesTextData)
+                    expect(modalMessageTexts).toEqual(texts)
                     expect(modalButton).toBeInTheDocument()
                 })
             })
 
             describe('and when editUserPasswordApi request fails', () => {
                 it('should show a warning with the error', async () => {
-                    const props = await renderPage({
-                        mockSuccessfulGetLoggedUserApi: true,
+                    await renderPage({
+                        skipInitialLoading: true,
                         submitValidPasswordForm: true,
                         mockFailEditUserPasswordApi: true
                     })
 
                     const warning = screen.getByRole('alert')
-                    const warningMessage = screen.getByText(props.errorMessage)
+                    const warningMessage = screen.getByText(ERROR_MESSAGE)
 
                     expect(warning).toBeInTheDocument()
                     expect(warningMessage).toBeInTheDocument()
@@ -597,10 +556,7 @@ describe('Profile Page', () => {
         describe('and when click in modal button', () => {
             it('should close the modal', async () => {
                 await renderPage({
-                    mockSuccessfulGetLoggedUserApi: true,
-                    waitInitialLoadingFinish: true,
                     submitValidInfoForm: true,
-                    mockSuccessfulEditUserDataApi: true
                 })
 
                 const modalOn = screen.getByRole('dialog')
@@ -616,10 +572,7 @@ describe('Profile Page', () => {
         describe('and when click to close the modal', () => {
             it('should close the modal', async () => {
                 await renderPage({
-                    mockSuccessfulGetLoggedUserApi: true,
-                    waitInitialLoadingFinish: true,
                     submitValidInfoForm: true,
-                    mockSuccessfulEditUserDataApi: true
                 })
 
                 const modalOn = screen.getByRole('dialog')
