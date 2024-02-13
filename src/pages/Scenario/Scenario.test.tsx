@@ -72,6 +72,8 @@ const renderPage = async (options?: {
     }
 }
 
+// TODO: test when nest step is finished
+
 describe('Scenario Page', () => {
     it('should render a preload scenario page', async () => {
         await renderPage()

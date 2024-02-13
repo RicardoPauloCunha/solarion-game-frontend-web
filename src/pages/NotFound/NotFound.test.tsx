@@ -8,7 +8,7 @@ const renderPage = () => {
 }
 
 describe('NotFound Page', () => {
-    it('should render the not found page', () => {
+    it('should render the not found age', () => {
         renderPage()
 
         const image = screen.getByAltText("Reação da Raeliana ao receber a informação (The Reason Why Raeliana Ended Up at the Duke's Mansion).")

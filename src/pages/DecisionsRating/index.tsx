@@ -28,7 +28,7 @@ const DecisionsRating = () => {
     const [warning, setWarning] = useState<WarningData | undefined>(undefined)
     const [scenario, setScenario] = useState<ScenarioData | undefined>(undefined)
     const [ratingType, setRatingType] = useState(RatingTypeEnum.None)
-    const [ratingTypeValue, setRatingTypeValue] = useState('FFF')
+    const [ratingTypeValue, setRatingTypeValue] = useState('')
 
     useEffect(() => {
         getLastScenario()
@@ -48,8 +48,10 @@ const DecisionsRating = () => {
     }
 
     const saveScore = async () => {
-        if (!loggedUser)
+        if (!loggedUser) {
             navigate(DefaultRoutePathEnum.Login)
+            return
+        }
 
         if (!scenario)
             return

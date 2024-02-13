@@ -62,7 +62,7 @@ const renderPage = async (options?: {
 // TODO: Test warning reset
 // TODO: Test error message reset
 
-describe('Login page', () => {
+describe('Login Page', () => {
     it('should render the login page', async () => {
         await renderPage()
 
