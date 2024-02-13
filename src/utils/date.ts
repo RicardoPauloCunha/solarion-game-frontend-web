@@ -35,3 +35,11 @@ export const formatDateToString = (value: string) => {
         .reverse()
         .join('/')
 }
+
+export const formatCurrentDateToISO = (addDay: number = 0) => {
+    let date = new Date()
+
+    date.setDate(date.getDate() + addDay)
+
+    return date.toISOString().split('T')[0]
+}

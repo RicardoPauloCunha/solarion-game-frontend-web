@@ -269,12 +269,12 @@ describe('MyScores Page', () => {
             skipInitialLoading: true
         })
 
-        const saveCardTitle = screen.queryByRole('heading', { name: 'Pontuação da última aventura' })
-        const warning = screen.queryByRole('alert')
         const title = screen.getByRole('heading', { name: 'Minhas pontuações' })
         const loadingText = screen.getByText('Carregando lista de pontuações...')
         const scoreCards = screen.queryAllByLabelText('Cartão da pontuação')
         const getMoreLink = screen.queryByRole('link', { name: 'Exibir mais' })
+        const saveCardTitle = screen.queryByRole('heading', { name: 'Pontuação da última aventura' })
+        const warning = screen.queryByRole('alert')
         const modal = screen.queryByRole('dialog')
 
         expect(saveCardTitle).toBeNull()
