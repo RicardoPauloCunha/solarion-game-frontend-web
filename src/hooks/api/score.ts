@@ -81,7 +81,7 @@ export interface GetScoreIndicatorsParams {
     endDate?: Date | null
 }
 
-export const GetScoreIndicatorsApi = async (params: GetScoreIndicatorsParams): Promise<ScoreIndicatorsViewModel> => {
+export const getScoreIndicatorsApi = async (params: GetScoreIndicatorsParams): Promise<ScoreIndicatorsViewModel> => {
     let { data } = await getParams<GetScoreIndicatorsParams, ScoreIndicatorsViewModel>(root + 'all/indicators', params)
     return data
 }

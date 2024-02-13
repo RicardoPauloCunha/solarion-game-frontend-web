@@ -41,7 +41,7 @@ describe('Modal Comp', () => {
         expect(content).toBeNull()
     })
 
-    describe('when click in icon to close', () => {
+    describe('when click on icon to close', () => {
         it('should call onClose function', async () => {
             renderComponent({
                 isOpen: true

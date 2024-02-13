@@ -240,7 +240,7 @@ const renderPage = async (options?: {
 }
 
 describe('Scores Page', () => {
-    it('should render my scores page', async () => {
+    it('should render scores page', async () => {
         await renderPage({
             skipInitialLoading: true
         })

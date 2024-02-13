@@ -83,7 +83,7 @@ describe('Login page', () => {
         expect(signupLink).toBeInTheDocument()
     })
 
-    describe('when click in the bottom link', () => {
+    describe('when click on the bottom link', () => {
         it.each([
             [DefaultRoutePathEnum.RecoverPassword, 'Esqueci minha senha'],
             [DefaultRoutePathEnum.RegisterAccount, 'Registrar-se'],

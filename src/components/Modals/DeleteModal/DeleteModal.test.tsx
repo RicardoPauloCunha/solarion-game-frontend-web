@@ -56,7 +56,7 @@ describe('SuccessModal Comp', () => {
         expect(removeButton).toBeInTheDocument()
     })
 
-    describe('when click in modal button', () => {
+    describe('when click on modal button', () => {
         it('should call onConfirm function', async () => {
             renderComponent()
 

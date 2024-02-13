@@ -92,7 +92,7 @@ describe('RegisterAccount Page', () => {
         expect(modal).toBeNull()
     })
 
-    describe('when click in the bottom link', () => {
+    describe('when click on the bottom link', () => {
         it('should call navigate function to login page', async () => {
             await renderPage()
 
@@ -297,7 +297,7 @@ describe('RegisterAccount Page', () => {
     })
 
     describe('when success modal is open', () => {
-        describe('and when click in modal button', () => {
+        describe('and when click on modal button', () => {
             it('should call navigate function to my scores page', async () => {
                 await renderPage({
                     submitValidAccountForm: true,

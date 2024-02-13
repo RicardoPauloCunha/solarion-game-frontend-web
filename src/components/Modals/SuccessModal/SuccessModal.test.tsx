@@ -30,7 +30,7 @@ describe('SuccessModal Comp', () => {
         expect(confirmButton).toBeInTheDocument()
     })
 
-    describe('when click in modal button', () => {
+    describe('when click on modal button', () => {
         it('should call onClose function', async () => {
             renderComponent()
 

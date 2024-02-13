@@ -19,7 +19,7 @@ jest.mock('react-router', () => ({
     useNavigate: () => mockNavigate
 }))
 
-const generateScenario = (options?: {
+const generateLastScenario = (options?: {
     hasNoDecisions?: boolean
 }): ScenarioData => {
     return {
@@ -29,14 +29,14 @@ const generateScenario = (options?: {
     }
 }
 
-const SCENARIO = generateScenario()
+const LAST_SCENARIO = generateLastScenario()
 
 const renderPage = async (options?: {
-    scenario?: ScenarioData,
+    lastScenario?: ScenarioData,
     openContinuePlayingModal?: boolean,
 }) => {
-    if (options?.scenario)
-        mockGetScenarioStorage.mockReturnValue(options?.scenario)
+    if (options?.lastScenario)
+        mockGetScenarioStorage.mockReturnValue(options?.lastScenario)
 
     render(<Home />, { wrapper: BrowserRouter })
 
@@ -69,7 +69,7 @@ describe('Home Page', () => {
         expect(modal).toBeNull()
     })
 
-    describe('when click in new game button', () => {
+    describe('when click on new game button', () => {
         it('should call removeScenarioStorage function', async () => {
             await renderPage()
 
@@ -90,7 +90,7 @@ describe('Home Page', () => {
         })
     })
 
-    describe('when click in continue button', () => {
+    describe('when click on continue button', () => {
         it('should open the modal', async () => {
             await renderPage({
                 openContinuePlayingModal: true
@@ -119,7 +119,7 @@ describe('Home Page', () => {
                 expect(newAdventureButton).toBeInTheDocument()
             })
 
-            describe('and when click in new adventure button', () => {
+            describe('and when click on new adventure button', () => {
                 it('should call removeScenarioStorage function', async () => {
                     await renderPage({
                         openContinuePlayingModal: true
@@ -150,15 +150,15 @@ describe('Home Page', () => {
         describe('and when have last scenario', () => {
             it('should show the last scenario', async () => {
                 await renderPage({
-                    scenario: SCENARIO,
+                    lastScenario: LAST_SCENARIO,
                     openContinuePlayingModal: true,
                 })
 
                 const modal = screen.getByRole('dialog')
                 const text = within(modal).getByText('O progresso da sua última aventura foi salvo.')
-                const hero = within(modal).getByText(getHeroTypeEnumValue(getHeroTypeByDecision(SCENARIO.decisions[0])))
-                const date = within(modal).getByText(formatDateToView(SCENARIO.creationDate))
-                const decisionsPreview = within(modal).getByText(`\u2022 ${getDecisionTypeEnumValue(SCENARIO.decisions[0])}..`)
+                const hero = within(modal).getByText(getHeroTypeEnumValue(getHeroTypeByDecision(LAST_SCENARIO.decisions[0])))
+                const date = within(modal).getByText(formatDateToView(LAST_SCENARIO.creationDate))
+                const decisionsPreview = within(modal).getByText(`\u2022 ${getDecisionTypeEnumValue(LAST_SCENARIO.decisions[0])}..`)
                 const continueButton = within(modal).getByRole('button', { name: 'Continuar' })
                 const removeButton = within(modal).getByRole('button', { name: 'Remover' })
 
@@ -172,11 +172,11 @@ describe('Home Page', () => {
 
             describe('and when no decisions', () => {
                 it('should not show the decisions field', async () => {
-                    const scenario = generateScenario({ hasNoDecisions: true })
+                    const lastScenario = generateLastScenario({ hasNoDecisions: true })
 
                     await renderPage({
                         openContinuePlayingModal: true,
-                        scenario,
+                        lastScenario,
                     })
 
                     const modal = screen.getByRole('dialog')
@@ -188,10 +188,10 @@ describe('Home Page', () => {
                 })
             })
 
-            describe('and when click in continue button', () => {
+            describe('and when click on continue button', () => {
                 it('should call navigate function to scenario page', async () => {
                     await renderPage({
-                        scenario: SCENARIO,
+                        lastScenario: LAST_SCENARIO,
                         openContinuePlayingModal: true,
                     })
 
@@ -204,10 +204,10 @@ describe('Home Page', () => {
                 })
             })
 
-            describe('and when click in remove button', () => {
+            describe('and when click on remove button', () => {
                 it('should empty the modal', async () => {
                     await renderPage({
-                        scenario: SCENARIO,
+                        lastScenario: LAST_SCENARIO,
                         openContinuePlayingModal: true,
                     })
 
@@ -230,7 +230,7 @@ describe('Home Page', () => {
 
                 it('should call removeScenarioStorage function', async () => {
                     await renderPage({
-                        scenario: SCENARIO,
+                        lastScenario: LAST_SCENARIO,
                         openContinuePlayingModal: true,
                     })
 

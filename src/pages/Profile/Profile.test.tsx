@@ -553,7 +553,7 @@ describe('Profile Page', () => {
     })
 
     describe('when success modal is open', () => {
-        describe('and when click in modal button', () => {
+        describe('and when click on modal button', () => {
             it('should close the modal', async () => {
                 await renderPage({
                     submitValidInfoForm: true,

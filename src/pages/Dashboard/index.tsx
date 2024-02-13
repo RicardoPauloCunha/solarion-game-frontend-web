@@ -15,7 +15,7 @@ import PageContainer from "../../components/PageContainer"
 import Toggle from "../../components/Toggle"
 import { getSchemaError } from "../../config/validator/methods"
 import { endDateSchema, startDateSchema } from "../../config/validator/schemas"
-import { GetScoreIndicatorsApi, GetScoreIndicatorsParams, ScoreIndicatorsViewModel } from "../../hooks/api/score"
+import { GetScoreIndicatorsParams, ScoreIndicatorsViewModel, getScoreIndicatorsApi } from "../../hooks/api/score"
 import { LastMonthsTypeEnum, listLastMonthsTypeOptions } from "../../types/enums/lastMonthsType"
 
 interface DashboardFilterFormData {
@@ -64,7 +64,7 @@ const Dashboard = () => {
         if (filter.lastMonths === LastMonthsTypeEnum.Custom && !hasDateInput)
             filter.lastMonths = undefined
 
-        await GetScoreIndicatorsApi(filter).then(response => {
+        await getScoreIndicatorsApi(filter).then(response => {
             let hasValue = response.adventuresChart?.totalValue !== 0
 
             setScoreIndicators(response)

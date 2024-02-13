@@ -138,7 +138,7 @@ const generateScores = (options?: {
     }))
 }
 
-const generateScenario = (options?: {
+const generateLastScenario = (options?: {
     finished?: boolean
 }): ScenarioData => {
     return options?.finished
@@ -156,13 +156,13 @@ const generateScenario = (options?: {
 const SCORES = generateScores()
 const MORE_SCORES = generateScores({ getMore1: true })
 const NEW_SCORE = generateScores({ newScore: true })[0]
-const FINISHED_SCENARIO = generateScenario({ finished: true })
+const LAST_SCENARIO_FINISHED = generateLastScenario({ finished: true })
 const ERROR_MESSAGE = 'Error message.'
 
 const renderPage = async (options?: {
     scores?: ScoreViewModel[],
     moreScores?: ScoreViewModel[],
-    scenario?: ScenarioData,
+    lastScenario?: ScenarioData,
     mockFailListMyScoresApi?: boolean,
     skipInitialLoading?: boolean,
     getMoreScoreCards?: boolean,
@@ -170,9 +170,9 @@ const renderPage = async (options?: {
     openDeleteModalToScoreCardIndex?: number,
     confirmScoreDeletion?: boolean,
     mockFailDeleteScoreApi?: boolean,
-    openDeleteModalToScenario?: boolean,
-    confirmScenarioDeletion?: boolean,
-    saveScenario?: boolean
+    openDeleteModalToLastScenario?: boolean,
+    confirmLastScenarioDeletion?: boolean,
+    saveLastScenario?: boolean
     mockFailCreateScoreApi?: boolean,
 }) => {
     defineValidatorErrorDictionary()
@@ -209,8 +209,8 @@ const renderPage = async (options?: {
         })
     }
 
-    if (options?.scenario)
-        mockGetScenarioStorage.mockReturnValue(options?.scenario)
+    if (options?.lastScenario)
+        mockGetScenarioStorage.mockReturnValue(options?.lastScenario)
 
     waitFor(() => {
         render(<MyScores />, { wrapper: BrowserRouter })
@@ -236,24 +236,24 @@ const renderPage = async (options?: {
         await userEvent.click(removeScoreIcon)
     }
 
-    if (options?.saveScenario || options?.openDeleteModalToScenario) {
+    if (options?.saveLastScenario || options?.openDeleteModalToLastScenario) {
         const saveCard = screen.getAllByLabelText('Cartão da pontuação')[0]
         const saveCardTitle = within(saveCard).getByRole('heading', { name: 'Pontuação da última aventura' })
 
         expect(saveCardTitle).toBeInTheDocument()
 
-        if (options?.saveScenario) {
+        if (options?.saveLastScenario) {
             const saveButton = within(saveCard).getByRole('button', { name: 'Salvar' })
             await userEvent.click(saveButton)
         }
 
-        if (options?.openDeleteModalToScenario) {
+        if (options?.openDeleteModalToLastScenario) {
             const removeScoreIcon = within(saveCard).getByRole('deletion')
             await userEvent.click(removeScoreIcon)
         }
     }
 
-    if (options?.confirmScoreDeletion || options?.confirmScenarioDeletion) {
+    if (options?.confirmScoreDeletion || options?.confirmLastScenarioDeletion) {
         const modal = screen.getByRole('dialog')
         const button = within(modal).getByRole('button', { name: 'Remover' })
         await userEvent.click(button)
@@ -531,7 +531,7 @@ describe('MyScores Page', () => {
             expect(valueTexts).toEqual(texts)
         })
 
-        describe('and when click in the main button', () => {
+        describe('and when click on the main button', () => {
             it('should call deleteScoreApi request', async () => {
                 const scoreCardIndex = 0
 
@@ -618,10 +618,10 @@ describe('MyScores Page', () => {
     describe('when have last scenario', () => {
         describe('and when not finished', () => {
             it('should not render the save card', async () => {
-                const scenarioNotFinished = generateScenario({ finished: false })
+                const lastScenario = generateLastScenario()
 
                 await renderPage({
-                    scenario: scenarioNotFinished,
+                    lastScenario,
                 })
 
                 const saveCard = screen.getAllByLabelText('Cartão da pontuação')[0]
@@ -634,7 +634,7 @@ describe('MyScores Page', () => {
         describe('and when finished', () => {
             it('should render the save card', async () => {
                 await renderPage({
-                    scenario: FINISHED_SCENARIO,
+                    lastScenario: LAST_SCENARIO_FINISHED,
                 })
 
                 const saveCard = screen.getAllByLabelText('Cartão da pontuação')[0]
@@ -648,8 +648,8 @@ describe('MyScores Page', () => {
             describe('and when click to remove', () => {
                 it('should open the delete modal', async () => {
                     await renderPage({
-                        scenario: FINISHED_SCENARIO,
-                        openDeleteModalToScenario: true
+                        lastScenario: LAST_SCENARIO_FINISHED,
+                        openDeleteModalToLastScenario: true
                     })
 
                     const modal = screen.getByRole('dialog')
@@ -660,9 +660,9 @@ describe('MyScores Page', () => {
 
             describe('and when delete modal is open', () => {
                 it('should render the main values of the save card', async () => {
-                    const ratingType = getRatingTypeEnumValue(getRatingTypeByDecisions(FINISHED_SCENARIO.decisions))
-                    const heroType = getHeroTypeEnumValue(getHeroTypeByDecision(FINISHED_SCENARIO.decisions[0]))
-                    const creationDate = formatDateToView(FINISHED_SCENARIO.creationDate)
+                    const ratingType = getRatingTypeEnumValue(getRatingTypeByDecisions(LAST_SCENARIO_FINISHED.decisions))
+                    const heroType = getHeroTypeEnumValue(getHeroTypeByDecision(LAST_SCENARIO_FINISHED.decisions[0]))
+                    const creationDate = formatDateToView(LAST_SCENARIO_FINISHED.creationDate)
 
                     const texts = ([
                         ratingType,
@@ -671,8 +671,8 @@ describe('MyScores Page', () => {
                     ]).map(x => `\u2022 ${x}`)
 
                     await renderPage({
-                        scenario: FINISHED_SCENARIO,
-                        openDeleteModalToScenario: true
+                        lastScenario: LAST_SCENARIO_FINISHED,
+                        openDeleteModalToLastScenario: true
                     })
 
                     const modal = screen.getByRole('dialog')
@@ -681,12 +681,12 @@ describe('MyScores Page', () => {
                     expect(valueTexts).toEqual(texts)
                 })
 
-                describe('and when click in the main button', () => {
+                describe('and when click on the main button', () => {
                     it('should call removeScenarioStorage function', async () => {
                         await renderPage({
-                            scenario: FINISHED_SCENARIO,
-                            openDeleteModalToScenario: true,
-                            confirmScenarioDeletion: true
+                            lastScenario: LAST_SCENARIO_FINISHED,
+                            openDeleteModalToLastScenario: true,
+                            confirmLastScenarioDeletion: true
                         })
 
                         expect(mockRemoveScenarioStorage).toHaveBeenCalledTimes(1)
@@ -694,9 +694,9 @@ describe('MyScores Page', () => {
 
                     it('should hide the save card', async () => {
                         await renderPage({
-                            scenario: FINISHED_SCENARIO,
-                            openDeleteModalToScenario: true,
-                            confirmScenarioDeletion: true
+                            lastScenario: LAST_SCENARIO_FINISHED,
+                            openDeleteModalToLastScenario: true,
+                            confirmLastScenarioDeletion: true
                         })
 
                         const saveCard = screen.getAllByLabelText('Cartão da pontuação')[0]
@@ -707,9 +707,9 @@ describe('MyScores Page', () => {
 
                     it('should close the modal', async () => {
                         await renderPage({
-                            scenario: FINISHED_SCENARIO,
-                            openDeleteModalToScenario: true,
-                            confirmScenarioDeletion: true
+                            lastScenario: LAST_SCENARIO_FINISHED,
+                            openDeleteModalToLastScenario: true,
+                            confirmLastScenarioDeletion: true
                         })
 
                         const modal = screen.queryByRole('dialog')
@@ -722,26 +722,26 @@ describe('MyScores Page', () => {
             describe('and when click to save', () => {
                 it('should call createScoreApi request', async () => {
                     await renderPage({
-                        scenario: FINISHED_SCENARIO,
-                        saveScenario: true,
+                        lastScenario: LAST_SCENARIO_FINISHED,
+                        saveLastScenario: true,
                     })
 
-                    const ratingType = getRatingTypeByDecisions(FINISHED_SCENARIO.decisions)
-                    const heroType = getHeroTypeByDecision(FINISHED_SCENARIO.decisions[0])
+                    const ratingType = getRatingTypeByDecisions(LAST_SCENARIO_FINISHED.decisions)
+                    const heroType = getHeroTypeByDecision(LAST_SCENARIO_FINISHED.decisions[0])
 
                     expect(mockCreateScoreApi).toHaveBeenCalledTimes(1)
                     expect(mockCreateScoreApi).toHaveBeenCalledWith({
                         ratingType,
                         heroType,
-                        decisionTypes: FINISHED_SCENARIO.decisions
+                        decisionTypes: LAST_SCENARIO_FINISHED.decisions
                     })
                 })
 
                 describe('and when createScoreApi request succeeds', () => {
                     it('should call removeScenarioStorage function', async () => {
                         await renderPage({
-                            scenario: FINISHED_SCENARIO,
-                            saveScenario: true,
+                            lastScenario: LAST_SCENARIO_FINISHED,
+                            saveLastScenario: true,
                         })
 
                         expect(mockRemoveScenarioStorage).toHaveBeenCalledTimes(1)
@@ -749,8 +749,8 @@ describe('MyScores Page', () => {
 
                     it('should hide the save card', async () => {
                         await renderPage({
-                            scenario: FINISHED_SCENARIO,
-                            saveScenario: true,
+                            lastScenario: LAST_SCENARIO_FINISHED,
+                            saveLastScenario: true,
                         })
 
                         const saveCard = screen.getAllByLabelText('Cartão da pontuação')[0]
@@ -761,8 +761,8 @@ describe('MyScores Page', () => {
 
                     it(`should render a list with 11 score cards`, async () => {
                         await renderPage({
-                            scenario: FINISHED_SCENARIO,
-                            saveScenario: true,
+                            lastScenario: LAST_SCENARIO_FINISHED,
+                            saveLastScenario: true,
                         })
 
                         await waitFor(() => {
@@ -776,8 +776,8 @@ describe('MyScores Page', () => {
                 describe('and when createScoreApi request fails', () => {
                     it('should show a warning with the error', async () => {
                         await renderPage({
-                            scenario: FINISHED_SCENARIO,
-                            saveScenario: true,
+                            lastScenario: LAST_SCENARIO_FINISHED,
+                            saveLastScenario: true,
                             mockFailCreateScoreApi: true
                         })
 
