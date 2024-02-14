@@ -22,7 +22,7 @@ const renderComponent = (options?: {
     </Toggle>)
 }
 
-describe('Toggle', () => {
+describe('Toggle Comp', () => {
     it('should render a closed toggle', () => {
         renderComponent()
 

@@ -23,8 +23,10 @@ const PASSWORD = 'password'
 const ERROR_MESSAGE = 'Error message.'
 
 const renderPage = async (options?: {
+    submitEmptySolicitForm?: boolean,
     submitValidSolicitForm?: boolean,
     mockFailSolicitPasswordRecoveryApi?: boolean,
+    submitEmptyRecoveryForm?: boolean
     submitValidRecoveryForm?: boolean
     mockFailReplyPasswordRecoveryApi?: boolean,
 }) => {
@@ -54,10 +56,16 @@ const renderPage = async (options?: {
 
     render(<RecoverPassword />, { wrapper: BrowserRouter })
 
+    if (options?.submitEmptySolicitForm)
+        await testSubmitForm('Avançar')
+
     if (options?.submitValidSolicitForm) {
         await testTypeInInput('Email', EMAIL)
         await testSubmitForm('Avançar')
     }
+
+    if (options?.submitEmptyRecoveryForm)
+        await testSubmitForm('Alterar senha')
 
     if (options?.submitValidRecoveryForm) {
         await testTypeInInput('Código de verificação', VERIFICATION_CODE)
@@ -169,9 +177,9 @@ describe('RecoverPassword Page', () => {
 
                     await testSubmitForm('Avançar')
 
-                    const inputsErrorText = screen.getAllByRole('alertdialog').map(x => x.textContent)
+                    const inputErrorTexts = screen.getAllByRole('alertdialog').map(x => x.textContent)
 
-                    expect(inputsErrorText).toEqual(errors)
+                    expect(inputErrorTexts).toEqual(errors)
                 })
             })
 
@@ -186,9 +194,9 @@ describe('RecoverPassword Page', () => {
                     await testTypeInInput('Email', 'e')
                     await testSubmitForm('Avançar')
 
-                    const inputsErrorText = screen.getAllByRole('alertdialog').map(x => x.textContent)
+                    const inputErrorTexts = screen.getAllByRole('alertdialog').map(x => x.textContent)
 
-                    expect(inputsErrorText).toEqual(errors)
+                    expect(inputErrorTexts).toEqual(errors)
                 })
             })
 
@@ -203,9 +211,9 @@ describe('RecoverPassword Page', () => {
                     await testTypeInInput('Email', 'emailemailemailemailemailemailemailemailemailemailemailemailemailemailemailemail1')
                     await testSubmitForm('Avançar')
 
-                    const inputsErrorText = screen.getAllByRole('alertdialog').map(x => x.textContent)
+                    const inputErrorTexts = screen.getAllByRole('alertdialog').map(x => x.textContent)
 
-                    expect(inputsErrorText).toEqual(errors)
+                    expect(inputErrorTexts).toEqual(errors)
                 })
             })
 
@@ -227,9 +235,33 @@ describe('RecoverPassword Page', () => {
                     await testTypeInInput('Email', emailInputValue)
                     await testSubmitForm('Avançar')
 
-                    const inputsErrorText = screen.getAllByRole('alertdialog').map(x => x.textContent)
+                    const inputErrorTexts = screen.getAllByRole('alertdialog').map(x => x.textContent)
 
-                    expect(inputsErrorText).toEqual(errors)
+                    expect(inputErrorTexts).toEqual(errors)
+                })
+            })
+
+            describe('and when submit again a valid form', () => {
+                it('should hide the warning', async () => {
+                    await renderPage({
+                        submitEmptySolicitForm: true,
+                        submitValidSolicitForm: true
+                    })
+
+                    const warning = screen.queryByRole('alert')
+
+                    expect(warning).toBeNull()
+                })
+
+                it('should hide the input errors', async () => {
+                    await renderPage({
+                        submitEmptySolicitForm: true,
+                        submitValidSolicitForm: true
+                    })
+
+                    const inputErrors = screen.queryAllByRole('alertdialog')
+
+                    expect(inputErrors).toHaveLength(0)
                 })
             })
         })
@@ -325,9 +357,9 @@ describe('RecoverPassword Page', () => {
 
                     await testSubmitForm('Alterar senha')
 
-                    const inputsErrorText = screen.getAllByRole('alertdialog').map(x => x.textContent)
+                    const inputErrorTexts = screen.getAllByRole('alertdialog').map(x => x.textContent)
 
-                    expect(inputsErrorText).toEqual(errors)
+                    expect(inputErrorTexts).toEqual(errors)
                 })
             })
 
@@ -347,9 +379,9 @@ describe('RecoverPassword Page', () => {
                     await testTypeInInput('Confirme sua nova senha', 'p')
                     await testSubmitForm('Alterar senha')
 
-                    const inputsErrorText = screen.getAllByRole('alertdialog').map(x => x.textContent)
+                    const inputErrorTexts = screen.getAllByRole('alertdialog').map(x => x.textContent)
 
-                    expect(inputsErrorText).toEqual(errors)
+                    expect(inputErrorTexts).toEqual(errors)
                 })
             })
 
@@ -369,9 +401,9 @@ describe('RecoverPassword Page', () => {
                     await testTypeInInput('Confirme sua nova senha', 'passwordpasswordpassword1')
                     await testSubmitForm('Alterar senha')
 
-                    const inputsErrorText = screen.getAllByRole('alertdialog').map(x => x.textContent)
+                    const inputErrorTexts = screen.getAllByRole('alertdialog').map(x => x.textContent)
 
-                    expect(inputsErrorText).toEqual(errors)
+                    expect(inputErrorTexts).toEqual(errors)
                 })
             })
 
@@ -397,9 +429,35 @@ describe('RecoverPassword Page', () => {
                     await testTypeInInput('Confirme sua nova senha', confirmPassword)
                     await testSubmitForm('Alterar senha')
 
-                    const inputsErrorText = screen.getAllByRole('alertdialog').map(x => x.textContent)
+                    const inputErrorTexts = screen.getAllByRole('alertdialog').map(x => x.textContent)
 
-                    expect(inputsErrorText).toEqual(errors)
+                    expect(inputErrorTexts).toEqual(errors)
+                })
+            })
+
+            describe('and when submit again a valid form', () => {
+                it('should hide the warning', async () => {
+                    await renderPage({
+                        submitValidSolicitForm: true,
+                        submitEmptyRecoveryForm: true,
+                        submitValidRecoveryForm: true,
+                    })
+
+                    const warning = screen.queryByRole('alert')
+
+                    expect(warning).toBeNull()
+                })
+
+                it('should hide the input errors', async () => {
+                    await renderPage({
+                        submitValidSolicitForm: true,
+                        submitEmptyRecoveryForm: true,
+                        submitValidRecoveryForm: true,
+                    })
+
+                    const inputErrors = screen.queryAllByRole('alertdialog')
+
+                    expect(inputErrors).toHaveLength(0)
                 })
             })
         })
@@ -433,7 +491,7 @@ describe('RecoverPassword Page', () => {
 
                     const modal = screen.getByRole('dialog')
                     const modalTitle = within(modal).getByRole('heading', { name: 'Senha alterada' })
-                    const modalMessageTexts = within(modal).getAllByRole('alertdialog').map(x => x.textContent)
+                    const modalMessageTexts = within(modal).getAllByRole('paragraph').map(x => x.textContent)
                     const modalButton = within(modal).getByRole('button', { name: 'Entendi' })
 
                     expect(modalTitle).toBeInTheDocument()

@@ -28,6 +28,7 @@ const TOKEN = 'jwt-token'
 const ERROR_MESSAGE = 'Error message.'
 
 const renderPage = async (options?: {
+    submitEmptyAccountForm?: boolean,
     submitValidAccountForm?: boolean,
     mockFailCreateCommonUserApi?: boolean,
 }) => {
@@ -57,6 +58,9 @@ const renderPage = async (options?: {
     >
         <RegisterAccount />
     </AuthContext.Provider>, { wrapper: BrowserRouter })
+
+    if (options?.submitEmptyAccountForm)
+        await testSubmitForm('Criar conta')
 
     if (options?.submitValidAccountForm) {
         await testTypeInInput('Nome', NAME)
@@ -131,9 +135,9 @@ describe('RegisterAccount Page', () => {
 
                     await testSubmitForm('Criar conta')
 
-                    const inputsErrorText = screen.getAllByRole('alertdialog').map(x => x.textContent)
+                    const inputErrorTexts = screen.getAllByRole('alertdialog').map(x => x.textContent)
 
-                    expect(inputsErrorText).toEqual(errors)
+                    expect(inputErrorTexts).toEqual(errors)
                 })
             })
 
@@ -153,9 +157,9 @@ describe('RegisterAccount Page', () => {
                     await testTypeInInput('Confirme sua senha', 'p')
                     await testSubmitForm('Criar conta')
 
-                    const inputsErrorText = screen.getAllByRole('alertdialog').map(x => x.textContent)
+                    const inputErrorTexts = screen.getAllByRole('alertdialog').map(x => x.textContent)
 
-                    expect(inputsErrorText).toEqual(errors)
+                    expect(inputErrorTexts).toEqual(errors)
                 })
             })
 
@@ -175,9 +179,9 @@ describe('RegisterAccount Page', () => {
                     await testTypeInInput('Confirme sua senha', 'passwordpasswordpassword1')
                     await testSubmitForm('Criar conta')
 
-                    const inputsErrorText = screen.getAllByRole('alertdialog').map(x => x.textContent)
+                    const inputErrorTexts = screen.getAllByRole('alertdialog').map(x => x.textContent)
 
-                    expect(inputsErrorText).toEqual(errors)
+                    expect(inputErrorTexts).toEqual(errors)
                 })
             })
 
@@ -202,9 +206,9 @@ describe('RegisterAccount Page', () => {
                     await testTypeInInput('Email', emailInputValue)
                     await testSubmitForm('Criar conta')
 
-                    const inputsErrorText = screen.getAllByRole('alertdialog').map(x => x.textContent)
+                    const inputErrorTexts = screen.getAllByRole('alertdialog').map(x => x.textContent)
 
-                    expect(inputsErrorText).toEqual(errors)
+                    expect(inputErrorTexts).toEqual(errors)
                 })
 
                 it.each([
@@ -227,9 +231,33 @@ describe('RegisterAccount Page', () => {
                     await testTypeInInput('Confirme sua senha', confirmPassword)
                     await testSubmitForm('Criar conta')
 
-                    const inputsErrorText = screen.getAllByRole('alertdialog').map(x => x.textContent)
+                    const inputErrorTexts = screen.getAllByRole('alertdialog').map(x => x.textContent)
 
-                    expect(inputsErrorText).toEqual(errors)
+                    expect(inputErrorTexts).toEqual(errors)
+                })
+            })
+
+            describe('and when submit again a valid form', () => {
+                it('should hide the warning', async () => {
+                    await renderPage({
+                        submitEmptyAccountForm: true,
+                        submitValidAccountForm: true
+                    })
+
+                    const warning = screen.queryByRole('alert')
+
+                    expect(warning).toBeNull()
+                })
+
+                it('should hide the input errors', async () => {
+                    await renderPage({
+                        submitEmptyAccountForm: true,
+                        submitValidAccountForm: true
+                    })
+
+                    const inputErrors = screen.queryAllByRole('alertdialog')
+
+                    expect(inputErrors).toHaveLength(0)
                 })
             })
         })
@@ -270,7 +298,7 @@ describe('RegisterAccount Page', () => {
 
                     const modal = screen.getByRole('dialog')
                     const modalTitle = within(modal).getByRole('heading', { name: 'Conta criada' })
-                    const modalMessageTexts = within(modal).getAllByRole('alertdialog').map(x => x.textContent)
+                    const modalMessageTexts = within(modal).getAllByRole('paragraph').map(x => x.textContent)
                     const modalButton = within(modal).getByRole('button', { name: 'Entendi' })
 
                     expect(modalTitle).toBeInTheDocument()

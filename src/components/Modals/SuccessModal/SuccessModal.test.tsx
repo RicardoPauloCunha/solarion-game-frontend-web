@@ -23,7 +23,7 @@ describe('SuccessModal Comp', () => {
     it('should render a modal', () => {
         renderComponent()
 
-        const messageTexts = screen.getAllByRole('alertdialog').map(x => x.textContent)
+        const messageTexts = screen.getAllByRole('paragraph').map(x => x.textContent)
         const confirmButton = screen.getByRole('button', { name: 'Entendi' })
 
         expect(messageTexts).toEqual(MESSAGES)

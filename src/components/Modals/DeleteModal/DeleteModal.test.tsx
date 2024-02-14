@@ -39,13 +39,13 @@ const renderComponent = (options?: {
     />)
 }
 
-describe('SuccessModal Comp', () => {
+describe('DeleteModal Comp', () => {
     it('should render a modal', () => {
         const texts = VALUES.map(x => `\u2022 ${x}`)
 
         renderComponent()
 
-        const messageTexts = screen.getAllByRole('alertdialog').map(x => x.textContent)
+        const messageTexts = screen.getAllByRole('paragraph').map(x => x.textContent)
         const valueTexts = screen.getAllByRole('listitem').map(x => x.textContent)
         const warning = screen.queryByRole('alert')
         const removeButton = screen.getByRole('button', { name: 'Remover' })

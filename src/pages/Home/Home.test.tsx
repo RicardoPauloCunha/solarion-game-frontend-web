@@ -20,16 +20,23 @@ jest.mock('react-router', () => ({
 }))
 
 const generateLastScenario = (options?: {
-    hasNoDecisions?: boolean
+    hasNoDecisions?: boolean,
+    finished?: boolean
 }): ScenarioData => {
-    return {
-        scenarioType: ScenarioTypeEnum.CH2_ACT1,
-        decisions: options?.hasNoDecisions ? [] : [DecisionTypeEnum.CH1_ACT2_DEC_Warrior],
-        creationDate: new Date()
-    }
+    return options?.finished
+        ? {
+            scenarioType: ScenarioTypeEnum.Finished,
+            decisions: [2, 5, 11, 16],
+            creationDate: new Date()
+        } : {
+            scenarioType: ScenarioTypeEnum.CH2_ACT1,
+            decisions: options?.hasNoDecisions ? [] : [DecisionTypeEnum.CH1_ACT2_DEC_Warrior],
+            creationDate: new Date()
+        }
 }
 
 const LAST_SCENARIO = generateLastScenario()
+const LAST_SCENARIO_FINISHED = generateLastScenario({ finished: true })
 
 const renderPage = async (options?: {
     lastScenario?: ScenarioData,
@@ -45,8 +52,6 @@ const renderPage = async (options?: {
         await userEvent.click(continuePlayingButton)
     }
 }
-
-// TODO: Test with scenario finished
 
 describe('Home Page', () => {
     it('should render the home page', async () => {
@@ -148,97 +153,144 @@ describe('Home Page', () => {
         })
 
         describe('and when have last scenario', () => {
-            it('should show the last scenario', async () => {
-                await renderPage({
-                    lastScenario: LAST_SCENARIO,
-                    openContinuePlayingModal: true,
-                })
-
-                const modal = screen.getByRole('dialog')
-                const text = within(modal).getByText('O progresso da sua última aventura foi salvo.')
-                const hero = within(modal).getByText(getHeroTypeEnumValue(getHeroTypeByDecision(LAST_SCENARIO.decisions[0])))
-                const date = within(modal).getByText(formatDateToView(LAST_SCENARIO.creationDate))
-                const decisionsPreview = within(modal).getByText(`\u2022 ${getDecisionTypeEnumValue(LAST_SCENARIO.decisions[0])}..`)
-                const continueButton = within(modal).getByRole('button', { name: 'Continuar' })
-                const removeButton = within(modal).getByRole('button', { name: 'Remover' })
-
-                expect(text).toBeInTheDocument()
-                expect(hero).toBeInTheDocument()
-                expect(date).toBeInTheDocument()
-                expect(decisionsPreview).toBeInTheDocument()
-                expect(continueButton).toBeInTheDocument()
-                expect(removeButton).toBeInTheDocument()
-            })
-
-            describe('and when no decisions', () => {
-                it('should not show the decisions field', async () => {
-                    const lastScenario = generateLastScenario({ hasNoDecisions: true })
-
+            describe('and when finished', () => {
+                it('should render a empty warning', async () => {
                     await renderPage({
-                        openContinuePlayingModal: true,
-                        lastScenario,
+                        lastScenario: LAST_SCENARIO_FINISHED,
+                        openContinuePlayingModal: true
                     })
 
                     const modal = screen.getByRole('dialog')
-                    const field = within(modal).queryByText('Decisões:')
-                    const preview = within(modal).queryByRole('list')
+                    const text = within(modal).getByText('Nenhum registro da sua última aventura foi encontrado.')
+                    const newAdventureButton = within(modal).getByRole('button', { name: 'Nova aventura' })
 
-                    expect(field).toBeNull()
-                    expect(preview).toBeNull()
+                    expect(text).toBeInTheDocument()
+                    expect(newAdventureButton).toBeInTheDocument()
+                })
+
+                describe('and when click on new adventure button', () => {
+                    it('should call removeScenarioStorage function', async () => {
+                        await renderPage({
+                            lastScenario: LAST_SCENARIO_FINISHED,
+                            openContinuePlayingModal: true
+                        })
+
+                        const modal = screen.getByRole('dialog')
+                        const newAdventureButton = within(modal).getByRole('button', { name: 'Nova aventura' })
+                        await userEvent.click(newAdventureButton)
+
+                        expect(mockRemoveScenarioStorage).toHaveBeenCalledTimes(1)
+                    })
+
+                    it('should call navigate function to scenario page', async () => {
+                        await renderPage({
+                            lastScenario: LAST_SCENARIO_FINISHED,
+                            openContinuePlayingModal: true
+                        })
+
+                        const modal = screen.getByRole('dialog')
+                        const newAdventureButton = within(modal).getByRole('button', { name: 'Nova aventura' })
+                        await userEvent.click(newAdventureButton)
+
+                        expect(mockNavigate).toHaveBeenCalledTimes(1)
+                        expect(mockNavigate).toHaveBeenCalledWith(DefaultRoutePathEnum.Scenario)
+                    })
                 })
             })
 
-            describe('and when click on continue button', () => {
-                it('should call navigate function to scenario page', async () => {
+            describe('and when not finished', () => {
+                it('should show the last scenario', async () => {
                     await renderPage({
                         lastScenario: LAST_SCENARIO,
                         openContinuePlayingModal: true,
                     })
 
                     const modal = screen.getByRole('dialog')
+                    const text = within(modal).getByText('O progresso da sua última aventura foi salvo.')
+                    const hero = within(modal).getByText(getHeroTypeEnumValue(getHeroTypeByDecision(LAST_SCENARIO.decisions[0])))
+                    const date = within(modal).getByText(formatDateToView(LAST_SCENARIO.creationDate))
+                    const decisionsPreview = within(modal).getByText(`\u2022 ${getDecisionTypeEnumValue(LAST_SCENARIO.decisions[0])}..`)
                     const continueButton = within(modal).getByRole('button', { name: 'Continuar' })
-                    await userEvent.click(continueButton)
-
-                    expect(mockNavigate).toHaveBeenCalledTimes(1)
-                    expect(mockNavigate).toHaveBeenCalledWith(DefaultRoutePathEnum.Scenario)
-                })
-            })
-
-            describe('and when click on remove button', () => {
-                it('should empty the modal', async () => {
-                    await renderPage({
-                        lastScenario: LAST_SCENARIO,
-                        openContinuePlayingModal: true,
-                    })
-
-                    const modal = screen.getByRole('dialog')
                     const removeButton = within(modal).getByRole('button', { name: 'Remover' })
-                    await userEvent.click(removeButton)
 
-                    const textOff = within(modal).queryByText('O progresso da sua última aventura foi salvo.')
-                    const continueButtonOff = within(modal).queryByRole('button', { name: 'Continuar' })
-
-                    expect(textOff).toBeNull()
-                    expect(continueButtonOff).toBeNull()
-
-                    const textOn = within(modal).getByText('Nenhum registro da sua última aventura foi encontrado.')
-                    const newAdventureButtonOn = within(modal).getByRole('button', { name: 'Nova aventura' })
-
-                    expect(textOn).toBeInTheDocument()
-                    expect(newAdventureButtonOn).toBeInTheDocument()
+                    expect(text).toBeInTheDocument()
+                    expect(hero).toBeInTheDocument()
+                    expect(date).toBeInTheDocument()
+                    expect(decisionsPreview).toBeInTheDocument()
+                    expect(continueButton).toBeInTheDocument()
+                    expect(removeButton).toBeInTheDocument()
                 })
 
-                it('should call removeScenarioStorage function', async () => {
-                    await renderPage({
-                        lastScenario: LAST_SCENARIO,
-                        openContinuePlayingModal: true,
+                describe('and when no decisions', () => {
+                    it('should not show the decisions field', async () => {
+                        const lastScenario = generateLastScenario({ hasNoDecisions: true })
+
+                        await renderPage({
+                            openContinuePlayingModal: true,
+                            lastScenario,
+                        })
+
+                        const modal = screen.getByRole('dialog')
+                        const field = within(modal).queryByText('Decisões:')
+                        const preview = within(modal).queryByRole('list')
+
+                        expect(field).toBeNull()
+                        expect(preview).toBeNull()
+                    })
+                })
+
+                describe('and when click on continue button', () => {
+                    it('should call navigate function to scenario page', async () => {
+                        await renderPage({
+                            lastScenario: LAST_SCENARIO,
+                            openContinuePlayingModal: true,
+                        })
+
+                        const modal = screen.getByRole('dialog')
+                        const continueButton = within(modal).getByRole('button', { name: 'Continuar' })
+                        await userEvent.click(continueButton)
+
+                        expect(mockNavigate).toHaveBeenCalledTimes(1)
+                        expect(mockNavigate).toHaveBeenCalledWith(DefaultRoutePathEnum.Scenario)
+                    })
+                })
+
+                describe('and when click on remove button', () => {
+                    it('should empty the modal', async () => {
+                        await renderPage({
+                            lastScenario: LAST_SCENARIO,
+                            openContinuePlayingModal: true,
+                        })
+
+                        const modal = screen.getByRole('dialog')
+                        const removeButton = within(modal).getByRole('button', { name: 'Remover' })
+                        await userEvent.click(removeButton)
+
+                        const textOff = within(modal).queryByText('O progresso da sua última aventura foi salvo.')
+                        const continueButtonOff = within(modal).queryByRole('button', { name: 'Continuar' })
+
+                        expect(textOff).toBeNull()
+                        expect(continueButtonOff).toBeNull()
+
+                        const textOn = within(modal).getByText('Nenhum registro da sua última aventura foi encontrado.')
+                        const newAdventureButtonOn = within(modal).getByRole('button', { name: 'Nova aventura' })
+
+                        expect(textOn).toBeInTheDocument()
+                        expect(newAdventureButtonOn).toBeInTheDocument()
                     })
 
-                    const modal = screen.getByRole('dialog')
-                    const removeButton = within(modal).getByRole('button', { name: 'Remover' })
-                    await userEvent.click(removeButton)
+                    it('should call removeScenarioStorage function', async () => {
+                        await renderPage({
+                            lastScenario: LAST_SCENARIO,
+                            openContinuePlayingModal: true,
+                        })
 
-                    expect(mockRemoveScenarioStorage).toHaveBeenCalledTimes(1)
+                        const modal = screen.getByRole('dialog')
+                        const removeButton = within(modal).getByRole('button', { name: 'Remover' })
+                        await userEvent.click(removeButton)
+
+                        expect(mockRemoveScenarioStorage).toHaveBeenCalledTimes(1)
+                    })
                 })
             })
         })

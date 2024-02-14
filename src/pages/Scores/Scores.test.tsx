@@ -625,9 +625,9 @@ describe('Scores Page', () => {
 
                         await testSubmitForm('Filtrar')
 
-                        const inputsErrorText = screen.getAllByRole('alertdialog').map(x => x.textContent)
+                        const inputErrorTexts = screen.getAllByRole('alertdialog').map(x => x.textContent)
 
-                        expect(inputsErrorText).toEqual(errors)
+                        expect(inputErrorTexts).toEqual(errors)
                     })
                 })
 
@@ -646,9 +646,9 @@ describe('Scores Page', () => {
                         await testTypeInInput('Data inicial', '1899-12-31')
                         await testSubmitForm('Filtrar')
 
-                        const inputsErrorText = screen.getAllByRole('alertdialog').map(x => x.textContent)
+                        const inputErrorTexts = screen.getAllByRole('alertdialog').map(x => x.textContent)
 
-                        expect(inputsErrorText).toEqual(errors)
+                        expect(inputErrorTexts).toEqual(errors)
                     })
                 })
 
@@ -668,9 +668,9 @@ describe('Scores Page', () => {
                         await testTypeInInput('Data final', yesterday)
                         await testSubmitForm('Filtrar')
 
-                        const inputsErrorText = screen.getAllByRole('alertdialog').map(x => x.textContent)
+                        const inputErrorTexts = screen.getAllByRole('alertdialog').map(x => x.textContent)
 
-                        expect(inputsErrorText).toEqual(errors)
+                        expect(inputErrorTexts).toEqual(errors)
                     })
                 })
 
@@ -691,9 +691,37 @@ describe('Scores Page', () => {
                         await testTypeInInput('Data final', tomorrow)
                         await testSubmitForm('Filtrar')
 
-                        const inputsErrorText = screen.getAllByRole('alertdialog').map(x => x.textContent)
+                        const inputErrorTexts = screen.getAllByRole('alertdialog').map(x => x.textContent)
 
-                        expect(inputsErrorText).toEqual(errors)
+                        expect(inputErrorTexts).toEqual(errors)
+                    })
+                })
+
+                describe('and when submit again a valid form', () => {
+                    it('should hide the warning', async () => {
+                        await renderPage({
+                            openFilterForm: true,
+                            selectCustomPeriodOption: true,
+                            submitEmptyFilterForm: true,
+                            submitValidFilterForm: true
+                        })
+
+                        const warning = screen.queryByRole('alert')
+
+                        expect(warning).toBeNull()
+                    })
+
+                    it('should hide the input errors', async () => {
+                        await renderPage({
+                            openFilterForm: true,
+                            selectCustomPeriodOption: true,
+                            submitEmptyFilterForm: true,
+                            submitValidFilterForm: true
+                        })
+
+                        const inputErrors = screen.queryAllByRole('alertdialog')
+
+                        expect(inputErrors).toHaveLength(0)
                     })
                 })
             })

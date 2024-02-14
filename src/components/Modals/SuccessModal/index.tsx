@@ -28,7 +28,7 @@ const SuccessModal = ({
                 {messages.map((x, index) => (
                     <p
                         key={index}
-                        role="alertdialog"
+                        role="paragraph"
                     >{x}</p>
                 ))}
             </VerticalGroup>

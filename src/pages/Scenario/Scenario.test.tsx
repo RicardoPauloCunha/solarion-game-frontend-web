@@ -72,8 +72,6 @@ const renderPage = async (options?: {
     }
 }
 
-// TODO: test when nest step is finished
-
 describe('Scenario Page', () => {
     it('should render a preload scenario page', async () => {
         await renderPage()
@@ -208,6 +206,41 @@ describe('Scenario Page', () => {
 
                 const image = screen.getByAltText(IMAGE_ALT_TEXT)
                 expect(image).toHaveAttribute('src', nextNextScene.image)
+            })
+        })
+    })
+
+    describe('when is the last scene', () => {
+        describe('and when click on the text container', () => {
+            it('should call setScenarioStorage function', async () => {
+                const lastScenarioFinished = {
+                    ...generateLastScenario({ finished: true }),
+                    scenarioType: ScenarioTypeEnum.CH8_ROT_HEA_SUBROT1_AC2_END
+                }
+                const scene = generateScene(lastScenarioFinished.scenarioType)
+
+                await renderPage({
+                    lastScenario: lastScenarioFinished,
+                    clickInTextToNextScene: scene.text
+                })
+
+                expect(mockSetScenarioStorage).toHaveBeenCalledTimes(2)
+            })
+
+            it('should call navigate function to decisions rating page', async () => {
+                const lastScenarioFinished = {
+                    ...generateLastScenario({ finished: true }),
+                    scenarioType: ScenarioTypeEnum.CH8_ROT_HEA_SUBROT1_AC2_END
+                }
+                const scene = generateScene(lastScenarioFinished.scenarioType)
+
+                await renderPage({
+                    lastScenario: lastScenarioFinished,
+                    clickInTextToNextScene: scene.text
+                })
+
+                expect(mockNavigate).toHaveBeenCalledTimes(1)
+                expect(mockNavigate).toHaveBeenCalledWith(DefaultRoutePathEnum.DecisionsRating)
             })
         })
     })

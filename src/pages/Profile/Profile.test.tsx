@@ -40,8 +40,10 @@ const USER = generateUser()
 const renderPage = async (options?: {
     mockFailGetLoggedUserApi?: boolean,
     skipInitialLoading?: boolean,
+    submitEmptyInfoForm?: boolean,
     submitValidInfoForm?: boolean,
     mockFailEditUserDataApi?: boolean,
+    submitEmptyPasswordForm?: boolean,
     submitValidPasswordForm?: boolean,
     mockFailEditUserPasswordApi?: boolean,
 }) => {
@@ -98,8 +100,25 @@ const renderPage = async (options?: {
         })
     }
 
-    if (options?.submitValidInfoForm)
+    if (options?.submitEmptyInfoForm) {
+        await testClearInputs([
+            'Nome',
+            'Email'
+        ])
         await testSubmitForm('Alterar informações')
+    }
+
+    if (options?.submitValidInfoForm) {
+        if (options?.submitEmptyInfoForm) {
+            await testTypeInInput('Nome', 'Name')
+            await testTypeInInput('Email', 'email@mail')
+        }
+
+        await testSubmitForm('Alterar informações')
+    }
+
+    if (options?.submitEmptyPasswordForm)
+        await testSubmitForm('Alterar senha')
 
     if (options?.submitValidPasswordForm) {
         await testTypeInInput('Senha', PASSWORD)
@@ -108,8 +127,6 @@ const renderPage = async (options?: {
         await testSubmitForm('Alterar senha')
     }
 }
-
-// TODO: Test if the data get by request is typed in the inputs using 'getByDisplayValue'
 
 describe('Profile Page', () => {
     it('should render the profile page', async () => {
@@ -158,6 +175,16 @@ describe('Profile Page', () => {
 
             expect(nameInput).toBeEnabled()
             expect(emailInput).toBeEnabled()
+        })
+
+        it('should fill the name and email inputs with the response', async () => {
+            await renderPage()
+
+            const nameInput = screen.getByDisplayValue(USER.name)
+            const emailInput = screen.getByDisplayValue(USER.email)
+
+            expect(nameInput).toBeInTheDocument()
+            expect(emailInput).toBeInTheDocument()
         })
     })
 
@@ -236,9 +263,9 @@ describe('Profile Page', () => {
                     ])
                     await testSubmitForm('Alterar informações')
 
-                    const inputsErrorText = screen.getAllByRole('alertdialog').map(x => x.textContent)
+                    const inputErrorTexts = screen.getAllByRole('alertdialog').map(x => x.textContent)
 
-                    expect(inputsErrorText).toEqual(errors)
+                    expect(inputErrorTexts).toEqual(errors)
                 })
             })
 
@@ -259,9 +286,9 @@ describe('Profile Page', () => {
                     await testTypeInInput('Email', 'e')
                     await testSubmitForm('Alterar informações')
 
-                    const inputsErrorText = screen.getAllByRole('alertdialog').map(x => x.textContent)
+                    const inputErrorTexts = screen.getAllByRole('alertdialog').map(x => x.textContent)
 
-                    expect(inputsErrorText).toEqual(errors)
+                    expect(inputErrorTexts).toEqual(errors)
                 })
             })
 
@@ -282,9 +309,9 @@ describe('Profile Page', () => {
                     await testTypeInInput('Email', 'emailemailemailemailemailemailemailemailemailemailemailemailemailemailemailemail1')
                     await testSubmitForm('Alterar informações')
 
-                    const inputsErrorText = screen.getAllByRole('alertdialog').map(x => x.textContent)
+                    const inputErrorTexts = screen.getAllByRole('alertdialog').map(x => x.textContent)
 
-                    expect(inputsErrorText).toEqual(errors)
+                    expect(inputErrorTexts).toEqual(errors)
                 })
             })
 
@@ -307,9 +334,33 @@ describe('Profile Page', () => {
                     await testTypeInInput('Email', emailInputValue)
                     await testSubmitForm('Alterar informações')
 
-                    const inputsErrorText = screen.getAllByRole('alertdialog').map(x => x.textContent)
+                    const inputErrorTexts = screen.getAllByRole('alertdialog').map(x => x.textContent)
 
-                    expect(inputsErrorText).toEqual(errors)
+                    expect(inputErrorTexts).toEqual(errors)
+                })
+            })
+
+            describe('and when submit again a valid form', () => {
+                it('should hide the warning', async () => {
+                    await renderPage({
+                        submitEmptyInfoForm: true,
+                        submitValidInfoForm: true
+                    })
+
+                    const warning = screen.queryByRole('alert')
+
+                    expect(warning).toBeNull()
+                })
+
+                it('should hide the input errors', async () => {
+                    await renderPage({
+                        submitEmptyInfoForm: true,
+                        submitValidInfoForm: true
+                    })
+
+                    const inputErrors = screen.queryAllByRole('alertdialog')
+
+                    expect(inputErrors).toHaveLength(0)
                 })
             })
         })
@@ -348,7 +399,7 @@ describe('Profile Page', () => {
 
                     const modal = screen.getByRole('dialog')
                     const modalTitle = within(modal).getByRole('heading', { name: 'Dados alterados' })
-                    const modalMessageTexts = within(modal).getAllByRole('alertdialog').map(x => x.textContent)
+                    const modalMessageTexts = within(modal).getAllByRole('paragraph').map(x => x.textContent)
                     const modalButton = within(modal).getByRole('button', { name: 'Entendi' })
 
                     expect(modalTitle).toBeInTheDocument()
@@ -404,9 +455,9 @@ describe('Profile Page', () => {
 
                     await testSubmitForm('Alterar senha')
 
-                    const inputsErrorText = screen.getAllByRole('alertdialog').map(x => x.textContent)
+                    const inputErrorTexts = screen.getAllByRole('alertdialog').map(x => x.textContent)
 
-                    expect(inputsErrorText).toEqual(errors)
+                    expect(inputErrorTexts).toEqual(errors)
                 })
             })
 
@@ -426,9 +477,9 @@ describe('Profile Page', () => {
                     await testTypeInInput('Confirme sua nova senha', 'p')
                     await testSubmitForm('Alterar senha')
 
-                    const inputsErrorText = screen.getAllByRole('alertdialog').map(x => x.textContent)
+                    const inputErrorTexts = screen.getAllByRole('alertdialog').map(x => x.textContent)
 
-                    expect(inputsErrorText).toEqual(errors)
+                    expect(inputErrorTexts).toEqual(errors)
                 })
             })
 
@@ -448,9 +499,9 @@ describe('Profile Page', () => {
                     await testTypeInInput('Confirme sua nova senha', 'passwordpasswordpassword1')
                     await testSubmitForm('Alterar senha')
 
-                    const inputsErrorText = screen.getAllByRole('alertdialog').map(x => x.textContent)
+                    const inputErrorTexts = screen.getAllByRole('alertdialog').map(x => x.textContent)
 
-                    expect(inputsErrorText).toEqual(errors)
+                    expect(inputErrorTexts).toEqual(errors)
                 })
             })
 
@@ -476,9 +527,35 @@ describe('Profile Page', () => {
                     await testTypeInInput('Confirme sua nova senha', confirmPassword)
                     await testSubmitForm('Alterar senha')
 
-                    const inputsErrorText = screen.getAllByRole('alertdialog').map(x => x.textContent)
+                    const inputErrorTexts = screen.getAllByRole('alertdialog').map(x => x.textContent)
 
-                    expect(inputsErrorText).toEqual(errors)
+                    expect(inputErrorTexts).toEqual(errors)
+                })
+            })
+
+            describe('and when submit again a valid form', () => {
+                it('should hide the warning', async () => {
+                    await renderPage({
+                        skipInitialLoading: true,
+                        submitEmptyPasswordForm: true,
+                        submitValidPasswordForm: true,
+                    })
+
+                    const warning = screen.queryByRole('alert')
+
+                    expect(warning).toBeNull()
+                })
+
+                it('should hide the input errors', async () => {
+                    await renderPage({
+                        skipInitialLoading: true,
+                        submitEmptyPasswordForm: true,
+                        submitValidPasswordForm: true,
+                    })
+
+                    const inputErrors = screen.queryAllByRole('alertdialog')
+
+                    expect(inputErrors).toHaveLength(0)
                 })
             })
         })
@@ -525,7 +602,7 @@ describe('Profile Page', () => {
 
                     const modal = screen.getByRole('dialog')
                     const modalTitle = within(modal).getByRole('heading', { name: 'Dados alterados' })
-                    const modalMessageTexts = within(modal).getAllByRole('alertdialog').map(x => x.textContent)
+                    const modalMessageTexts = within(modal).getAllByRole('paragraph').map(x => x.textContent)
                     const modalButton = within(modal).getByRole('button', { name: 'Entendi' })
 
                     expect(modalTitle).toBeInTheDocument()

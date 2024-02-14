@@ -496,7 +496,7 @@ describe('MyScores Page', () => {
             const modal = screen.getByRole('dialog')
             const modalTitle = within(modal).getByRole('heading', { name: 'Remover pontuação' })
             const messageGroup = within(modal).getByRole('group')
-            const messageTexts = within(modal).getAllByRole('alertdialog').map(x => x.textContent)
+            const messageTexts = within(modal).getAllByRole('paragraph').map(x => x.textContent)
             const valueList = within(modal).getByRole('list')
             const button = within(modal).getByRole('button', { name: 'Remover' })
 

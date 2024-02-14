@@ -5,7 +5,7 @@ import Login from "."
 import { createAxiosError } from "../../config/axios/error"
 import { ErrorDictionary, defineValidatorErrorDictionary, replaceVariableInErrorDictionaryMessage } from "../../config/validator/dictionary"
 import * as userApiFile from "../../hooks/api/user"
-import { AuthContext, AuthContextData } from "../../hooks/contexts/auth"
+import { AuthContext, AuthContextData, LoggedUserData } from "../../hooks/contexts/auth"
 import * as tokenStorageFile from "../../hooks/storage/token"
 import { DefaultRoutePathEnum } from "../../types/enums/routePath"
 import { UserTypeEnum } from "../../types/enums/userType"
@@ -27,7 +27,9 @@ const TOKEN = 'jwt-token'
 const ERROR_MESSAGE = 'Error message.'
 
 const renderPage = async (options?: {
+    loggedUser?: LoggedUserData,
     submitValidLoginForm?: boolean,
+    submitEmptyLoginForm?: boolean,
     mockFailLoginApi?: boolean,
 }) => {
     defineValidatorErrorDictionary()
@@ -43,6 +45,12 @@ const renderPage = async (options?: {
         })
     }
 
+    mockDefineLoggedUserByToken.mockReturnValue(options?.loggedUser ? options.loggedUser : {
+        userId: 1,
+        name: 'Name',
+        userType: UserTypeEnum.Common
+    })
+
     render(<AuthContext.Provider
         value={{
             defineLoggedUserByToken: mockDefineLoggedUserByToken
@@ -50,6 +58,10 @@ const renderPage = async (options?: {
     >
         <Login />
     </AuthContext.Provider>, { wrapper: BrowserRouter })
+
+    if (options?.submitEmptyLoginForm) {
+        await testSubmitForm('Entrar')
+    }
 
     if (options?.submitValidLoginForm) {
         await testTypeInInput('Email', EMAIL)
@@ -59,8 +71,6 @@ const renderPage = async (options?: {
 }
 
 // TODO: Test loading message in button when submit form
-// TODO: Test warning reset
-// TODO: Test error message reset
 
 describe('Login Page', () => {
     it('should render the login page', async () => {
@@ -123,9 +133,9 @@ describe('Login Page', () => {
 
                     await testSubmitForm('Entrar')
 
-                    const inputsErrorText = screen.getAllByRole('alertdialog').map(x => x.textContent)
+                    const inputErrorTexts = screen.getAllByRole('alertdialog').map(x => x.textContent)
 
-                    expect(inputsErrorText).toEqual(errors)
+                    expect(inputErrorTexts).toEqual(errors)
                 })
             })
 
@@ -142,9 +152,9 @@ describe('Login Page', () => {
                     await testTypeInInput('Senha', 'p')
                     await testSubmitForm('Entrar')
 
-                    const inputsErrorText = screen.getAllByRole('alertdialog').map(x => x.textContent)
+                    const inputErrorTexts = screen.getAllByRole('alertdialog').map(x => x.textContent)
 
-                    expect(inputsErrorText).toEqual(errors)
+                    expect(inputErrorTexts).toEqual(errors)
                 })
             })
 
@@ -161,9 +171,9 @@ describe('Login Page', () => {
                     await testTypeInInput('Senha', 'passwordpasswordpassword1')
                     await testSubmitForm('Entrar')
 
-                    const inputsErrorText = screen.getAllByRole('alertdialog').map(x => x.textContent)
+                    const inputErrorTexts = screen.getAllByRole('alertdialog').map(x => x.textContent)
 
-                    expect(inputsErrorText).toEqual(errors)
+                    expect(inputErrorTexts).toEqual(errors)
                 })
             })
 
@@ -186,9 +196,33 @@ describe('Login Page', () => {
                     await testTypeInInput('Email', emailInputValue)
                     await testSubmitForm('Entrar')
 
-                    const inputsErrorText = screen.getAllByRole('alertdialog').map(x => x.textContent)
+                    const inputErrorTexts = screen.getAllByRole('alertdialog').map(x => x.textContent)
 
-                    expect(inputsErrorText).toEqual(errors)
+                    expect(inputErrorTexts).toEqual(errors)
+                })
+            })
+
+            describe('and when submit again a valid form', () => {
+                it('should hide the warning', async () => {
+                    await renderPage({
+                        submitEmptyLoginForm: true,
+                        submitValidLoginForm: true
+                    })
+
+                    const warning = screen.queryByRole('alert')
+
+                    expect(warning).toBeNull()
+                })
+
+                it('should hide the input errors', async () => {
+                    await renderPage({
+                        submitEmptyLoginForm: true,
+                        submitValidLoginForm: true
+                    })
+
+                    const inputErrors = screen.queryAllByRole('alertdialog')
+
+                    expect(inputErrors).toHaveLength(0)
                 })
             })
         })
@@ -220,13 +254,14 @@ describe('Login Page', () => {
                     [DefaultRoutePathEnum.Scores, UserTypeEnum.Admin],
                     [DefaultRoutePathEnum.MyScores, UserTypeEnum.Common],
                 ])('should call navigate function to %p', async (linkPath, userType) => {
-                    mockDefineLoggedUserByToken.mockReturnValue({
+                    const loggedUser = {
                         userId: 1,
                         name: 'Name',
                         userType
-                    })
+                    }
 
                     await renderPage({
+                        loggedUser,
                         submitValidLoginForm: true,
                     })
 

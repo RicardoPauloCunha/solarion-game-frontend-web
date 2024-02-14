@@ -92,8 +92,6 @@ const renderPage = async (options?: {
     }
 }
 
-// TODO: Test when is admin
-
 describe('DecisionsRating Page', () => {
     describe('when no last scenario', () => {
         it('should not render the content', async () => {
@@ -187,6 +185,16 @@ describe('DecisionsRating Page', () => {
 
                         expect(mockCreateScoreApi).not.toHaveBeenCalled()
                     })
+
+                    it('should not call removeScenarioStorage function', async () => {
+                        await renderPage({
+                            loggedUser: undefined,
+                            lastScenario: LAST_SCENARIO_FINISHED,
+                            saveLastScenario: true,
+                        })
+
+                        expect(mockRemoveScenarioStorage).not.toHaveBeenCalled()
+                    })
                 })
 
                 describe('and when logged user', () => {
@@ -234,7 +242,7 @@ describe('DecisionsRating Page', () => {
 
                             const modal = screen.getByRole('dialog')
                             const modalTitle = within(modal).getByRole('heading', { name: 'Pontuação salva' })
-                            const modalMessageTexts = within(modal).getAllByRole('alertdialog').map(x => x.textContent)
+                            const modalMessageTexts = within(modal).getAllByRole('paragraph').map(x => x.textContent)
                             const modalButton = within(modal).getByRole('button', { name: 'Entendi' })
 
                             expect(modal).toBeInTheDocument()
